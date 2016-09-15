@@ -1,0 +1,10 @@
+[
+    {
+        "merged": "/home/adrian/android-ndk/android4-ccnlite/app/build/intermediates/res/merged/debug/drawable/ccn_lite_logo_712x184.jpg",
+        "source": "/home/adrian/android-ndk/android4-ccnlite/app/src/main/res/drawable/ccn_lite_logo_712x184.jpg"
+    },
+    {
+        "merged": "/home/adrian/android-ndk/android4-ccnlite/app/build/intermediates/res/merged/debug/drawable/icon.png",
+        "source": "/home/adrian/android-ndk/android4-ccnlite/app/src/main/res/drawable/icon.png"
+    }
+]

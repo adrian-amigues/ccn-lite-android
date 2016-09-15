@@ -1,0 +1,30 @@
+*** Configuring for Linux ***
+*** No Linux Kernel ***
+rm -rf *~ *.o  ccn-lite-simu ccn-lite-relay ccn-lite-minimalrelay ccn-lite-lnxkernel ccn-lite-simu ccn-nfn-relay ccn-lite-relay-nack ccn-nfn-relay-nack
+rm -rf .ccn-lite-lnxkernel* *.ko *.mod.c *.mod.o .tmp_versions modules.order Module.symvers
+rm -rf ccn-lite-omnet.tgz
+rm -rf ../bin
+make -C util clean
+make[1]: Entering directory `/home/adrian/ccn-lite/src/util'
+rm -rf *~ ccn-lite-ccnb2xml ccn-lite-cryptoserver ccn-lite-ctrl ccn-lite-fetch ccn-lite-mkC ccn-lite-mkI ccn-lite-mkF ccn-lite-peek ccn-lite-pktdump ccn-lite-produce ccn-lite-rpc ccn-lite-simplenfn ccn-lite-valid
+rm -rf ../../bin
+make[1]: Leaving directory `/home/adrian/ccn-lite/src/util'
+cc -o ccn-lite-simu -Wall -Werror -std=c99 -g -pedantic -O0 -D_XOPEN_SOURCE=500 -D_XOPEN_SOURCE_EXTENDED -Dlinux ccn-lite-simu.c -lcrypto -lrt
+cc -o ccn-lite-relay -Wall -Werror -std=c99 -g -pedantic -O0 -D_XOPEN_SOURCE=500 -D_XOPEN_SOURCE_EXTENDED -Dlinux ccn-lite-relay.c -lcrypto -lrt
+cc -o ccn-lite-minimalrelay -Wall -Werror -std=c99 -g -pedantic -O0 -D_XOPEN_SOURCE=500 -D_XOPEN_SOURCE_EXTENDED -Dlinux ccn-lite-minimalrelay.c
+make -C util
+make[1]: Entering directory `/home/adrian/ccn-lite/src/util'
+cc -Wall -g -DUSE_UTIL -Wno-error=deprecated-declarations -std=c99 -Werror ccn-lite-ccnb2xml.c -o ccn-lite-ccnb2xml -lcrypto
+cc -Wall -g -DUSE_UTIL -Wno-error=deprecated-declarations -std=c99 -Werror ccn-lite-cryptoserver.c -o ccn-lite-cryptoserver -lcrypto
+cc -Wall -g -DUSE_UTIL -Wno-error=deprecated-declarations -std=c99 -Werror ccn-lite-ctrl.c -o ccn-lite-ctrl -lcrypto
+cc -Wall -g -DUSE_UTIL -Wno-error=deprecated-declarations -std=c99 -Werror ccn-lite-fetch.c -o ccn-lite-fetch
+cc -Wall -g -DUSE_UTIL -Wno-error=deprecated-declarations -std=c99 -Werror ccn-lite-mkC.c -o ccn-lite-mkC -lcrypto
+cc -Wall -g -DUSE_UTIL -Wno-error=deprecated-declarations -std=c99 -Werror ccn-lite-mkI.c -o ccn-lite-mkI
+cc -Wall -g -DUSE_UTIL -Wno-error=deprecated-declarations -std=c99 -Werror ccn-lite-mkF.c -o ccn-lite-mkF
+cc -Wall -g -DUSE_UTIL -Wno-error=deprecated-declarations -std=c99 -Werror ccn-lite-peek.c -o ccn-lite-peek
+cc -Wall -g -DUSE_UTIL -Wno-error=deprecated-declarations -std=c99 -Werror ccn-lite-pktdump.c -o ccn-lite-pktdump
+cc -Wall -g -DUSE_UTIL -Wno-error=deprecated-declarations -std=c99 -Werror ccn-lite-produce.c -o ccn-lite-produce -lcrypto
+cc -Wall -g -DUSE_UTIL -Wno-error=deprecated-declarations -std=c99 -Werror ccn-lite-rpc.c -o ccn-lite-rpc
+cc -Wall -g -DUSE_UTIL -Wno-error=deprecated-declarations -std=c99 -Werror ccn-lite-simplenfn.c -o ccn-lite-simplenfn
+cc -Wall -g -DUSE_UTIL -Wno-error=deprecated-declarations -std=c99 -Werror ccn-lite-valid.c -o ccn-lite-valid
+make[1]: Leaving directory `/home/adrian/ccn-lite/src/util'
