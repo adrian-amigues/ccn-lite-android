@@ -705,7 +705,8 @@ ccnl_android_init()
     DEBUGMSG(INFO, "  compile time: %s %s\n", __DATE__, __TIME__);
     DEBUGMSG(INFO, "  compile options: %s\n", compile_string);
 
-    ccnl_relay_config(&theRelay, 8080, NULL, 0, NULL);
+    // ccnl_relay_config(&theRelay, 8080, NULL, 0, NULL);
+    ccnl_relay_config(&theRelay, 9999, NULL, 0, NULL);
 
     theLooper = ALooper_forThread();
 

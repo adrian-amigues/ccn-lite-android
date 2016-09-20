@@ -29,55 +29,50 @@ char* ccnl_android_peek(char* suite, char* addr, int port, char* uri) {
     static ccnl_isContentFunc isContent;
     struct ccnl_prefix_s *prefix;
     unsigned int chunknum = UINT_MAX;
-    int len, socksize, rc;
+    int len, socksize, rc, packettype;
     int sock = 0;
     time_t curtime;
     uint32_t nonce = (uint32_t) difftime(curtime, 0);
     char *path;
     struct sockaddr sa;
     float wait = 3.0;
-    int packettype = CCNL_SUITE_CCNTLV; // default value = CCNx 1.0 protocol
 
-    // Initializing time
     time(&curtime);
 
     DEBUGMSG(TRACE, "using udp address %s/%d\n", addr, port);
     sprintf(response, " using udp address %s/%d\n", addr, port);
 
+    // Getting the suite integer value
     packettype = ccnl_str2suite(suite);
     isContent = ccnl_suite2isContentFunc(packettype);
     if (!isContent) {
         exit(-1);
     }
 
+    // Transforming prefix if needed
     strcpy(uri_static, uri);
     prefix = ccnl_URItoPrefix(uri_static, packettype, NULL, NULL);
     if (!prefix) {
         DEBUGMSG(ERROR, "no URI found, aborting\n");
         return -1;
     }
+    sprintf(response, "%s prefix <%s> became %s\n", response, uri, ccnl_prefix_to_path(prefix));
 
-    len = ccntlv_mkInterest(prefix,
-                                (int*)&nonce,
-                                out, sizeof(out));
 
-    if (len <= 0) {
-        DEBUGMSG(ERROR, "internal error: empty packet\n");
-        return NULL;
-    }
-
-    sprintf(response, "%s uri = %s\n", response, uri);
-    sprintf(response, "%s ccnl prefix to path = %s\n", response, ccnl_prefix_to_path(prefix));
+    // Make the interest
+    len = ccntlv_mkInterest(prefix, &nonce, out, sizeof(out));
     sprintf(response, "%s interest has %d bytes\n", response, len);
 
+    // Initialize network functionalities
     struct sockaddr_in *si = (struct sockaddr_in*) &sa;
     si->sin_family = PF_INET;
     si->sin_addr.s_addr = inet_addr(addr);
     si->sin_port = htons(port);
-    sock = udp_open_by_max();
+    sock = udp_open();
     // sock = udp_open_by_max();
     socksize = sizeof(struct sockaddr_in);
 
+    // Sending Interest
     sprintf(response, "%s sendto: sock=%d, len out=%d, out=%s\n", response, sock, strlen(out), out);
     rc = sendto(sock, out, len, 0, (struct sockaddr*)&sa, socksize);
     if (rc < 0) {
@@ -124,6 +119,7 @@ char* ccnl_android_peek(char* suite, char* addr, int port, char* uri) {
             int len3;
             DEBUGMSG(DEBUG, "  fragment, %d bytes\n", len2);
             sprintf(response, "%s fragment, %d bytes\n", response, len2);
+            return response;
             switch(suite) {
             case CCNL_SUITE_CCNTLV: {
                 struct ccnx_tlvhdr_ccnx2015_s *hp;
@@ -200,6 +196,7 @@ char* ccnl_android_peek(char* suite, char* addr, int port, char* uri) {
                 continue;
             len = outlen;
         }
+
 #endif
 
 /*
@@ -212,6 +209,7 @@ char* ccnl_android_peek(char* suite, char* addr, int port, char* uri) {
         rc = isContent(out, len);
         if (rc < 0) {
             DEBUGMSG(ERROR, "error when checking type of packet\n");
+            sprintf(response, "%s error when checking type of packet\n", response);
             goto done;
         }
         if (rc == 0) { // it's an interest, ignore it
@@ -219,7 +217,7 @@ char* ccnl_android_peek(char* suite, char* addr, int port, char* uri) {
             continue;
         }
         write(1, out, len);
-        myexit(0);
+        // myexit(0);
     }
 
 
@@ -227,8 +225,7 @@ char* ccnl_android_peek(char* suite, char* addr, int port, char* uri) {
     return response;
 done:
     close(sock);
-    myexit(-1);
-    return NULL; // avoid a compiler warning
+    return response; // avoid a compiler warning
 }
 
 // Max's functions

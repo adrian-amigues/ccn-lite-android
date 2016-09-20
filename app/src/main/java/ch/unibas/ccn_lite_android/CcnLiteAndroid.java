@@ -86,9 +86,6 @@ public class CcnLiteAndroid extends Activity
         }
         adapter.notifyDataSetChanged();
 
-        String test = androidPeek();
-        adapter.add(test);
-
         hello = relayInit();
         ccnLiteContext = this;
     }
@@ -139,7 +136,10 @@ public class CcnLiteAndroid extends Activity
             });
 
         mHandler = new Handler();
-        scanLeDevice(true);
+//        scanLeDevice(true);
+
+        String test = androidPeek();
+        adapter.add(test);
     }
 
     public void appendToLog(String line) {
