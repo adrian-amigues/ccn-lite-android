@@ -756,7 +756,7 @@ ccnl_android_init()
     sprintf(hello, "ccn-lite-android, %s",
             ctime(&theRelay.startup_time) + 4);
 
-    return "etst";
+    return hello;
 }
 
 
@@ -807,8 +807,8 @@ ccnl_android_getTransport()
     return NULL;
 }
 
-int testTest() {
-    return "test";
+char* testTest() {
+    return "suite: ccn-lite-android";
 }
 
 // eof
