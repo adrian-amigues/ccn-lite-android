@@ -1,0 +1,9 @@
+.gradle
+.idea
+build
+gradle
+gradlew
+gradlew.bat
+app/build
+app/src/main/obj
+app/src/main/libs
