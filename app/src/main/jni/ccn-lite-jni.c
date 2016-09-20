@@ -6,6 +6,7 @@
 int jni_bleSend(unsigned char *data, int len);
 
 #include "../../ccn-lite-android.c"
+#include "../../ccn-lite-android-peek.c"
 
 static JavaVM *jvm;
 static jclass ccnLiteClass;
@@ -32,7 +33,6 @@ Java_ch_unibas_ccn_1lite_1android_CcnLiteAndroid_relayInit(JNIEnv* env,
 
     hello = ccnl_android_init();
     return (*env)->NewStringUTF(env, hello);
-    // return "ccn-lite-jni.c sublime";
 }
 
 JNIEXPORT jstring JNICALL
@@ -40,6 +40,16 @@ Java_ch_unibas_ccn_1lite_1android_CcnLiteAndroid_relayGetTransport(JNIEnv* env,
                                                                    jobject thiz)
 {
     return (*env)->NewStringUTF(env, ccnl_android_getTransport());
+}
+
+JNIEXPORT jstring JNICALL
+Java_ch_unibas_ccn_1lite_1android_CcnLiteAndroid_androidPeek(JNIEnv* env,
+                                                                jobject thiz)
+{
+    // char *test;
+    // test = testAndroidPeek();
+    // return (*env)->NewStringUTF(env, test);
+    return (*env)->NewStringUTF(env, ccnl_android_peek("ccnx2015", "130.238.15.221", 9999, "/ccn/test/mycontent"));
 }
 
 char*

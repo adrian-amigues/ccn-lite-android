@@ -78,13 +78,16 @@ public class CcnLiteAndroid extends Activity
 
             adapter.add("sys: BLE is supported");
             if (BTadapter == null || !BTadapter.isEnabled()) {
-                Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                Intent enableBtIntent = new Intent (BluetoothAdapter.ACTION_REQUEST_ENABLE);
                 adapter.add("sys: BLE not yet enabled");
                 //                startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
                 startActivityForResult(enableBtIntent, 1);
             }
         }
         adapter.notifyDataSetChanged();
+
+        String test = androidPeek();
+        adapter.add(test);
 
         hello = relayInit();
         ccnLiteContext = this;
@@ -154,6 +157,8 @@ public class CcnLiteAndroid extends Activity
     public native void relayDump();
     public native void relayTimer();
     public native void relayRX(byte[] addr, byte[] data);
+
+    public native String androidPeek();
 
     /* this is used to load the 'ccn-lite-android' library on application
      * startup. The library has already been unpacked into
