@@ -70,12 +70,6 @@
 #include "../ccnl-core.h"
 #include "../ccnl-ext.h"
 
-// // Adrian
-// #ifndef CCNL-EXT-DEBUG_C
-// #define CCNL-EXT-DEBUG_C
-// #include "../ccnl-ext-debug.c"
-// #endif
-
 // #include "../ccnl-ext-debug.c"
  
 // #include "../ccnl-os-time.c"
@@ -97,10 +91,10 @@ int ccnl_pkt_prependComponent(int suite, char *src, int *offset, unsigned char *
 // #include "../ccnl-pkt-switch.c"
 // #include "../ccnl-pkt-ccnb.c"
 // #include "../ccnl-pkt-ccntlv.c"
-#include "../ccnl-pkt-cistlv.c"
+// #include "../ccnl-pkt-cistlv.c"
 // #include "../ccnl-pkt-iottlv.c"
 // #include "../ccnl-pkt-ndntlv.c"
-#include "../ccnl-pkt-localrpc.c"
+// #include "../ccnl-pkt-localrpc.c"
 
 #define ccnl_core_addToCleanup(b)       do{}while(0)
 
@@ -134,6 +128,7 @@ extern int ccnl_suite2defaultPort(int suite);
 #endif
 
 #endif // CCNL_UAPI_H_
+// #include "ccn-lite-pktdump-android.c"
 
 
 // ----------------------------------------------------------------------

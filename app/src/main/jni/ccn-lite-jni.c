@@ -2,11 +2,11 @@
 
 #include <string.h>
 #include <jni.h>
+#include <android/log.h>
 
 int jni_bleSend(unsigned char *data, int len);
 
 #include "../../ccn-lite-android.c"
-#include "../../ccn-lite-android-peek.c"
 
 static JavaVM *jvm;
 static jclass ccnLiteClass;

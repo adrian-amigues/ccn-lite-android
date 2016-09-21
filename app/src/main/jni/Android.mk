@@ -21,7 +21,7 @@ include $(CLEAR_VARS)
 
 LOCAL_MODULE    := ccn-lite-android
 LOCAL_SRC_FILES := ccn-lite-jni.c
-LOCAL_LDLIBS    := -landroid
+LOCAL_LDLIBS    := -landroid -llog
 LOCAL_CFLAGS    := -w
 
 include $(BUILD_SHARED_LIBRARY)

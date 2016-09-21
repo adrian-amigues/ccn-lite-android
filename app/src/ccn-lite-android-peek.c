@@ -8,6 +8,10 @@
 #include "util/ccnl-socket.c"
 
 
+#include "util/ccn-lite-pktdump-android.c"
+
+
+
 
 #define USE_URI_TO_PREFIX
 
@@ -20,6 +24,17 @@ int ccnl_mgmt_discover(struct ccnl_relay_s *ccnl, struct ccnl_buf_s *orig,
 unsigned char out[8*CCNL_MAX_PACKET_SIZE];
 int outlen;
 
+int
+frag_cb(struct ccnl_relay_s *relay, struct ccnl_face_s *from,
+        unsigned char **data, int *len)
+{
+    DEBUGMSG(INFO, "frag_cb\n");
+
+    memcpy(out, *data, *len);
+    outlen = *len;
+    return 0;
+}
+
 
 // Main function for peeking with android
 char* ccnl_android_peek(char* suite, char* addr, int port, char* uri) {
@@ -27,7 +42,9 @@ char* ccnl_android_peek(char* suite, char* addr, int port, char* uri) {
     static char uri_static[100];
     static char response[400];
     static ccnl_isContentFunc isContent;
+    static ccnl_isFragmentFunc isFragment;
     struct ccnl_prefix_s *prefix;
+    struct ccnl_face_s dummyFace;
     unsigned int chunknum = UINT_MAX;
     int len, socksize, rc, packettype;
     int sock = 0;
@@ -36,6 +53,7 @@ char* ccnl_android_peek(char* suite, char* addr, int port, char* uri) {
     char *path;
     struct sockaddr sa;
     float wait = 3.0;
+
 
     time(&curtime);
 
@@ -120,7 +138,7 @@ char* ccnl_android_peek(char* suite, char* addr, int port, char* uri) {
             DEBUGMSG(DEBUG, "  fragment, %d bytes\n", len2);
             sprintf(response, "%s fragment, %d bytes\n", response, len2);
             return response;
-            switch(suite) {
+            switch(packettype) {
             case CCNL_SUITE_CCNTLV: {
                 struct ccnx_tlvhdr_ccnx2015_s *hp;
                 hp = (struct ccnx_tlvhdr_ccnx2015_s *) out;
