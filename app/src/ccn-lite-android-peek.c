@@ -18,27 +18,17 @@
 // Function prototypes
 int udp_open_by_max();
 int ccnl_mgmt_discover(struct ccnl_relay_s *ccnl, struct ccnl_buf_s *orig,
-               struct ccnl_prefix_s *prefix, struct ccnl_face_s *from);
+        struct ccnl_prefix_s *prefix, struct ccnl_face_s *from);
+int frag_cb(struct ccnl_relay_s *relay, struct ccnl_face_s *from,
+        unsigned char **data, int *len);
 
 // Global variables
 unsigned char out[8*CCNL_MAX_PACKET_SIZE];
 int outlen;
 
-int
-frag_cb(struct ccnl_relay_s *relay, struct ccnl_face_s *from,
-        unsigned char **data, int *len)
-{
-    DEBUGMSG(INFO, "frag_cb\n");
-
-    memcpy(out, *data, *len);
-    outlen = *len;
-    return 0;
-}
-
 
 // Main function for peeking with android
-char* ccnl_android_peek(char* suite, char* addr, int port, char* uri) {
-    // static unsigned char out[8*CCNL_MAX_PACKET_SIZE];
+char* ccnl_android_peek(char* suiteStr, char* addr, int port, char* uri) {
     static char uri_static[100];
     static char response[400];
     static ccnl_isContentFunc isContent;
@@ -46,8 +36,9 @@ char* ccnl_android_peek(char* suite, char* addr, int port, char* uri) {
     struct ccnl_prefix_s *prefix;
     struct ccnl_face_s dummyFace;
     unsigned int chunknum = UINT_MAX;
-    int len, socksize, rc, packettype;
+    int len, socksize, rc, suite;
     int sock = 0;
+    int format = 2; // To print just the content of the returned content object, don't change to lower
     time_t curtime;
     uint32_t nonce = (uint32_t) difftime(curtime, 0);
     char *path;
@@ -61,15 +52,15 @@ char* ccnl_android_peek(char* suite, char* addr, int port, char* uri) {
     sprintf(response, " using udp address %s/%d\n", addr, port);
 
     // Getting the suite integer value
-    packettype = ccnl_str2suite(suite);
-    isContent = ccnl_suite2isContentFunc(packettype);
+    suite = ccnl_str2suite(suiteStr);
+    isContent = ccnl_suite2isContentFunc(suite);
     if (!isContent) {
         exit(-1);
     }
 
     // Transforming prefix if needed
     strcpy(uri_static, uri);
-    prefix = ccnl_URItoPrefix(uri_static, packettype, NULL, NULL);
+    prefix = ccnl_URItoPrefix(uri_static, suite, NULL, NULL);
     if (!prefix) {
         DEBUGMSG(ERROR, "no URI found, aborting\n");
         return -1;
@@ -138,7 +129,7 @@ char* ccnl_android_peek(char* suite, char* addr, int port, char* uri) {
             DEBUGMSG(DEBUG, "  fragment, %d bytes\n", len2);
             sprintf(response, "%s fragment, %d bytes\n", response, len2);
             return response;
-            switch(packettype) {
+            switch(suite) {
             case CCNL_SUITE_CCNTLV: {
                 struct ccnx_tlvhdr_ccnx2015_s *hp;
                 hp = (struct ccnx_tlvhdr_ccnx2015_s *) out;
@@ -234,12 +225,12 @@ char* ccnl_android_peek(char* suite, char* addr, int port, char* uri) {
             DEBUGMSG(WARNING, "skipping non-data packet\n");
             continue;
         }
-        write(1, out, len);
-        // myexit(0);
+        
     }
 
 
-    sprintf(response, "%s Returning response\n", response);
+    sprintf(response, "%s Returning response, len = %d, strlen(out) = %d\n", response, len, strlen(out));
+    sprintf(response, "%s out = %s\n", response, pktdump_android(out, len, format, suite));
     return response;
 done:
     close(sock);
@@ -295,7 +286,7 @@ ccnl_mgmt_discover(struct ccnl_relay_s *ccnl, struct ccnl_buf_s *orig,
     char *pfx;
     int len=0;
     struct ccnl_prefix_s *prefixfind;
-    int packettype = CCNL_SUITE_CCNB;
+    int suite = CCNL_SUITE_CCNB;
     time_t curtime;
     time(&curtime);
     struct sockaddr sa;
@@ -314,7 +305,7 @@ ccnl_mgmt_discover(struct ccnl_relay_s *ccnl, struct ccnl_buf_s *orig,
 
 
     prefixfind = ccnl_URItoPrefix(buf,
-                              packettype,
+                              suite,
                               NULL,
                               NULL);
 
@@ -343,5 +334,18 @@ ccnl_mgmt_discover(struct ccnl_relay_s *ccnl, struct ccnl_buf_s *orig,
     printf("%d", len);
 
 
+    return 0;
+}
+
+
+// necessary function from ccn-lite-peek.c
+int
+frag_cb(struct ccnl_relay_s *relay, struct ccnl_face_s *from,
+        unsigned char **data, int *len)
+{
+    DEBUGMSG(INFO, "frag_cb\n");
+
+    memcpy(out, *data, *len);
+    outlen = *len;
     return 0;
 }

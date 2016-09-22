@@ -1490,7 +1490,7 @@ localrpc_201405(unsigned char *data, int len, int rawxml, FILE* out)
 // ----------------------------------------------------------------------
 
 int
-emit_content_only(unsigned char *start, int len, int suite, int format)
+emit_content_only(unsigned char *start, int len, int suite, int format, char *pktContent)
 {
     unsigned char *data;
     struct ccnl_pkt_s *pkt;
@@ -1539,10 +1539,11 @@ emit_content_only(unsigned char *start, int len, int suite, int format)
         return -1;
     }
 
-    printf("%.*s", pkt->contlen, pkt->content);
-    if (format > 2) {
-        printf("\n");
-    }
+    // printf("%.*s", pkt->contlen, pkt->content);
+    // if (format > 2) {
+    //     printf("\n");
+    // }
+    sprintf(pktContent, "%.*s\n", pkt->contlen, pkt->content);
 
     free_packet(pkt);
     return 0;
@@ -1553,7 +1554,7 @@ emit_content_only(unsigned char *start, int len, int suite, int format)
 // returns 0 on success, -1 on error, 1 on "warning"
 int
 dump_content(int lev, unsigned char *base, unsigned char *data,
-             int len, int format, int suite, FILE *out)
+             int len, int format, int suite, FILE *outstd, char *pktContent)
 {
     char *forced;
     int enc, oldlen = len;
@@ -1596,7 +1597,7 @@ dump_content(int lev, unsigned char *base, unsigned char *data,
     }
 
     if (format >= 2)
-        return emit_content_only(data, len, suite, format);
+        return emit_content_only(data, len, suite, format, pktContent);
 
     switch (suite) {
     case CCNL_SUITE_CCNB:
@@ -1604,28 +1605,28 @@ dump_content(int lev, unsigned char *base, unsigned char *data,
             indent("#   ", lev);
             printf("%s CCNB format\n#\n", forced);
         }
-        ccnb_parse(lev, data, len, format == 1, out);
+        ccnb_parse(lev, data, len, format == 1, outstd);
         break;
     case CCNL_SUITE_CCNTLV:
         if (format == 0) {
             indent("#   ", lev);
             printf("%s CCNx TLV format (as of Mar 2015)\n#\n", forced);
         }
-        ccntlv_2015(lev, data, len, format == 1, out);
+        ccntlv_2015(lev, data, len, format == 1, outstd);
         break;
     case CCNL_SUITE_CISTLV:
         if (format == 0) {
             indent("#   ", lev);
             printf("%s Cisco TLV format (as of Jan 2015)\n#\n", forced);
         }
-        cistlv_201501(lev, data, len, format == 1, out);
+        cistlv_201501(lev, data, len, format == 1, outstd);
         break;
     case CCNL_SUITE_IOTTLV:
         if (format == 0) {
             indent("#   ", lev);
             printf("%s IOT TLV format (as of Nov 2014)\n#\n", forced);
         }
-        iottlv_201411(lev, base, data, len, format == 1, out);
+        iottlv_201411(lev, base, data, len, format == 1, outstd);
         break;
     case CCNL_SUITE_LOCALRPC:
         if (format == 0) {
@@ -1633,14 +1634,14 @@ dump_content(int lev, unsigned char *base, unsigned char *data,
             printf("%s local RPC format (Dec 2014, with NDNTLV encoding)\n#\n",
                    forced);
         }
-        localrpc_201405(data, len, format == 1, out);
+        localrpc_201405(data, len, format == 1, outstd);
         break;
     case CCNL_SUITE_NDNTLV:
         if (format == 0) {
             indent("#   ", lev);
             printf("%s NDN TLV format (as of Mar 2014)\n#\n", forced);
         }
-        ndntlv_201311(data, len, format == 1, out);
+        ndntlv_201311(data, len, format == 1, outstd);
         break;
     default:
         rc = -1;
@@ -1648,7 +1649,7 @@ dump_content(int lev, unsigned char *base, unsigned char *data,
             indent("#   ", lev);
             printf("unknown pkt format, showing plain hex\n");
         }
-        hexdump(-1, data, data, len, format == 1, out);
+        hexdump(-1, data, data, len, format == 1, outstd);
 done:
         if (format == 0) {
             printf("%04x", (int)(data - base));
@@ -1713,6 +1714,7 @@ help:
 
     len = 0;
     maxlen = sizeof(data);
+    // reads maxlen bytes from stdin, puts them into data
     while (maxlen > 0) {
         rc = read(0, data+len, maxlen);
         if (rc == 0)
@@ -1728,8 +1730,19 @@ help:
     if (format == 0)
         printf("# ccn-lite-pktdump, parsing %d byte%s\n", len, len!=1 ? "s":"");
 
-    return dump_content(0, data, data, len, format, suite, out);
+    // May have to replace last argument NULL with a char*
+    return dump_content(0, data, data, len, format, suite, out, NULL);
 }
 #endif
+
+char* pktdump_android(unsigned char* data, int len, int format, int suite) {
+    unsigned char pktContent[2000];
+    FILE *outstd = stdout;
+    // data = (unsigned char *)malloc(sizeof(out));
+    // memcpy(data, out, sizeof(out));
+    dump_content(0, data, data, len, format, -1, outstd, pktContent);
+
+    return pktContent;
+}
 
 // eof
