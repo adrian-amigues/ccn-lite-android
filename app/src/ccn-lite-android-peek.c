@@ -10,9 +10,6 @@
 
 #include "util/ccn-lite-pktdump-android.c"
 
-
-
-
 #define USE_URI_TO_PREFIX
 
 // Function prototypes

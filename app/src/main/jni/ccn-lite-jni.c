@@ -49,7 +49,7 @@ Java_ch_unibas_ccn_1lite_1android_CcnLiteAndroid_androidPeek(JNIEnv* env,
     // char *test;
     // test = testAndroidPeek();
     // return (*env)->NewStringUTF(env, test);
-    return (*env)->NewStringUTF(env, ccnl_android_peek("ccnx2015", "130.238.15.221", 9999, "/android/test/mycontent"));
+    return (*env)->NewStringUTF(env, ccnl_android_peek("ccnx2015", "130.238.15.225", 9999, "/ccn/sensor/temp"));
 }
 
 char*

@@ -2,6 +2,7 @@
 
 package ch.unibas.ccn_lite_android;
 
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -140,6 +141,16 @@ public class CcnLiteAndroid extends Activity
 
         String test = androidPeek();
         adapter.add(test);
+
+        String filename = "ccn-sensor-temp";
+        FileOutputStream outputStream;
+        try {
+            outputStream = openFileOutput(filename, Context.MODE_PRIVATE);
+            outputStream.write(test.getBytes());
+            outputStream.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public void appendToLog(String line) {
