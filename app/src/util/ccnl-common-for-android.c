@@ -1,6 +1,6 @@
 /*
  * @f util/ccnl-common-for-android.c
- * @b common functions for the CCN-lite utilities
+ * @b common functions for the CCN-lite utilities modified for use in the Android application
  *
  * Copyright (C) 2013-15, Christian Tschudin, University of Basel
  *
@@ -17,13 +17,7 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *
  * File history:
- * 2013-07-22 created
- * 2013-10-17 extended <christopher.scherb@unibas.ch>
- */
-
-/*
- * Modified :
- * commented a lot of incluedes in order for it to work with the ccn-lite-android.c file
+ * 2016-09-16 created, extended from ccnl-common.c by the Uppsala University CSproject 2016 team
  */
 
 

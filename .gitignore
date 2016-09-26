@@ -1,9 +1,13 @@
 .gradle
 .idea
 build
+build.gradle
 gradle
 gradlew
 gradlew.bat
 app/build
 app/src/main/obj
 app/src/main/libs
+app/app.iml
+local.properties
+ccn-lite-android.iml

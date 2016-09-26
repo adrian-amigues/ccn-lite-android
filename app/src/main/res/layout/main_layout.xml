@@ -1,96 +1,134 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
               android:layout_width="fill_parent"
               android:layout_height="fill_parent"
               android:orientation="vertical"
               android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
-              android:background="#FFFFFF" >
+              android:background="#FFFFFF"
+              tools:context="ch.unibas.ccn_lite_android.CcnLiteAndroid">
+
+   <TextView
+       android:text="Port:"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:layout_below="@+id/IPEditText"
+       android:layout_alignStart="@+id/IPTextView"
+       android:layout_marginTop="20dp"
+       android:id="@+id/PortTextView"
+       android:textStyle="normal|bold"
+       android:textColor="@android:color/background_dark" />
+
+   <TextView
+       android:text="Content"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:layout_below="@+id/portEditText"
+       android:layout_alignStart="@+id/PortTextView"
+       android:layout_marginTop="24dp"
+       android:id="@+id/ContentTextView"
+       android:textColor="@android:color/black"
+       android:textStyle="normal|bold" />
+
+   <EditText
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:inputType="textPersonName"
+       android:text="/android/test/mycontent"
+       android:ems="10"
+       android:id="@+id/contentEditText"
+       android:layout_alignBaseline="@+id/ContentTextView"
+       android:layout_alignBottom="@+id/ContentTextView"
+       android:layout_alignStart="@+id/portEditText"
+       android:textColor="@android:color/darker_gray"
+       android:layout_marginTop="30dp" />
+
+   <EditText
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:inputType="textPersonName"
+       android:text="130.238.15.221"
+       android:ems="10"
+       android:id="@+id/IPEditText"
+       android:textColor="@android:color/darker_gray"
+       android:layout_alignBaseline="@+id/IPTextView"
+       android:layout_alignBottom="@+id/IPTextView"
+       android:layout_alignParentEnd="true"
+       android:layout_marginEnd="38dp" />
+
+   <TextView
+       android:text="IP:"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:layout_marginTop="121dp"
+       android:id="@+id/IPTextView"
+       android:textStyle="normal|bold"
+       android:textColor="@android:color/background_dark"
+       android:layout_marginStart="49dp"
+       android:layout_alignParentTop="true"
+       android:layout_alignParentStart="true" />
+
+   <Button
+       android:text="Send Interest Message"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:layout_marginTop="20dp"
+       android:id="@+id/sendButton"
+       android:onClick="sendInterest"
+       android:layout_below="@+id/contentEditText"
+       android:layout_alignStart="@+id/contentEditText"
+       android:layout_marginStart="23dp" />
 
    <ImageView android:layout_width="200sp"
               android:layout_height="50sp"
               android:layout_gravity="center"
-              android:layout_margin="5dp"
-              android:paddingTop="15dp"
-              android:src="@drawable/ccn_lite_logo_712x184"/>
+       android:paddingTop="15dp"
+              android:src="@drawable/ccn_lite_logo_712x184"
+       android:layout_marginLeft="5dp"
+       android:layout_marginRight="5dp"
+       android:layout_marginTop="15dp"
+       android:layout_alignParentTop="true"
+       android:layout_alignParentEnd="true"
+       android:layout_marginEnd="12dp" />
 
-    <TextView android:id="@+id/transport"
-              android:layout_width="fill_parent"
-              android:layout_height="20dp"
-              android:paddingTop="5dp"
-              android:paddingLeft="3dp"
-              android:textSize="10sp"
-              android:textColor="#808080"
-              />
+   <TextView
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:id="@+id/resultTextView"
+       android:textSize="18sp"
+       android:scrollbars = "vertical"
+       android:maxLines="7"
+       android:layout_below="@+id/sendButton"
+       android:layout_marginTop="52dp"
+       android:layout_alignEnd="@+id/contentEditText"
+       android:layout_alignStart="@+id/ContentTextView"
+       android:layout_weight="1.12"
+       android:background="@android:color/background_light" />
 
-    <TextView android:id="@+id/loglink"
-              android:layout_width="fill_parent"
-              android:layout_height="25dp"
-              android:paddingLeft="3dp"
-              android:paddingBottom="10dp"
-              android:textSize="10sp"
-              android:textColor="#808080"
-              />
+   <TextView
+       android:text="Result:"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:layout_below="@+id/sendButton"
+       android:layout_alignStart="@+id/resultTextView"
+       android:layout_marginTop="16dp"
+       android:id="@+id/resultTitleTextView"
+       android:textColor="@android:color/black"
+       android:textSize="18sp" />
 
-    <ListView android:id="@+id/listview"
-              android:layout_width="fill_parent"
-              android:layout_height="20dp"
-              android:layout_weight="3"
-              android:background="#ffd763"
-              android:textSize="10sp"
-              android:divider="#ffd763"
-              android:dividerHeight="1px"
-              android:listSelector="@android:color/transparent"
-              android:cacheColorHint="@android:color/transparent"
-              android:transcriptMode="alwaysScroll"
-              android:stackFromBottom="true"
-              />
+   <EditText
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:inputType="textPersonName"
+       android:text="9999"
+       android:ems="10"
+       android:id="@+id/portEditText"
+       android:textColor="@android:color/darker_gray"
+       android:layout_alignBaseline="@+id/PortTextView"
+       android:layout_alignBottom="@+id/PortTextView"
+       android:layout_alignStart="@+id/IPEditText" />
 
-  <LinearLayout android:id="@+id/footer"
-                android:layout_width="match_parent"
-                android:layout_height="25dp"
-                android:orientation="horizontal"
-                android:paddingRight="2dp"
-                android:background="#dfb743"
-                android:textColor="#000000"
-                >
 
-    <TextView android:id="@+id/debuglevel"
-              android:layout_width="wrap_content"
-              android:layout_height="match_parent"
-              android:layout_margin="3dp"
-              android:layout_marginLeft="6dp"
-              android:textSize="10sp"
-              android:textColor="#000000"
-              android:text=" 5" />
+</RelativeLayout>
 
-    <Button android:id="@+id/minus"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="4"
-            android:layout_margin="3dp"
-            android:background="#cf9723"
-            android:textSize="13sp"
-            android:textColor="#000000"
-            android:text=" -- "
-            />
-    <Button android:id="@+id/plus"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="4"
-            android:layout_margin="3dp"
-            android:background="#cf9723"
-            android:textSize="13sp"
-            android:textColor="#000000"
-            android:text=" ++ " />
-    <Button android:id="@+id/dump"
-            android:layout_height="match_parent"
-            android:layout_width="wrap_content"
-            android:layout_margin="3dp"
-            android:background="#cf9723"
-            android:textSize="10sp"
-            android:textColor="#000000"
-            android:text=" memdump " />
 
-  </LinearLayout>
-
-</LinearLayout>

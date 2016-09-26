@@ -1,7 +1,7 @@
 /*
- * @f util/ccn-lite-pktdump.c
+ * @f util/ccn-lite-pktdump-android.c
  * @b CCN lite - dumps CCNB, CCN-TLV and NDN-TLV encoded packets
- *               as well as RPC data structures
+ *               as well as RPC data structures, modified for the Anroid application
  *
  * Copyright (C) 2014-15, Christian Tschudin, University of Basel
  *
@@ -18,7 +18,7 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *
  * File history:
- * 2014-03-29 created (merging three old dump programs)
+ * 2016-09-21 created, extended from ccn-lite-pktdump.c by the Uppsala University CSproject 2016 team
  *
  */
 
