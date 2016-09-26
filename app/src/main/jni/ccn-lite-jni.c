@@ -46,9 +46,6 @@ JNIEXPORT jstring JNICALL
 Java_ch_unibas_ccn_1lite_1android_CcnLiteAndroid_androidPeek(JNIEnv* env,
                                                                 jobject thiz, jstring ipString, jint portString, jstring contentString)
 {
-    // char *test;
-    // test = testAndroidPeek();
-    // return (*env)->NewStringUTF(env, test);
     char buf[128];
     const char *ip = (*env)->GetStringUTFChars(env, ipString, 0);
     int port = (int) portString;

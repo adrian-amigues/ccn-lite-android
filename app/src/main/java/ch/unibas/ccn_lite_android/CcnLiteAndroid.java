@@ -2,6 +2,12 @@
 
 package ch.unibas.ccn_lite_android;
 
+<<<<<<< HEAD
+import java.io.FileOutputStream;
+import java.util.ArrayList;
+import java.util.List;
+=======
+>>>>>>> 5930f0160eb98c1a427bb5f78bca001affde7d8d
 import java.util.UUID;
 
 import android.app.Activity;
@@ -149,9 +155,19 @@ public class CcnLiteAndroid extends Activity
 */
         mHandler = new Handler();
 //        scanLeDevice(true);
-        System.out.print("hiiiiiiiiiiiiiiii");
-       // String test = androidPeek(ipString, portString, contentString);
-       // adapter.add(test);
+
+        String test = androidPeek(ipString, portString, contentString);
+        adapter.add(test);
+
+        String filename = "ccn-sensor-temp";
+        FileOutputStream outputStream;
+        try {
+            outputStream = openFileOutput(filename, Context.MODE_PRIVATE);
+            outputStream.write(test.getBytes());
+            outputStream.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 
