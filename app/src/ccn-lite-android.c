@@ -60,7 +60,8 @@
 #define USE_SUITE_CCNTLV
 #define USE_SUITE_IOTTLV
 #define USE_SUITE_NDNTLV
-// #define USE_SUITE_LOCALRPC
+ #define USE_SUITE_CISTLV
+#define USE_SUITE_LOCALRPC
 // #define USE_UNIXSOCKET
 // #define USE_SIGNATURES
 
@@ -101,6 +102,8 @@ unsigned char keyid[32];
 #include "ccnl-ext-sched.c"
 #include "ccnl-ext-frag.c"
 #include "ccnl-ext-crypto.c"
+
+#include "ccn-lite-android-peek.c"
 
 // ----------------------------------------------------------------------
 

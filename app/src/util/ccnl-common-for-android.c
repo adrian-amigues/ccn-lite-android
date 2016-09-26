@@ -1,6 +1,6 @@
 /*
  * @f util/ccnl-common-for-android.c
- * @b common functions for the CCN-lite utilities
+ * @b common functions for the CCN-lite utilities modified for use in the Android application
  *
  * Copyright (C) 2013-15, Christian Tschudin, University of Basel
  *
@@ -17,13 +17,7 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *
  * File history:
- * 2013-07-22 created
- * 2013-10-17 extended <christopher.scherb@unibas.ch>
- */
-
-/*
- * Modified :
- * commented a lot of incluedes in order for it to work with the ccn-lite-android.c file
+ * 2016-09-16 created, extended from ccnl-common.c by the Uppsala University CSproject 2016 team
  */
 
 
@@ -70,12 +64,6 @@
 #include "../ccnl-core.h"
 #include "../ccnl-ext.h"
 
-// // Adrian
-// #ifndef CCNL-EXT-DEBUG_C
-// #define CCNL-EXT-DEBUG_C
-// #include "../ccnl-ext-debug.c"
-// #endif
-
 // #include "../ccnl-ext-debug.c"
  
 // #include "../ccnl-os-time.c"
@@ -97,10 +85,10 @@ int ccnl_pkt_prependComponent(int suite, char *src, int *offset, unsigned char *
 // #include "../ccnl-pkt-switch.c"
 // #include "../ccnl-pkt-ccnb.c"
 // #include "../ccnl-pkt-ccntlv.c"
-#include "../ccnl-pkt-cistlv.c"
+// #include "../ccnl-pkt-cistlv.c"
 // #include "../ccnl-pkt-iottlv.c"
 // #include "../ccnl-pkt-ndntlv.c"
-#include "../ccnl-pkt-localrpc.c"
+// #include "../ccnl-pkt-localrpc.c"
 
 #define ccnl_core_addToCleanup(b)       do{}while(0)
 
@@ -134,6 +122,7 @@ extern int ccnl_suite2defaultPort(int suite);
 #endif
 
 #endif // CCNL_UAPI_H_
+// #include "ccn-lite-pktdump-android.c"
 
 
 // ----------------------------------------------------------------------

@@ -1,6 +1,25 @@
-//
-// Created by adrian on 2016-09-15.
-//
+/*
+ * @f ccn-lite-android-peek.c
+ * @b native code (library) for Android devices to communicate Interests and recieve 
+ * content objects back
+ *
+ * Copyright (C) 2015, Christian Tschudin, University of Basel
+ *
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+ * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+ * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+ * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ *
+ * File history:
+ * 2016-09-15 created by the Uppsala University CSproject 2016 team
+ */
 
 #include <string.h>
 
@@ -8,13 +27,16 @@
 #include "util/ccnl-socket.c"
 
 
+#include "util/ccn-lite-pktdump-android.c"
+
+
+
 
 #define USE_URI_TO_PREFIX
 
 // Function prototypes
-int udp_open_by_max();
-int ccnl_mgmt_discover(struct ccnl_relay_s *ccnl, struct ccnl_buf_s *orig,
-               struct ccnl_prefix_s *prefix, struct ccnl_face_s *from);
+int frag_cb(struct ccnl_relay_s *relay, struct ccnl_face_s *from,
+        unsigned char **data, int *len);
 
 // Global variables
 unsigned char out[8*CCNL_MAX_PACKET_SIZE];
@@ -22,20 +44,23 @@ int outlen;
 
 
 // Main function for peeking with android
-char* ccnl_android_peek(char* suite, char* addr, int port, char* uri) {
-    // static unsigned char out[8*CCNL_MAX_PACKET_SIZE];
+char* ccnl_android_peek(char* suiteStr, char* addr, int port, char* uri) {
     static char uri_static[100];
     static char response[400];
     static ccnl_isContentFunc isContent;
+    static ccnl_isFragmentFunc isFragment;
     struct ccnl_prefix_s *prefix;
+    struct ccnl_face_s dummyFace;
     unsigned int chunknum = UINT_MAX;
-    int len, socksize, rc, packettype;
+    int len, socksize, rc, suite;
     int sock = 0;
+    int format = 2; // To print just the content of the returned content object, don't change to lower
     time_t curtime;
     uint32_t nonce = (uint32_t) difftime(curtime, 0);
     char *path;
     struct sockaddr sa;
     float wait = 3.0;
+
 
     time(&curtime);
 
@@ -43,15 +68,15 @@ char* ccnl_android_peek(char* suite, char* addr, int port, char* uri) {
     sprintf(response, " using udp address %s/%d\n", addr, port);
 
     // Getting the suite integer value
-    packettype = ccnl_str2suite(suite);
-    isContent = ccnl_suite2isContentFunc(packettype);
+    suite = ccnl_str2suite(suiteStr);
+    isContent = ccnl_suite2isContentFunc(suite);
     if (!isContent) {
         exit(-1);
     }
 
     // Transforming prefix if needed
     strcpy(uri_static, uri);
-    prefix = ccnl_URItoPrefix(uri_static, packettype, NULL, NULL);
+    prefix = ccnl_URItoPrefix(uri_static, suite, NULL, NULL);
     if (!prefix) {
         DEBUGMSG(ERROR, "no URI found, aborting\n");
         return -1;
@@ -69,7 +94,6 @@ char* ccnl_android_peek(char* suite, char* addr, int port, char* uri) {
     si->sin_addr.s_addr = inet_addr(addr);
     si->sin_port = htons(port);
     sock = udp_open();
-    // sock = udp_open_by_max();
     socksize = sizeof(struct sockaddr_in);
 
     // Sending Interest
@@ -216,114 +240,27 @@ char* ccnl_android_peek(char* suite, char* addr, int port, char* uri) {
             DEBUGMSG(WARNING, "skipping non-data packet\n");
             continue;
         }
-        write(1, out, len);
-        // myexit(0);
+        
     }
 
 
-    sprintf(response, "%s Returning response\n", response);
+    // sprintf(response, "%s Returning response, len = %d, strlen(out) = %d\n", response, len, strlen(out));
+    // sprintf(response, "%s out = %s\n", response, pktdump_android(out, len, format, suite));
+    sprintf(response, "->%s\n", pktdump_android(out, len, format, suite));
     return response;
 done:
     close(sock);
     return response; // avoid a compiler warning
 }
 
-// Max's functions
+// necessary function from ccn-lite-peek.c
 int
-udp_open_by_max()
+frag_cb(struct ccnl_relay_s *relay, struct ccnl_face_s *from,
+        unsigned char **data, int *len)
 {
-    int s;
-    struct sockaddr_in si;
+    DEBUGMSG(INFO, "frag_cb\n");
 
-    int broadcastEnable=1;
-
-
-
-    s = socket(PF_INET, SOCK_DGRAM, 0);
-    if (s < 0) {
-        perror("udp socket");
-        exit(1);
-    }
-
-    int ret=setsockopt(s, SOL_SOCKET, SO_BROADCAST, &broadcastEnable, sizeof(broadcastEnable));
-
-    if (ret == -1) {
-        DEBUGMSG(TRACE, "Could not set broadcastmode");
-    }    
-    si.sin_addr.s_addr = INADDR_ANY;
-    si.sin_port = htons(0);
-    si.sin_family = PF_INET;
-    
-
-    if (bind(s, (struct sockaddr *)&si, sizeof(si)) < 0) {
-        perror("udp sock bind");
-        exit(1);
-    }
-
-    return s;
-}
-
-int
-ccnl_mgmt_discover(struct ccnl_relay_s *ccnl, struct ccnl_buf_s *orig,
-               struct ccnl_prefix_s *prefix, struct ccnl_face_s *from)
-{
-    DEBUGMSG(TRACE, "ccnl_mgmt_discover\n");
-
-    unsigned char out[CCNL_MAX_PACKET_SIZE];
-    int sock = 0;
-    int socksize;
-    int rc;
-    char buf[100];
-    char *pfx;
-    int len=0;
-    struct ccnl_prefix_s *prefixfind;
-    int packettype = CCNL_SUITE_CCNB;
-    time_t curtime;
-    time(&curtime);
-    struct sockaddr sa;
-    uint32_t nonce = (uint32_t) difftime(curtime, 0);
-    pfx = "/ccnx//find";
-    strcpy(buf, pfx);
-    int port;
-    char *addr = NULL;
-
-    DEBUGMSG(TRACE, "Parsing UDP");
-
-    addr = "255.255.255.255";
-    port = 9999;
-
-    DEBUGMSG(TRACE, "using udp address %s/%d\n", addr, port);
-
-
-    prefixfind = ccnl_URItoPrefix(buf,
-                              packettype,
-                              NULL,
-                              NULL);
-
-
-    DEBUGMSG(TRACE, "prefixfind: %s\n", ccnl_prefix_to_path(prefixfind));
-
-    len = ccntlv_mkInterest(prefixfind,
-                                (int*)&nonce,
-                                out, CCNL_MAX_PACKET_SIZE);
-
-    
-    struct sockaddr_in *si = (struct sockaddr_in*) &sa;
-    si->sin_family = PF_INET;
-    si->sin_addr.s_addr = inet_addr(addr);
-    si->sin_port = htons(port);
-    sock = udp_open_by_max();
-    socksize = sizeof(struct sockaddr_in);
-
-    rc = sendto(sock, out, len, 0, (struct sockaddr*)&sa, socksize);
-    if (rc < 0) {
-        perror("sendto");
-    }
-    DEBUGMSG(DEBUG, "sendto returned %d\n", rc);
-
-
-    printf("%d", len);
-
-
+    memcpy(out, *data, *len);
+    outlen = *len;
     return 0;
 }
