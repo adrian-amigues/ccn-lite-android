@@ -44,12 +44,16 @@ Java_ch_unibas_ccn_1lite_1android_CcnLiteAndroid_relayGetTransport(JNIEnv* env,
 
 JNIEXPORT jstring JNICALL
 Java_ch_unibas_ccn_1lite_1android_CcnLiteAndroid_androidPeek(JNIEnv* env,
-                                                                jobject thiz)
+                                                                jobject thiz, jstring ipString, jint portString, jstring contentString)
 {
     // char *test;
     // test = testAndroidPeek();
     // return (*env)->NewStringUTF(env, test);
-    return (*env)->NewStringUTF(env, ccnl_android_peek("ccnx2015", "130.238.15.221", 9999, "/adri/test/mycontent"));
+    char buf[128];
+    const char *ip = (*env)->GetStringUTFChars(env, ipString, 0);
+    int port = (int) portString;
+    const char *content = (*env)->GetStringUTFChars(env, contentString, 0);
+    return (*env)->NewStringUTF(env, ccnl_android_peek("ccnx2015", ip, port, content));
 }
 
 char*

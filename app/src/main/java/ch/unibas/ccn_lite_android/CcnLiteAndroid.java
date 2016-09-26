@@ -2,11 +2,8 @@
 
 package ch.unibas.ccn_lite_android;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
-import android.app.Activity;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -15,22 +12,17 @@ import android.bluetooth.BluetoothGattCallback;
 import android.bluetooth.BluetoothGattDescriptor;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattService;
-import android.bluetooth.BluetoothManager;
 import android.bluetooth.BluetoothProfile;
 import android.content.Context;
-import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.text.Html;
-import android.text.method.LinkMovementMethod;
+import android.text.method.ScrollingMovementMethod;
 import android.view.View;
 import android.view.Window;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 
@@ -63,10 +55,11 @@ public class CcnLiteAndroid extends Activity
 
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.main_layout);
+        //setContentView(R.layout.activity_main);
 
         adapter = new ArrayAdapter(this, R.layout.logtextview, 0);
 
-        if (!getPackageManager().hasSystemFeature(
+        /*if (!getPackageManager().hasSystemFeature(
                                       PackageManager.FEATURE_BLUETOOTH_LE)) {
             Toast.makeText(this, R.string.ble_not_supported,
                            Toast.LENGTH_SHORT).show();
@@ -83,7 +76,7 @@ public class CcnLiteAndroid extends Activity
                 //                startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
                 startActivityForResult(enableBtIntent, 1);
             }
-        }
+        }*/
         adapter.notifyDataSetChanged();
 
         hello = relayInit();
@@ -96,8 +89,27 @@ public class CcnLiteAndroid extends Activity
         ListView lv;
 
         super.onStart();
+        Button b = (Button) findViewById(R.id.sendButton);
+        b.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                EditText ip = (EditText) findViewById(R.id.IPEditText);
+                String ipString = ip.getText().toString();
+                EditText port = (EditText) findViewById(R.id.portEditText);
+                String portString = port.getText().toString();
+                int portInt = Integer.parseInt(portString);
+                EditText content = (EditText) findViewById(R.id.contentEditText);
+                String contentString = content.getText().toString();
+                mHandler = new Handler();
+                String test = androidPeek(ipString, portInt, contentString);
+                TextView result = (TextView) findViewById(R.id.resultTextView);
+                result.setMovementMethod(new ScrollingMovementMethod());
+                result.setText(test, TextView.BufferType.EDITABLE);
 
-        lv = (ListView) findViewById(R.id.listview);
+
+
+            }
+        });
+      /*  lv = (ListView) findViewById(R.id.listview);
         lv.setAdapter(adapter);
 
         TextView tv = (TextView) findViewById(R.id.loglink);
@@ -134,13 +146,17 @@ public class CcnLiteAndroid extends Activity
                     relayDump();
                 }
             });
-
+*/
         mHandler = new Handler();
 //        scanLeDevice(true);
-
-        String test = androidPeek();
-        adapter.add(test);
+        System.out.print("hiiiiiiiiiiiiiiii");
+       // String test = androidPeek(ipString, portString, contentString);
+       // adapter.add(test);
     }
+
+
+
+
 
     public void appendToLog(String line) {
         while (adapter.getCount() > 500)
@@ -158,7 +174,7 @@ public class CcnLiteAndroid extends Activity
     public native void relayTimer();
     public native void relayRX(byte[] addr, byte[] data);
 
-    public native String androidPeek();
+    public native String androidPeek(String ipString, int portString, String contentString);
 
     /* this is used to load the 'ccn-lite-android' library on application
      * startup. The library has already been unpacked into
@@ -425,4 +441,7 @@ public class CcnLiteAndroid extends Activity
         return;
 
     }
+
+
+
 }
