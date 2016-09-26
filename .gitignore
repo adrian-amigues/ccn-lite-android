@@ -5,6 +5,7 @@ gradle
 gradlew
 gradlew.bat
 app/build
+app/app.iml
 app/src/main/obj
 app/src/main/libs
 local.properties

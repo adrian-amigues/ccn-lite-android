@@ -5,14 +5,6 @@ package ch.unibas.ccn_lite_android;
 import java.util.UUID;
 
 import android.app.Activity;
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothGatt;
-import android.bluetooth.BluetoothGattCallback;
-import android.bluetooth.BluetoothGattDescriptor;
-import android.bluetooth.BluetoothGattCharacteristic;
-import android.bluetooth.BluetoothGattService;
-import android.bluetooth.BluetoothProfile;
 import android.content.Context;
 import android.text.method.ScrollingMovementMethod;
 import android.view.View;
@@ -30,17 +22,14 @@ import android.os.Handler;
 public class CcnLiteAndroid extends Activity
 {
     ArrayAdapter adapter;
-    TextView debuglevel;
-    BluetoothAdapter BTadapter;
-    BluetoothGatt bleConnection;
-    BluetoothGattService bleService;
-    byte bleAddr[] = new byte[6];
     String hello;
     Context ccnLiteContext;
     int newData;
     String ipString;
     String portString;
     String contentString;
+    private Handler mHandler;
+
 
 
     public final static UUID SERV_UUID = new UUID(0x0000222000001000L,
@@ -59,7 +48,6 @@ public class CcnLiteAndroid extends Activity
 
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.main_layout);
-        //setContentView(R.layout.activity_main);
 
         adapter = new ArrayAdapter(this, R.layout.logtextview, 0);
 
@@ -80,12 +68,12 @@ public class CcnLiteAndroid extends Activity
         b.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 EditText ip = (EditText) findViewById(R.id.IPEditText);
-                String ipString = ip.getText().toString();
+                ipString = ip.getText().toString();
                 EditText port = (EditText) findViewById(R.id.portEditText);
-                String portString = port.getText().toString();
+                portString = port.getText().toString();
                 int portInt = Integer.parseInt(portString);
                 EditText content = (EditText) findViewById(R.id.contentEditText);
-                String contentString = content.getText().toString();
+                contentString = content.getText().toString();
                 mHandler = new Handler();
                 String test = androidPeek(ipString, portInt, contentString);
                 TextView result = (TextView) findViewById(R.id.resultTextView);
@@ -114,7 +102,6 @@ public class CcnLiteAndroid extends Activity
 
     public native String relayInit();
     public native String relayGetTransport();
-
     public native String relayPlus();
     public native String relayMinus();
     public native void relayDump();
@@ -134,260 +121,6 @@ public class CcnLiteAndroid extends Activity
 
     // ----------------------------------------------------------------------
 
-
-    private boolean mScanning;
-    private Handler mHandler;
-
-    // Stops scanning after 10 seconds.
-    private static final long SCAN_PERIOD = 10000;
-
-    private void scanLeDevice(final boolean enable) {
-        if (enable) {
-            // Stops scanning after a pre-defined scan period.
-            mHandler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    mScanning = false;
-                    BTadapter.stopLeScan(mLeScanCallback);
-                }
-                }, SCAN_PERIOD);
-
-            mScanning = true;
-            BTadapter.startLeScan(mLeScanCallback);
-        } else {
-            mScanning = false;
-            BTadapter.stopLeScan(mLeScanCallback);
-        }
-    }
-
-    //private LeDeviceListAdapter mLeDeviceListAdapter;
-
-    // Device scan callback.
-    private BluetoothAdapter.LeScanCallback mLeScanCallback =
-        new BluetoothAdapter.LeScanCallback() {
-            public void debugMsg(String msg) {
-                final String str = msg;
-                runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            appendToLog(str);
-                        }
-                    });
-            }
-            @Override
-            public void onLeScan(final BluetoothDevice device, int rssi,
-                                 byte[] scanRecord) {
-                runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            scanLeDevice(false);
-                            // adapter.addDevice(device);
-                            debugMsg("addr=" + device.getAddress());
-                            String[] baddr = device.getAddress().split(":");
-                            for (int i = 0; i < 6; i++) {
-                                bleAddr[i] = (byte) Integer.parseInt(baddr[i], 16);
-                            }
-                            adapter.notifyDataSetChanged();
-                            bleConnection = device.connectGatt(ccnLiteContext,
-                                                               false,
-                                                               bleConnectCB);
-                            appendToLog("after connect");
-
-                        }
-                    });
-            }
-        };
-
-
-    private final BluetoothGattCallback bleConnectCB =
-        new BluetoothGattCallback() {
-            public void debugMsg(String msg) {
-                final String str = msg;
-                runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            appendToLog(str);
-                        }
-                    });
-            }
-            @Override
-            public void onConnectionStateChange(BluetoothGatt gatt,
-                                                int status, int newState) {
-                String intentAction;
-
-                debugMsg("  onConnectionStateChange " + gatt);
-                debugMsg("  onConnectionStateChange " + status +
-                            " " + newState);
-                if (newState == BluetoothProfile.STATE_CONNECTED) {
-                    debugMsg("BLE connected!");
-
-                    BluetoothGattCharacteristic c1 =
-                        new BluetoothGattCharacteristic(RECV_UUID,
-                             BluetoothGattCharacteristic.PROPERTY_READ,
-                             BluetoothGattCharacteristic.PERMISSION_READ);
-                    debugMsg("  read=" +
-                                bleConnection.readCharacteristic(c1));
-
-                    //                    debugMsg("BLE MTU is " + bleConnection.requestMtu(50));
-
-                    bleConnection.discoverServices();
-                    /*
-                      intentAction = ACTION_GATT_CONNECTED;
-                      mConnectionState = STATE_CONNECTED;
-                      broadcastUpdate(intentAction);
-                      Log.i(TAG, "Connected to GATT server.");
-                      Log.i(TAG, "Attempting to start service discovery:" +
-                      mBluetoothGatt.discoverServices());
-                    */
-                } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
-                    debugMsg("BLE disconnected\n");
-                    /*
-                      intentAction = ACTION_GATT_DISCONNECTED;
-                      mConnectionState = STATE_DISCONNECTED;
-                      Log.i(TAG, "Disconnected from GATT server.");
-                      broadcastUpdate(intentAction);
-                    */
-                }
-            }
-            @Override
-            public void onServicesDiscovered(BluetoothGatt gatt, int status) {
-                debugMsg("services discovered! " + status);
-
-                if (status == BluetoothGatt.GATT_SUCCESS) {
-                    debugMsg("  success");
-
-                    bleService = gatt.getService(SERV_UUID);
-                    if (bleService == null) {
-                        debugMsg("no service!");
-                        return;
-                    }
-                    BluetoothGattCharacteristic recvC =
-                        bleService.getCharacteristic(RECV_UUID);
-                    if (recvC == null)  {
-                        debugMsg("no RECV characteristic!");
-                        return;
-                    }
-                    BluetoothGattDescriptor recvD =
-                        recvC.getDescriptor(CONF_UUID);
-                    if (recvD == null) {
-                        debugMsg("no RECV descriptor!");
-                        return;
-                    }
-                    debugMsg("setChar returns " +
-                           gatt.setCharacteristicNotification(recvC, true));
-                    debugMsg("setVal returns " + recvD.setValue(
-                        BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE));
-                    debugMsg("writeDescr returns " +
-                             gatt.writeDescriptor(recvD));
-
-                    if ((recvC.getProperties() & BluetoothGattCharacteristic.PROPERTY_READ) == 0) {
-                        debugMsg(" no read property");
-                    }
-
-                    /*
-                    debugMsg("readChar returns " +
-                             gatt.readCharacteristic(recvC));
-                    */
-
-
-                    BluetoothGattCharacteristic sendC =
-                        bleService.getCharacteristic(SEND_UUID);
-                    if (sendC == null)  {
-                        debugMsg("no SEND characteristic!");
-                        return;
-                    }
-                    if ((sendC.getProperties() & BluetoothGattCharacteristic.PROPERTY_WRITE) == 0) {
-                        debugMsg(" no send property");
-                    }
-
-                    /*
-                    sendC.setValue("holla");
-                    sendC.setWriteType(
-                       BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE);
-                    debugMsg("  send returned " +
-                             gatt.writeCharacteristic(sendC));
-                    */
-
-                    debugMsg("  success, done");
-                }
-
-                /*
-                List<BluetoothGattService> services =
-                    bleConnection.getServices();
-                for (BluetoothGattService service : services) {
-                    debugMsg("  service " + service.getUuid());
-
-                    List<BluetoothGattCharacteristic> characteristics =
-                        service.getCharacteristics();
-                    for (BluetoothGattCharacteristic ch : characteristics) {
-                        debugMsg("    characteristic " + ch.getUuid());
-                    }
-                }
-                */
-
-                debugMsg("SERV " + SERV_UUID);
-                debugMsg("CONF " + CONF_UUID);
-                debugMsg("SEND " + SEND_UUID);
-                debugMsg("RECV " + RECV_UUID);
-            }
-
-            @Override
-            public void onCharacteristicRead(BluetoothGatt gatt,
-                                 BluetoothGattCharacteristic characteristic,
-                                 int status) {
-                if (newData > 0) {
-                    debugMsg("onChRead0");
-                    if (status == BluetoothGatt.GATT_SUCCESS) {
-                        debugMsg("  readChar returns " +
-                             gatt.readCharacteristic(characteristic) +
-                             " cnt=" +
-                             characteristic.getValue().length);
-//                  broadcastUpdate(ACTION_DATA_AVAILABLE, characteristic);
-//                        newData -= 1;
-                    }
-                }
-            }
-
-            @Override
-            public void onCharacteristicChanged(BluetoothGatt gatt,
-                                 BluetoothGattCharacteristic characteristic) {
-                if (!gatt.readCharacteristic(characteristic)) {
-                    debugMsg("onChChange - readChar returns false");
-                } else {
-                    final byte[] val = characteristic.getValue();
-                    runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                relayRX(bleAddr, val);
-                            }
-                        });
-                }
-            }
-
-        };
-
-    public void bleSend(byte[] data)
-    {
-        if (bleConnection == null || bleService == null) {
-            appendToLog("bleSend: BLE not initialized");
-            return; // false;
-        }
-
-        BluetoothGattCharacteristic sendC =
-            bleService.getCharacteristic(SEND_UUID);
-        if (sendC == null) {
-            appendToLog("bleSend: no send characteristic");
-            return; // false;
-        }
-
-        sendC.setValue(data);
-        sendC.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE);
-        boolean b = bleConnection.writeCharacteristic(sendC);
-        if (!b)
-            appendToLog("bleSend: write characteristics failed");
-        return;
-
-    }
 
 
 
