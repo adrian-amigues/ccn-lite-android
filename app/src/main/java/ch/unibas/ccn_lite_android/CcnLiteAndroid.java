@@ -38,6 +38,10 @@ public class CcnLiteAndroid extends Activity
     String hello;
     Context ccnLiteContext;
     int newData;
+    String ipString;
+    String portString;
+    String contentString;
+
 
     public final static UUID SERV_UUID = new UUID(0x0000222000001000L,
                                                   0x800000805f9b34fbL);
@@ -59,24 +63,7 @@ public class CcnLiteAndroid extends Activity
 
         adapter = new ArrayAdapter(this, R.layout.logtextview, 0);
 
-        /*if (!getPackageManager().hasSystemFeature(
-                                      PackageManager.FEATURE_BLUETOOTH_LE)) {
-            Toast.makeText(this, R.string.ble_not_supported,
-                           Toast.LENGTH_SHORT).show();
-            adapter.add("sys: BLE not supported");
-        } else { // Initializes Bluetooth adapter
-            final BluetoothManager bluetoothManager =
-                (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
-            BTadapter = bluetoothManager.getAdapter();
 
-            adapter.add("sys: BLE is supported");
-            if (BTadapter == null || !BTadapter.isEnabled()) {
-                Intent enableBtIntent = new Intent (BluetoothAdapter.ACTION_REQUEST_ENABLE);
-                adapter.add("sys: BLE not yet enabled");
-                //                startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
-                startActivityForResult(enableBtIntent, 1);
-            }
-        }*/
         adapter.notifyDataSetChanged();
 
         hello = relayInit();
@@ -109,49 +96,9 @@ public class CcnLiteAndroid extends Activity
 
             }
         });
-      /*  lv = (ListView) findViewById(R.id.listview);
-        lv.setAdapter(adapter);
-
-        TextView tv = (TextView) findViewById(R.id.loglink);
-        tv.setText(Html.fromHtml("Status console &gt;&gt; " +
-                                 "<a href=\"http://localhost:8080/\">" +
-                                 hello + "  </a> "));
-        tv.setMovementMethod(LinkMovementMethod.getInstance());
-
-        debuglevel = (TextView) findViewById(R.id.debuglevel);
-
-        tv = (TextView) findViewById(R.id.transport);
-        tv.setText("Transport: " + relayGetTransport());
-
-        tv = (TextView) findViewById(R.id.debuglevel);
-        tv.setText(Html.fromHtml("loglevel &le; debug"));
-
-        Button b = (Button) findViewById(R.id.plus);
-        b.setText(">>");
-        b.setOnClickListener(new View.OnClickListener() {
-                public void onClick(View v) {
-                    debuglevel.setText(Html.fromHtml(relayPlus()));
-                }
-            });
-        b = (Button) findViewById(R.id.minus);
-        b.setText("<<");
-        b.setOnClickListener(new View.OnClickListener() {
-                public void onClick(View v) {
-                    debuglevel.setText(Html.fromHtml(relayMinus()));
-                }
-            });
-        b = (Button) findViewById(R.id.dump);
-        b.setOnClickListener(new View.OnClickListener() {
-                public void onClick(View v) {
-                    relayDump();
-                }
-            });
-*/
-        mHandler = new Handler();
-//        scanLeDevice(true);
+      mHandler = new Handler();
         System.out.print("hiiiiiiiiiiiiiiii");
-       // String test = androidPeek(ipString, portString, contentString);
-       // adapter.add(test);
+
     }
 
 
