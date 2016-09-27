@@ -29,11 +29,10 @@ public class CcnLiteAndroid extends Activity {
     EditText ipEditText;
     EditText portEditText;
     int portInt;
-    EditText content = (EditText) findViewById(R.id.contentEditText);
+    EditText contentEditText;
     String androidPeekResult;
-    TextView resultTextView
-    result.setMovementMethod(new ScrollingMovementMethod());
-    result.setText(test, TextView.BufferType.EDITABLE);
+    TextView resultTextView;
+
 
 
     @Override
@@ -52,6 +51,7 @@ public class CcnLiteAndroid extends Activity {
         portString = portEditText.getText().toString();
         portInt = Integer.parseInt(portString);
         resultTextView = (TextView) findViewById(R.id.resultTextView);
+        contentEditText = (EditText) findViewById(R.id.contentEditText);
     }
 
     @Override
