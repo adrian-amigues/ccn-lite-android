@@ -21,6 +21,7 @@ public class CcnLiteAndroid extends Activity {
     ArrayAdapter adapter;
     String hello;
     Context ccnLiteContext;
+    int newData;
     String ipString;
     String portString;
     String contentString;
@@ -28,9 +29,9 @@ public class CcnLiteAndroid extends Activity {
 
     EditText ipEditText;
     EditText portEditText;
-    int portInt;
+    //int portInt;
     EditText contentEditText;
-    String androidPeekResult;
+    //String androidPeekResult;
     TextView resultTextView;
 
 
@@ -46,10 +47,7 @@ public class CcnLiteAndroid extends Activity {
         ccnLiteContext = this;
 
         ipEditText = (EditText) findViewById(R.id.IPEditText);
-        ipString = ipEditText.getText().toString();
         portEditText = (EditText) findViewById(R.id.portEditText);
-        portString = portEditText.getText().toString();
-        portInt = Integer.parseInt(portString);
         resultTextView = (TextView) findViewById(R.id.resultTextView);
         contentEditText = (EditText) findViewById(R.id.contentEditText);
     }
@@ -63,8 +61,13 @@ public class CcnLiteAndroid extends Activity {
         b.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
 
+                ipEditText = (EditText) findViewById(R.id.IPEditText);
+                ipString = ipEditText.getText().toString();
+                portString = portEditText.getText().toString();
+                int portInt = Integer.parseInt(portString);
+                contentString = contentEditText.getText().toString();
                 mHandler = new Handler();
-                androidPeekResult = androidPeek(ipString, portInt, contentString);
+                String androidPeekResult = androidPeek(ipString, portInt, contentString);
                 resultTextView.setMovementMethod(new ScrollingMovementMethod());
                 resultTextView.setText(androidPeekResult, TextView.BufferType.EDITABLE);
 
