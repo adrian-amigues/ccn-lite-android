@@ -2,19 +2,15 @@ package ch.unibas.ccn_lite_android;
 
 import android.app.Activity;
 import android.content.Context;
-
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
-
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Color;
 import android.text.method.ScrollingMovementMethod;
-import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -25,20 +21,10 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.PopupMenu;
-import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.PopupMenu.OnMenuItemClickListener;
-
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-
-import static android.provider.AlarmClock.EXTRA_MESSAGE;
-
 
 public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener
 {
@@ -109,44 +95,20 @@ public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener
                 filename = contentString.replace("/", ""); //maybe file can't start with dash
                 androidPeekResult = "No Data Found";
                 mHandler = new Handler();
+                //if not do network op
+                //check network connection
+                netConnString = "No Network Connection";
+                ConnectivityManager connMgr = (ConnectivityManager)
+                        getSystemService(Context.CONNECTIVITY_SERVICE);
+                NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+                if (networkInfo != null && networkInfo.isConnected()) {
+                    new AndroidPeekTask().execute(androidPeekResult); //TODO: it's not actually using this content string
 
-                //check if file exists
-                //File file = new File(ccnLiteContext.getFilesDir(), filename);
-                //if(file.exists()) {
-                  /*  FileInputStream inputStream;
-                    try {
-                        inputStream = openFileInput(filename);
-                        //inputStream.read(contentString.getBytes());
-                        int c;
-                        String temp="";
-                        while( (c = inputStream.read()) != -1){
-                            temp = temp + Character.toString((char)c);
-                        }
-                        androidPeekResult = temp;
-                        inputStream.close();
-                        toast("result taken from file");
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+                } else {
+                    // display error
+                    toast(netConnString);
+                    androidPeekResult = netConnString;
                     resultTextView.setText(androidPeekResult, TextView.BufferType.EDITABLE);
-                    resultTextView.setMovementMethod(new ScrollingMovementMethod());
-                    */
-                //} else {
-                    //if not do network op
-                    //check network connection
-                    netConnString = "No Network Connection";
-                    ConnectivityManager connMgr = (ConnectivityManager)
-                            getSystemService(Context.CONNECTIVITY_SERVICE);
-                    NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
-                    if (networkInfo != null && networkInfo.isConnected()) {
-                        new AndroidPeekTask().execute(androidPeekResult); //TODO: it's not actually using this content string
-
-                    } else {
-                        // display error
-                        toast(netConnString);
-                        androidPeekResult = netConnString;
-                        resultTextView.setText(androidPeekResult, TextView.BufferType.EDITABLE);
-                   // }
                 }
             }
         });
@@ -215,19 +177,6 @@ public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener
         protected void onPostExecute(String result) {
             resultTextView.setText(androidPeekResult, TextView.BufferType.EDITABLE);
             resultTextView.setMovementMethod(new ScrollingMovementMethod());
-
-            //create file and store result
-            //temp files saving to be replaced by data base
-           /* FileOutputStream outputStream;
-            try {
-                outputStream = openFileOutput(filename, Context.MODE_PRIVATE);
-                outputStream.write(androidPeekResult.getBytes());
-                outputStream.close();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            //end temp file saving
-            */
         }
     }
 
