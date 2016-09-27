@@ -14,13 +14,18 @@ import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattService;
 import android.bluetooth.BluetoothProfile;
 import android.content.Context;
+import android.graphics.Color;
 import android.text.method.ScrollingMovementMethod;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.Window;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.PopupMenu;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import android.os.Bundle;
@@ -92,6 +97,8 @@ public class CcnLiteAndroid extends Activity
         Button b = (Button) findViewById(R.id.sendButton);
         b.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+                RelativeLayout myLayout = (RelativeLayout) findViewById(R.id.myLayout);
+               // myLayout.setBackgroundColor(Color.rgb(1,0,0));
                 EditText ip = (EditText) findViewById(R.id.IPEditText);
                 String ipString = ip.getText().toString();
                 EditText port = (EditText) findViewById(R.id.portEditText);
@@ -109,6 +116,14 @@ public class CcnLiteAndroid extends Activity
 
             }
         });
+
+        ImageView imageViewMenu = (ImageView) findViewById(R.id.imageViewMenu);
+        imageViewMenu.setOnClickListener(new View.OnClickListener(){
+            public void onClick(View v){
+                showPopUp(v);
+            }
+        });
+
       /*  lv = (ListView) findViewById(R.id.listview);
         lv.setAdapter(adapter);
 
@@ -148,14 +163,19 @@ public class CcnLiteAndroid extends Activity
             });
 */
         mHandler = new Handler();
-//        scanLeDevice(true);
-        System.out.print("hiiiiiiiiiiiiiiii");
+        //scanLeDevice(true);
        // String test = androidPeek(ipString, portString, contentString);
        // adapter.add(test);
     }
 
 
+    public void showPopUp(View v){
+        PopupMenu popup = new PopupMenu(this, v);
+        MenuInflater inflater = popup.getMenuInflater();
+        inflater.inflate(R.menu.menu_items, popup.getMenu());
+        popup.show();
 
+    }
 
 
     public void appendToLog(String line) {

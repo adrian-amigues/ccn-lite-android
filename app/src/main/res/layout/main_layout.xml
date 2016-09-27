@@ -1,34 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+              android:id="@+id/myLayout"
               android:layout_width="fill_parent"
               android:layout_height="fill_parent"
               android:orientation="vertical"
               android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
-              android:background="#FFFFFF"
+              android:background="#e9d5f4"
               tools:context="ch.unibas.ccn_lite_android.CcnLiteAndroid">
-
-   <TextView
-       android:text="Port:"
-       android:layout_width="wrap_content"
-       android:layout_height="wrap_content"
-       android:layout_below="@+id/IPEditText"
-       android:layout_alignStart="@+id/IPTextView"
-       android:layout_marginTop="20dp"
-       android:id="@+id/PortTextView"
-       android:textStyle="normal|bold"
-       android:textColor="@android:color/background_dark" />
-
-   <TextView
-       android:text="Content"
-       android:layout_width="wrap_content"
-       android:layout_height="wrap_content"
-       android:layout_below="@+id/portEditText"
-       android:layout_alignStart="@+id/PortTextView"
-       android:layout_marginTop="24dp"
-       android:id="@+id/ContentTextView"
-       android:textColor="@android:color/black"
-       android:textStyle="normal|bold" />
 
    <EditText
        android:layout_width="wrap_content"
@@ -68,29 +47,6 @@
        android:layout_alignParentTop="true"
        android:layout_alignParentStart="true" />
 
-   <Button
-       android:text="Send Interest Message"
-       android:layout_width="wrap_content"
-       android:layout_height="wrap_content"
-       android:layout_marginTop="20dp"
-       android:id="@+id/sendButton"
-       android:onClick="sendInterest"
-       android:layout_below="@+id/contentEditText"
-       android:layout_alignStart="@+id/contentEditText"
-       android:layout_marginStart="23dp" />
-
-   <ImageView android:layout_width="200sp"
-              android:layout_height="50sp"
-              android:layout_gravity="center"
-       android:paddingTop="15dp"
-              android:src="@drawable/ccn_lite_logo_712x184"
-       android:layout_marginLeft="5dp"
-       android:layout_marginRight="5dp"
-       android:layout_marginTop="15dp"
-       android:layout_alignParentTop="true"
-       android:layout_alignParentEnd="true"
-       android:layout_marginEnd="12dp" />
-
    <TextView
        android:layout_width="match_parent"
        android:layout_height="wrap_content"
@@ -103,7 +59,7 @@
        android:layout_alignEnd="@+id/contentEditText"
        android:layout_alignStart="@+id/ContentTextView"
        android:layout_weight="1.12"
-       android:background="@android:color/background_light" />
+       android:background="#f2e6f9" />
 
    <TextView
        android:text="Result:"
@@ -127,6 +83,61 @@
        android:layout_alignBaseline="@+id/PortTextView"
        android:layout_alignBottom="@+id/PortTextView"
        android:layout_alignStart="@+id/IPEditText" />
+
+   <TextView
+       android:text="Content:"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:layout_marginTop="37dp"
+       android:id="@+id/ContentTextView"
+       android:textColor="@android:color/black"
+       android:textStyle="normal|bold"
+       android:layout_below="@+id/portEditText"
+       android:layout_alignStart="@+id/PortTextView" />
+
+   <Button
+       android:text="Send Interest Message"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:layout_marginTop="34dp"
+       android:id="@+id/sendButton"
+       android:onClick="sendInterest"
+       android:layout_marginStart="21dp"
+       android:layout_below="@+id/contentEditText"
+       android:layout_alignStart="@+id/contentEditText" />
+
+   <TextView
+       android:text="Port:"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:layout_marginTop="34dp"
+       android:id="@+id/PortTextView"
+       android:textStyle="normal|bold"
+       android:textColor="@android:color/background_dark"
+       android:layout_below="@+id/IPEditText"
+       android:layout_alignStart="@+id/IPTextView" />
+
+   <RelativeLayout
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:layout_alignParentTop="true"
+       android:layout_centerHorizontal="true"
+       android:background="#A949BA">
+
+      <ImageView android:layout_width="200sp"
+                 android:layout_height="50sp"
+                 android:layout_gravity="center"
+          android:paddingTop="15dp"
+                 android:src="@drawable/ccn_lite_logo_712x184"
+          android:layout_marginLeft="5dp"
+          android:layout_marginRight="5dp"
+          android:layout_alignParentTop="true"
+          android:layout_alignParentEnd="true"
+          android:layout_marginEnd="14dp"
+          android:clickable="true"
+          android:onClick="showPopUp"
+          android:id="@+id/imageViewMenu" />
+   </RelativeLayout>
 
 
 </RelativeLayout>
