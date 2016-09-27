@@ -119,13 +119,7 @@ char* ccnl_android_peek(char* suiteStr, char* addr, int port, char* uri) {
 
         DEBUGMSG(DEBUG, "received %d bytes\n", len);
         sprintf(response, "%s received %d bytes\n", response, len);
-/*
-        {
-            int fd = open("incoming.bin", O_WRONLY|O_CREAT|O_TRUNC, 0700);
-            write(fd, out, len);
-            close(fd);
-        }
-*/
+
         suite2 = -1;
         len2 = len;
         while (!ccnl_switch_dehead(&cp, &len2, &enc))
@@ -155,12 +149,7 @@ char* ccnl_android_peek(char* suiteStr, char* addr, int port, char* uri) {
                     DEBUGMSG(ERROR, "  error parsing fragment\n");
                     continue;
                 }
-                /*
-                rc = ccnl_frag_RX_Sequenced2015(frag_cb, NULL, &dummyFace,
-                                  4096, hp->fill[0] >> 6,
-                                  ntohs(*(uint16_t*) hp->fill) & 0x03fff,
-                                  &cp, (int*) &len2);
-                */
+
                 rc = ccnl_frag_RX_BeginEnd2015(frag_cb, NULL, &dummyFace,
                                   4096, hp->fill[0] >> 6,
                                   ntohs(*(uint16_t*) hp->fill) & 0x03fff,
@@ -174,11 +163,7 @@ char* ccnl_android_peek(char* suiteStr, char* addr, int port, char* uri) {
                     DEBUGMSG(VERBOSE, "problem parsing fragment\n");
                     continue;
                 }
-                /*
-                fprintf(stderr, "t=%d len=%d\n", t, len2);
-                if (ccnl_iottlv_dehead(&cp, &len, &t, &len2))
-                    continue;
-                */
+
                 DEBUGMSG(VERBOSE, "t=%d, len=%d\n", t, len3);
                 sprintf(response, "%s t=%d, len=%d\n", response, t, len3);
                 if (t == IOT_TLV_F_OptFragHdr) { // skip it for the time being
@@ -204,10 +189,7 @@ char* ccnl_android_peek(char* suiteStr, char* addr, int port, char* uri) {
                     DEBUGMSG(DEBUG, "  no payload (%d)\n", t);
                     continue;
                 }
-                /*
-                rc = ccnl_frag_RX_Sequenced2015(frag_cb, NULL, &dummyFace,
-                         4096, tmp >> 14, tmp & 0x7ff, &cp, (int*) &len2);
-                */
+
                 rc = ccnl_frag_RX_BeginEnd2015(frag_cb, NULL, &dummyFace,
                          4096, tmp >> 14, tmp & 0x3fff, &cp, (int*) &len3);
                 fprintf(stderr, "--\n");
