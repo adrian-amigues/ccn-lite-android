@@ -21,20 +21,20 @@ public class CcnLiteAndroid extends Activity {
     ArrayAdapter adapter;
     String hello;
     Context ccnLiteContext;
-    int newData;
     String ipString;
     String portString;
     String contentString;
     private Handler mHandler;
 
-    public final static UUID SERV_UUID = new UUID(0x0000222000001000L,
-            0x800000805f9b34fbL);
-    public final static UUID CONF_UUID = new UUID(0x0000290200001000L,
-            0x800000805f9b34fbL);
-    public final static UUID SEND_UUID = new UUID(0x0000222200001000L,
-            0x800000805f9b34fbL);
-    public final static UUID RECV_UUID = new UUID(0x0000222100001000L,
-            0x800000805f9b34fbL);
+    EditText ipEditText;
+    EditText portEditText;
+    int portInt;
+    EditText content = (EditText) findViewById(R.id.contentEditText);
+    String androidPeekResult;
+    TextView resultTextView
+    result.setMovementMethod(new ScrollingMovementMethod());
+    result.setText(test, TextView.BufferType.EDITABLE);
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -45,6 +45,13 @@ public class CcnLiteAndroid extends Activity {
         adapter.notifyDataSetChanged();
         hello = relayInit();
         ccnLiteContext = this;
+
+        ipEditText = (EditText) findViewById(R.id.IPEditText);
+        ipString = ipEditText.getText().toString();
+        portEditText = (EditText) findViewById(R.id.portEditText);
+        portString = portEditText.getText().toString();
+        portInt = Integer.parseInt(portString);
+        resultTextView = (TextView) findViewById(R.id.resultTextView);
     }
 
     @Override
@@ -55,18 +62,11 @@ public class CcnLiteAndroid extends Activity {
         Button b = (Button) findViewById(R.id.sendButton);
         b.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                EditText ip = (EditText) findViewById(R.id.IPEditText);
-                ipString = ip.getText().toString();
-                EditText port = (EditText) findViewById(R.id.portEditText);
-                portString = port.getText().toString();
-                int portInt = Integer.parseInt(portString);
-                EditText content = (EditText) findViewById(R.id.contentEditText);
-                contentString = content.getText().toString();
+
                 mHandler = new Handler();
-                String test = androidPeek(ipString, portInt, contentString);
-                TextView result = (TextView) findViewById(R.id.resultTextView);
-                result.setMovementMethod(new ScrollingMovementMethod());
-                result.setText(test, TextView.BufferType.EDITABLE);
+                androidPeekResult = androidPeek(ipString, portInt, contentString);
+                resultTextView.setMovementMethod(new ScrollingMovementMethod());
+                resultTextView.setText(androidPeekResult, TextView.BufferType.EDITABLE);
 
             }
         });
