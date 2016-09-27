@@ -2,31 +2,53 @@ package ch.unibas.ccn_lite_android;
 
 import android.app.Activity;
 import android.content.Context;
+
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+
+import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Color;
 import android.text.method.ScrollingMovementMethod;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.PopupMenu;
+import android.widget.RelativeLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.PopupMenu.OnMenuItemClickListener;
+
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+import static android.provider.AlarmClock.EXTRA_MESSAGE;
 
-public class CcnLiteAndroid extends Activity {
+
+public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener
+{
     ArrayAdapter adapter;
 
     Context ccnLiteContext;
+    String hello;
+    int newData;
+    SQLiteDatabase sensorDatabase;
+    String resultValue;
     String ipString;
     String portString;
     String contentString;
@@ -44,7 +66,6 @@ public class CcnLiteAndroid extends Activity {
     String filename;
 
 
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,6 +74,17 @@ public class CcnLiteAndroid extends Activity {
         adapter = new ArrayAdapter(this, R.layout.logtextview, 0);
         adapter.notifyDataSetChanged();
 
+
+        String arraySpinner[] = new String[] {
+                "CCNx2015", "NDN2013", "CCNB", "IOT2014", "LOCALRPC", "LOCALRPC"
+        };
+
+        Spinner s = (Spinner) findViewById(R.id.formatSpinner);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
+                android.R.layout.simple_spinner_item, arraySpinner);
+
+        s.setAdapter(adapter);
+        
         ccnLiteContext = this;
 
         ipEditText = (EditText) findViewById(R.id.IPEditText);
@@ -65,6 +97,8 @@ public class CcnLiteAndroid extends Activity {
     @Override
     public void onStart() {
         ListView lv;
+        sensorDatabase = openOrCreateDatabase("SENSORDATABASE",MODE_PRIVATE,null);
+        sensorDatabase.execSQL("CREATE TABLE IF NOT EXISTS sensorTable(sensorValue VARCHAR);");
 
         super.onStart();
         Button b = (Button) findViewById(R.id.sendButton);
@@ -119,8 +153,57 @@ public class CcnLiteAndroid extends Activity {
                 }
             }
         });
-        mHandler = new Handler();
 
+        ImageView imageViewMenu = (ImageView) findViewById(R.id.imageViewMenu);
+        imageViewMenu.setOnClickListener(new View.OnClickListener(){
+            public void onClick(View v){
+                showPopUp(v);
+            }
+        });
+        mHandler = new Handler();
+    }
+    public boolean onMenuItemClick(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_add:
+                sensorDatabase.execSQL("INSERT INTO sensorTable VALUES('" + resultValue + "');");
+                return true;
+
+            case R.id.menu_history:
+                Cursor resultSet = sensorDatabase.rawQuery("Select * from sensorTable",null);
+                String sensorValue="";
+                int count = 0;
+                if(resultSet != null) {
+                    resultSet.moveToFirst();
+                    while (count < resultSet.getCount()) {
+                        count++;
+                        sensorValue += count + ": ";
+                        sensorValue += resultSet.getString(0) + "\n";
+                        resultSet.moveToNext();
+
+                    }
+                }
+
+                Intent intent = new Intent(this, DisplayDatabaseHistory.class);
+                intent.putExtra("sensorHistory", sensorValue);
+                intent.putExtra("countOfItems", count);
+                startActivity(intent);
+
+                return true;
+
+            case R.id.menu_reset:
+                sensorDatabase.execSQL("DELETE FROM sensorTable;");
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    public void showPopUp(View v){
+        PopupMenu popup = new PopupMenu(CcnLiteAndroid.this, v);
+        popup.setOnMenuItemClickListener(CcnLiteAndroid.this);
+        MenuInflater inflater = popup.getMenuInflater();
+        inflater.inflate(R.menu.menu_items, popup.getMenu());
+        popup.show();
     }
 
     //executes the android peek function
@@ -155,6 +238,7 @@ public class CcnLiteAndroid extends Activity {
         Toast toast = Toast.makeText(ccnLiteContext, text, Toast.LENGTH_SHORT);
         toast.show();
     }
+
 
     public void appendToLog(String line) {
         while (adapter.getCount() > 500)

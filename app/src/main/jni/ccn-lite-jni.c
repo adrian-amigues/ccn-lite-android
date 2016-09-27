@@ -36,6 +36,11 @@ Java_ch_unibas_ccn_1lite_1android_CcnLiteAndroid_relayInit(JNIEnv* env,
     return (*env)->NewStringUTF(env, hello);
 }
 
+/**
+  * @desc connect to node with specific ip addr and send interest object
+  * @param string $ipString - ip addr,integer-$portString-port,string -$contentString- name of interest object
+  * @return String - content Object
+*/
 
 JNIEXPORT jstring JNICALL
 Java_ch_unibas_ccn_1lite_1android_CcnLiteAndroid_androidPeek(JNIEnv* env,
