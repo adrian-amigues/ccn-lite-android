@@ -203,7 +203,7 @@ public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener
         Toast toast = Toast.makeText(ccnLiteContext, text, Toast.LENGTH_SHORT);
         toast.show();
     }
-    
+
     public void appendToLog(String line) {
         while (adapter.getCount() > 500)
             adapter.remove(adapter.getItem(0));
