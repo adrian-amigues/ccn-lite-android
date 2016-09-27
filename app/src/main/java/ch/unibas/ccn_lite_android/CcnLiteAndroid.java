@@ -28,6 +28,7 @@ import android.widget.PopupMenu.OnMenuItemClickListener;
 
 public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener
 {
+
     ArrayAdapter adapter;
 
     Context ccnLiteContext;
@@ -117,6 +118,22 @@ public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener
         imageViewMenu.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
                 showPopUp(v);
+
+                //if not do network op
+                //check network connection
+                netConnString = "No Network Connection";
+                ConnectivityManager connMgr = (ConnectivityManager)
+                        getSystemService(Context.CONNECTIVITY_SERVICE);
+                NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+                if (networkInfo != null && networkInfo.isConnected()) {
+                    new AndroidPeekTask().execute(androidPeekResult); //TODO: it's not actually using this content string
+                } else {
+                    // display error
+                    toast(netConnString);
+                    androidPeekResult = netConnString;
+                    resultTextView.setText(androidPeekResult, TextView.BufferType.EDITABLE);
+                }
+
             }
         });
         mHandler = new Handler();
@@ -177,6 +194,7 @@ public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener
         protected void onPostExecute(String result) {
             resultTextView.setText(androidPeekResult, TextView.BufferType.EDITABLE);
             resultTextView.setMovementMethod(new ScrollingMovementMethod());
+
         }
     }
 
@@ -185,8 +203,7 @@ public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener
         Toast toast = Toast.makeText(ccnLiteContext, text, Toast.LENGTH_SHORT);
         toast.show();
     }
-
-
+    
     public void appendToLog(String line) {
         while (adapter.getCount() > 500)
             adapter.remove(adapter.getItem(0));
