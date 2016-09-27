@@ -27,6 +27,14 @@ public class CcnLiteAndroid extends Activity {
     String contentString;
     private Handler mHandler;
 
+    EditText ipEditText;
+    EditText portEditText;
+    int portInt;
+    EditText content = (EditText) findViewById(R.id.contentEditText);
+    String androidPeekResult;
+    TextView resultTextView;
+
+
 
 
     @Override
@@ -38,6 +46,13 @@ public class CcnLiteAndroid extends Activity {
         adapter.notifyDataSetChanged();
         hello = relayInit();
         ccnLiteContext = this;
+
+        ipEditText = (EditText) findViewById(R.id.IPEditText);
+        ipString = ipEditText.getText().toString();
+        portEditText = (EditText) findViewById(R.id.portEditText);
+        portString = portEditText.getText().toString();
+        portInt = Integer.parseInt(portString);
+        resultTextView = (TextView) findViewById(R.id.resultTextView);
     }
 
     @Override
@@ -48,18 +63,11 @@ public class CcnLiteAndroid extends Activity {
         Button b = (Button) findViewById(R.id.sendButton);
         b.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                EditText ip = (EditText) findViewById(R.id.IPEditText);
-                ipString = ip.getText().toString();
-                EditText port = (EditText) findViewById(R.id.portEditText);
-                portString = port.getText().toString();
-                int portInt = Integer.parseInt(portString);
-                EditText content = (EditText) findViewById(R.id.contentEditText);
-                contentString = content.getText().toString();
+
                 mHandler = new Handler();
-                String test = androidPeek(ipString, portInt, contentString);
-                TextView result = (TextView) findViewById(R.id.resultTextView);
-                result.setMovementMethod(new ScrollingMovementMethod());
-                result.setText(test, TextView.BufferType.EDITABLE);
+                androidPeekResult = androidPeek(ipString, portInt, contentString);
+                resultTextView.setMovementMethod(new ScrollingMovementMethod());
+                resultTextView.setText(androidPeekResult, TextView.BufferType.EDITABLE);
 
             }
         });
