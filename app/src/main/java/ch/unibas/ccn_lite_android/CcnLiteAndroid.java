@@ -1,9 +1,9 @@
 package ch.unibas.ccn_lite_android;
 
-import java.util.UUID;
-
 import android.app.Activity;
 import android.content.Context;
+import android.os.Bundle;
+import android.os.Handler;
 import android.text.method.ScrollingMovementMethod;
 import android.view.View;
 import android.view.Window;
@@ -13,8 +13,7 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import android.os.Bundle;
-import android.os.Handler;
+import java.io.FileOutputStream;
 
 
 public class CcnLiteAndroid extends Activity {
@@ -58,7 +57,6 @@ public class CcnLiteAndroid extends Activity {
         b.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
 
-                ipEditText = (EditText) findViewById(R.id.IPEditText);
                 ipString = ipEditText.getText().toString();
                 portString = portEditText.getText().toString();
                 int portInt = Integer.parseInt(portString);
@@ -67,6 +65,21 @@ public class CcnLiteAndroid extends Activity {
                 String androidPeekResult = androidPeek(ipString, portInt, contentString);
                 resultTextView.setMovementMethod(new ScrollingMovementMethod());
                 resultTextView.setText(androidPeekResult, TextView.BufferType.EDITABLE);
+
+                //temp files saving to be replaced by data base
+                String filename = "temp";
+                FileOutputStream outputStream;
+
+                try {
+                    outputStream = openFileOutput(filename, Context.MODE_PRIVATE);
+                    outputStream.write(androidPeekResult.getBytes());
+                    outputStream.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                //end temp file saving
+
+
 
             }
         });
