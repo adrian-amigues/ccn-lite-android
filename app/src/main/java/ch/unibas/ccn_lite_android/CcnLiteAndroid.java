@@ -19,9 +19,8 @@ import android.os.Handler;
 
 public class CcnLiteAndroid extends Activity {
     ArrayAdapter adapter;
-    String hello;
+
     Context ccnLiteContext;
-    int newData;
     String ipString;
     String portString;
     String contentString;
@@ -29,9 +28,7 @@ public class CcnLiteAndroid extends Activity {
 
     EditText ipEditText;
     EditText portEditText;
-    //int portInt;
     EditText contentEditText;
-    //String androidPeekResult;
     TextView resultTextView;
 
 
@@ -43,7 +40,7 @@ public class CcnLiteAndroid extends Activity {
         setContentView(R.layout.main_layout);
         adapter = new ArrayAdapter(this, R.layout.logtextview, 0);
         adapter.notifyDataSetChanged();
-        hello = relayInit();
+
         ccnLiteContext = this;
 
         ipEditText = (EditText) findViewById(R.id.IPEditText);
@@ -74,7 +71,6 @@ public class CcnLiteAndroid extends Activity {
             }
         });
         mHandler = new Handler();
-        //  System.out.print("hiiiiiiiiiiiiiiii");
 
     }
 
@@ -84,8 +80,6 @@ public class CcnLiteAndroid extends Activity {
         adapter.add(line);
         adapter.notifyDataSetChanged();
     }
-
-    public native String relayInit();
 
     public native String androidPeek(String ipString, int portString, String contentString);
 
