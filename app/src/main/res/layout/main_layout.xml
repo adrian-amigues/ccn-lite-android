@@ -60,7 +60,8 @@
        android:layout_alignStart="@+id/ContentTextView"
        android:layout_weight="1.12"
        android:background="#f2e6f9"
-       android:layout_marginBottom="30dp" />
+       android:layout_marginBottom="30dp"
+       android:textColor="@android:color/black" />
 
    <TextView
        android:text="Result:"

@@ -199,25 +199,24 @@ public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener
 
             case R.id.menu_history:
                 Cursor resultSet = sensorDatabase.rawQuery("Select * from sensorTable",null);
-                TextView result = (TextView) findViewById(R.id.resultTextView);
-                result.setMovementMethod(new ScrollingMovementMethod());
                 String sensorValue="";
                 int count = 0;
                 if(resultSet != null) {
                     resultSet.moveToFirst();
                     while (count < resultSet.getCount()) {
+                        count++;
+                        sensorValue += count + ": ";
                         sensorValue += resultSet.getString(0) + "\n";
                         resultSet.moveToNext();
-                        count++;
+
                     }
                 }
 
-                /*Intent intent = new Intent(this, DisplayDatabaseHistory.class);
-                intent.putExtra(EXTRA_MESSAGE, sensorValue);
-                startActivity(intent);*/
+                Intent intent = new Intent(this, DisplayDatabaseHistory.class);
+                intent.putExtra("sensorHistory", sensorValue);
+                intent.putExtra("countOfItems", count);
+                startActivity(intent);
 
-
-                result.setText("Count: " + count + "\n" + sensorValue , TextView.BufferType.EDITABLE);
                 return true;
 
             case R.id.menu_reset:
