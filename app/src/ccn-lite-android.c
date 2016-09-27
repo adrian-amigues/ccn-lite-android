@@ -191,13 +191,13 @@ ccnl_ll_TX(struct ccnl_relay_s *ccnl, struct ccnl_if_s *ifc,
                  inet_ntoa(dest->ip4.sin_addr), ntohs(dest->ip4.sin_port), rc);
         break;
 #endif
-#ifdef USE_LINKLAYER
+/*#ifdef USE_LINKLAYER
     case AF_PACKET:
         rc = jni_bleSend(buf->data, buf->datalen);
         DEBUGMSG(DEBUG, "eth_sendto %s returned %d\n",
                  ll2ascii(dest->linklayer.sll_addr, dest->linklayer.sll_halen), rc);
         break;
-#endif
+#endif*/
 #ifdef USE_UNIXSOCKET
     case AF_UNIX:
         rc = sendto(ifc->sock,

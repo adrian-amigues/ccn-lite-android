@@ -12,6 +12,7 @@ static JavaVM *jvm;
 static jclass ccnLiteClass;
 static jobject ccnLiteObject;
 
+/*Init Relay*/
 
 JNIEXPORT jstring JNICALL
 Java_ch_unibas_ccn_1lite_1android_CcnLiteAndroid_relayInit(JNIEnv* env,
@@ -42,13 +43,11 @@ Java_ch_unibas_ccn_1lite_1android_CcnLiteAndroid_relayGetTransport(JNIEnv* env,
     return (*env)->NewStringUTF(env, ccnl_android_getTransport());
 }
 
+/* This send Interest Object to CCN relay*/
 JNIEXPORT jstring JNICALL
 Java_ch_unibas_ccn_1lite_1android_CcnLiteAndroid_androidPeek(JNIEnv* env,
                                                                 jobject thiz, jstring ipString, jint portString, jstring contentString)
 {
-    // char *test;
-    // test = testAndroidPeek();
-    // return (*env)->NewStringUTF(env, test);
     char buf[128];
     const char *ip = (*env)->GetStringUTFChars(env, ipString, 0);
     int port = (int) portString;
@@ -56,55 +55,6 @@ Java_ch_unibas_ccn_1lite_1android_CcnLiteAndroid_androidPeek(JNIEnv* env,
     return (*env)->NewStringUTF(env, ccnl_android_peek("ccnx2015", ip, port, content));
 }
 
-char*
-lvl2str(int level)
-{
-    switch (level) {
-        case FATAL:     return "loglevel = fatal";
-        case ERROR:     return "loglevel &le; error";
-        case WARNING:   return "loglevel &le; warning";
-        case INFO:      return "loglevel &le; info";
-        case DEBUG:     return "loglevel &le; debug";
-        case VERBOSE:   return "loglevel &le; verbose";
-        case TRACE:     return "loglevel &le; trace";
-        default:        return "loglevel = ?";
-    }
-}
-
-JNIEXPORT jstring JNICALL
-Java_ch_unibas_ccn_1lite_1android_CcnLiteAndroid_relayPlus(JNIEnv* env,
-                                                           jobject thiz)
-{
-    if (debug_level < TRACE)
-        debug_level++;
-
-    return (*env)->NewStringUTF(env, lvl2str(debug_level));
-}
-
-JNIEXPORT jstring JNICALL
-Java_ch_unibas_ccn_1lite_1android_CcnLiteAndroid_relayMinus(JNIEnv* env,
-                                                            jobject thiz)
-{
-    if (debug_level > 0)
-        debug_level--;
-
-    return (*env)->NewStringUTF(env, lvl2str(debug_level));
-}
-
-JNIEXPORT void JNICALL
-Java_ch_unibas_ccn_1lite_1android_CcnLiteAndroid_relayDump(JNIEnv* env,
-                                                           jobject thiz)
-{
-    debug_memdump();
-}
-
-JNIEXPORT void JNICALL
-Java_ch_unibas_ccn_1lite_1android_CcnLiteAndroid_relayTimer(JNIEnv* env,
-                                                           jobject thiz)
-{
-    DEBUGMSG(DEBUG, "relayTimer");
-    ccnl_run_events();
-}
 
 void
 add_route(char *pfx, struct ccnl_face_s *face, int suite, int mtu)
@@ -192,25 +142,4 @@ void jni_append_to_log(char *line)
                            (*env)->NewStringUTF(env, line));
 }
 
-int jni_bleSend(unsigned char *data, int len)
-{
-    JNIEnv *env;
-    jmethodID method;
-    jbyteArray a;
 
-    if (len > 20) {
-        DEBUGMSG(WARNING, "  bleSend: trimming from %d to 20 bytes!\n", len);
-        len = 20;
-    }
-
-    (*jvm)->GetEnv(jvm, (void**)&env, JNI_VERSION_1_4);
-
-    a = (*env)->NewByteArray(env, len);
-    (*env)->SetByteArrayRegion(env, a, 0, len, data);
-
-    method = (*env)->GetMethodID(env, ccnLiteClass,
-                                 "bleSend", "([B)V");
-    (*env)->CallVoidMethod(env, ccnLiteObject, method, a);
-
-    return len;
-}

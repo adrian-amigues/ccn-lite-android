@@ -1,5 +1,3 @@
-//
-
 package ch.unibas.ccn_lite_android;
 
 import java.util.UUID;
@@ -30,8 +28,6 @@ public class CcnLiteAndroid extends Activity
     String contentString;
     private Handler mHandler;
 
-
-
     public final static UUID SERV_UUID = new UUID(0x0000222000001000L,
                                                   0x800000805f9b34fbL);
     public final static UUID CONF_UUID = new UUID(0x0000290200001000L,
@@ -45,15 +41,10 @@ public class CcnLiteAndroid extends Activity
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.main_layout);
-
         adapter = new ArrayAdapter(this, R.layout.logtextview, 0);
-
-
         adapter.notifyDataSetChanged();
-
         hello = relayInit();
         ccnLiteContext = this;
     }
@@ -80,19 +71,12 @@ public class CcnLiteAndroid extends Activity
                 result.setMovementMethod(new ScrollingMovementMethod());
                 result.setText(test, TextView.BufferType.EDITABLE);
 
-
-
             }
         });
       mHandler = new Handler();
-        System.out.print("hiiiiiiiiiiiiiiii");
+      //  System.out.print("hiiiiiiiiiiiiiiii");
 
     }
-
-
-
-
-
     public void appendToLog(String line) {
         while (adapter.getCount() > 500)
             adapter.remove(adapter.getItem(0));
@@ -102,9 +86,6 @@ public class CcnLiteAndroid extends Activity
 
     public native String relayInit();
     public native String relayGetTransport();
-    public native String relayPlus();
-    public native String relayMinus();
-    public native void relayDump();
     public native void relayTimer();
     public native void relayRX(byte[] addr, byte[] data);
 
@@ -118,10 +99,4 @@ public class CcnLiteAndroid extends Activity
     static {
         System.loadLibrary("ccn-lite-android");
     }
-
-    // ----------------------------------------------------------------------
-
-
-
-
 }
