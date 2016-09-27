@@ -17,8 +17,7 @@ import android.os.Bundle;
 import android.os.Handler;
 
 
-public class CcnLiteAndroid extends Activity
-{
+public class CcnLiteAndroid extends Activity {
     ArrayAdapter adapter;
     String hello;
     Context ccnLiteContext;
@@ -29,17 +28,16 @@ public class CcnLiteAndroid extends Activity
     private Handler mHandler;
 
     public final static UUID SERV_UUID = new UUID(0x0000222000001000L,
-                                                  0x800000805f9b34fbL);
+            0x800000805f9b34fbL);
     public final static UUID CONF_UUID = new UUID(0x0000290200001000L,
-                                                  0x800000805f9b34fbL);
+            0x800000805f9b34fbL);
     public final static UUID SEND_UUID = new UUID(0x0000222200001000L,
-                                                  0x800000805f9b34fbL);
+            0x800000805f9b34fbL);
     public final static UUID RECV_UUID = new UUID(0x0000222100001000L,
-                                                  0x800000805f9b34fbL);
+            0x800000805f9b34fbL);
 
     @Override
-    public void onCreate(Bundle savedInstanceState)
-    {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.main_layout);
@@ -50,8 +48,7 @@ public class CcnLiteAndroid extends Activity
     }
 
     @Override
-    public void onStart()
-    {
+    public void onStart() {
         ListView lv;
 
         super.onStart();
@@ -73,10 +70,11 @@ public class CcnLiteAndroid extends Activity
 
             }
         });
-      mHandler = new Handler();
-      //  System.out.print("hiiiiiiiiiiiiiiii");
+        mHandler = new Handler();
+        //  System.out.print("hiiiiiiiiiiiiiiii");
 
     }
+
     public void appendToLog(String line) {
         while (adapter.getCount() > 500)
             adapter.remove(adapter.getItem(0));
@@ -85,9 +83,6 @@ public class CcnLiteAndroid extends Activity
     }
 
     public native String relayInit();
-    public native String relayGetTransport();
-    public native void relayTimer();
-    public native void relayRX(byte[] addr, byte[] data);
 
     public native String androidPeek(String ipString, int portString, String contentString);
 
@@ -98,5 +93,6 @@ public class CcnLiteAndroid extends Activity
      */
     static {
         System.loadLibrary("ccn-lite-android");
+
     }
 }
