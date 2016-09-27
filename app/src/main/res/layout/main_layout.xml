@@ -59,14 +59,15 @@
        android:layout_alignEnd="@+id/contentEditText"
        android:layout_alignStart="@+id/ContentTextView"
        android:layout_weight="1.12"
-       android:background="#f2e6f9" />
+       android:background="#f2e6f9"
+       android:layout_marginBottom="30dp" />
 
    <TextView
        android:text="Result:"
        android:layout_width="wrap_content"
        android:layout_height="wrap_content"
        android:layout_below="@+id/sendButton"
-       android:layout_alignStart="@+id/resultTextView"
+       android:layout_alignStart="@+id/ContentTextView"
        android:layout_marginTop="16dp"
        android:id="@+id/resultTitleTextView"
        android:textColor="@android:color/black"
@@ -95,16 +96,16 @@
        android:layout_below="@+id/portEditText"
        android:layout_alignStart="@+id/PortTextView" />
 
-   <Button
-       android:text="Send Interest Message"
+   <TextView
+       android:text="Format:"
        android:layout_width="wrap_content"
        android:layout_height="wrap_content"
        android:layout_marginTop="34dp"
-       android:id="@+id/sendButton"
-       android:onClick="sendInterest"
-       android:layout_marginStart="21dp"
+       android:id="@+id/formatTextView"
+       android:textColor="@android:color/background_dark"
        android:layout_below="@+id/contentEditText"
-       android:layout_alignStart="@+id/contentEditText" />
+       android:layout_alignStart="@+id/ContentTextView"
+       android:textStyle="normal|bold" />
 
    <TextView
        android:text="Port:"
@@ -138,6 +139,29 @@
           android:onClick="showPopUp"
           android:id="@+id/imageViewMenu" />
    </RelativeLayout>
+
+   <Button
+       android:text="Send Interest Message"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:layout_marginTop="30dp"
+       android:id="@+id/sendButton"
+       android:onClick="sendInterest"
+       android:layout_marginStart="25dp"
+       android:layout_below="@id/formatTextView"
+       android:layout_alignStart="@+id/contentEditText" />
+
+   <Spinner
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:id="@+id/formatSpinner"
+       android:layout_alignBaseline="@+id/formatTextView"
+       android:layout_alignBottom="@+id/formatTextView"
+       android:layout_alignStart="@+id/contentEditText"
+       android:layout_alignEnd="@+id/contentEditText"
+       android:layout_marginTop="30dp"
+       android:spinnerMode="dropdown"
+       android:popupBackground="@android:color/darker_gray" />
 
 
 </RelativeLayout>

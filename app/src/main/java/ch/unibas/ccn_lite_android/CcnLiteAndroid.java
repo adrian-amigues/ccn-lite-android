@@ -14,9 +14,14 @@ import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattService;
 import android.bluetooth.BluetoothProfile;
 import android.content.Context;
+import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.text.method.ScrollingMovementMethod;
+import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.widget.ArrayAdapter;
@@ -26,13 +31,18 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.PopupMenu;
 import android.widget.RelativeLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.PopupMenu.OnMenuItemClickListener;
+
 
 import android.os.Bundle;
 import android.os.Handler;
 
+import static android.provider.AlarmClock.EXTRA_MESSAGE;
 
-public class CcnLiteAndroid extends Activity
+
+public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener
 {
     ArrayAdapter adapter;
     TextView debuglevel;
@@ -43,6 +53,8 @@ public class CcnLiteAndroid extends Activity
     String hello;
     Context ccnLiteContext;
     int newData;
+    SQLiteDatabase sensorDatabase;
+    String resultValue;
 
     public final static UUID SERV_UUID = new UUID(0x0000222000001000L,
                                                   0x800000805f9b34fbL);
@@ -84,6 +96,18 @@ public class CcnLiteAndroid extends Activity
         }*/
         adapter.notifyDataSetChanged();
 
+
+        String arraySpinner[] = new String[] {
+                "CCNx2015", "NDN2013", "CCNB", "IOT2014", "LOCALRPC", "LOCALRPC"
+        };
+
+        Spinner s = (Spinner) findViewById(R.id.formatSpinner);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
+                android.R.layout.simple_spinner_item, arraySpinner);
+
+        s.setAdapter(adapter);
+
+
         hello = relayInit();
         ccnLiteContext = this;
     }
@@ -92,6 +116,8 @@ public class CcnLiteAndroid extends Activity
     public void onStart()
     {
         ListView lv;
+        sensorDatabase = openOrCreateDatabase("SENSORDATABASE",MODE_PRIVATE,null);
+        sensorDatabase.execSQL("CREATE TABLE IF NOT EXISTS sensorTable(sensorValue VARCHAR);");
 
         super.onStart();
         Button b = (Button) findViewById(R.id.sendButton);
@@ -107,12 +133,10 @@ public class CcnLiteAndroid extends Activity
                 EditText content = (EditText) findViewById(R.id.contentEditText);
                 String contentString = content.getText().toString();
                 mHandler = new Handler();
-                String test = androidPeek(ipString, portInt, contentString);
+                resultValue = androidPeek(ipString, portInt, contentString);
                 TextView result = (TextView) findViewById(R.id.resultTextView);
                 result.setMovementMethod(new ScrollingMovementMethod());
-                result.setText(test, TextView.BufferType.EDITABLE);
-
-
+                result.setText(resultValue, TextView.BufferType.EDITABLE);
 
             }
         });
@@ -167,14 +191,49 @@ public class CcnLiteAndroid extends Activity
        // String test = androidPeek(ipString, portString, contentString);
        // adapter.add(test);
     }
+    public boolean onMenuItemClick(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_add:
+                sensorDatabase.execSQL("INSERT INTO sensorTable VALUES('" + resultValue + "');");
+                return true;
 
+            case R.id.menu_history:
+                Cursor resultSet = sensorDatabase.rawQuery("Select * from sensorTable",null);
+                TextView result = (TextView) findViewById(R.id.resultTextView);
+                result.setMovementMethod(new ScrollingMovementMethod());
+                String sensorValue="";
+                int count = 0;
+                if(resultSet != null) {
+                    resultSet.moveToFirst();
+                    while (count < resultSet.getCount()) {
+                        sensorValue += resultSet.getString(0) + "\n";
+                        resultSet.moveToNext();
+                        count++;
+                    }
+                }
+
+                /*Intent intent = new Intent(this, DisplayDatabaseHistory.class);
+                intent.putExtra(EXTRA_MESSAGE, sensorValue);
+                startActivity(intent);*/
+
+
+                result.setText("Count: " + count + "\n" + sensorValue , TextView.BufferType.EDITABLE);
+                return true;
+
+            case R.id.menu_reset:
+                sensorDatabase.execSQL("DELETE FROM sensorTable;");
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
 
     public void showPopUp(View v){
-        PopupMenu popup = new PopupMenu(this, v);
+        PopupMenu popup = new PopupMenu(CcnLiteAndroid.this, v);
+        popup.setOnMenuItemClickListener(CcnLiteAndroid.this);
         MenuInflater inflater = popup.getMenuInflater();
         inflater.inflate(R.menu.menu_items, popup.getMenu());
         popup.show();
-
     }
 
 
