@@ -45,10 +45,8 @@ public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener
     ArrayAdapter adapter;
 
     Context ccnLiteContext;
-    String hello;
-    int newData;
+
     SQLiteDatabase sensorDatabase;
-    String resultValue;
     String ipString;
     String portString;
     String contentString;
@@ -61,7 +59,6 @@ public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener
     int portInt;
     String androidPeekResult;
 
-    boolean networkConnectionBool;
     String netConnString;
     String filename;
 
@@ -84,7 +81,7 @@ public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener
                 android.R.layout.simple_spinner_item, arraySpinner);
 
         s.setAdapter(adapter);
-        
+
         ccnLiteContext = this;
 
         ipEditText = (EditText) findViewById(R.id.IPEditText);
@@ -114,9 +111,9 @@ public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener
                 mHandler = new Handler();
 
                 //check if file exists
-                File file = new File(ccnLiteContext.getFilesDir(), filename);
-                if(file.exists()) {
-                    FileInputStream inputStream;
+                //File file = new File(ccnLiteContext.getFilesDir(), filename);
+                //if(file.exists()) {
+                  /*  FileInputStream inputStream;
                     try {
                         inputStream = openFileInput(filename);
                         //inputStream.read(contentString.getBytes());
@@ -133,9 +130,9 @@ public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener
                     }
                     resultTextView.setText(androidPeekResult, TextView.BufferType.EDITABLE);
                     resultTextView.setMovementMethod(new ScrollingMovementMethod());
-                } else {
+                    */
+                //} else {
                     //if not do network op
-                    //TODO: make sure this happens in seperate thread
                     //check network connection
                     netConnString = "No Network Connection";
                     ConnectivityManager connMgr = (ConnectivityManager)
@@ -149,7 +146,7 @@ public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener
                         toast(netConnString);
                         androidPeekResult = netConnString;
                         resultTextView.setText(androidPeekResult, TextView.BufferType.EDITABLE);
-                    }
+                   // }
                 }
             }
         });
@@ -165,7 +162,7 @@ public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener
     public boolean onMenuItemClick(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_add:
-                sensorDatabase.execSQL("INSERT INTO sensorTable VALUES('" + resultValue + "');");
+                sensorDatabase.execSQL("INSERT INTO sensorTable VALUES('" + androidPeekResult + "');");
                 return true;
 
             case R.id.menu_history:
@@ -221,7 +218,7 @@ public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener
 
             //create file and store result
             //temp files saving to be replaced by data base
-            FileOutputStream outputStream;
+           /* FileOutputStream outputStream;
             try {
                 outputStream = openFileOutput(filename, Context.MODE_PRIVATE);
                 outputStream.write(androidPeekResult.getBytes());
@@ -230,6 +227,7 @@ public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener
                 e.printStackTrace();
             }
             //end temp file saving
+            */
         }
     }
 
