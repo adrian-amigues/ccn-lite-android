@@ -21,20 +21,13 @@ public class CcnLiteAndroid extends Activity {
     ArrayAdapter adapter;
     String hello;
     Context ccnLiteContext;
-    int newData;
+
     String ipString;
     String portString;
     String contentString;
     private Handler mHandler;
 
-    public final static UUID SERV_UUID = new UUID(0x0000222000001000L,
-            0x800000805f9b34fbL);
-    public final static UUID CONF_UUID = new UUID(0x0000290200001000L,
-            0x800000805f9b34fbL);
-    public final static UUID SEND_UUID = new UUID(0x0000222200001000L,
-            0x800000805f9b34fbL);
-    public final static UUID RECV_UUID = new UUID(0x0000222100001000L,
-            0x800000805f9b34fbL);
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
