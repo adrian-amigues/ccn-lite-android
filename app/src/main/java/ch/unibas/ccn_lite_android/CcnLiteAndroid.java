@@ -152,7 +152,7 @@ public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener
         popup.show();
     }
 
-    }
+
 
     public void appendToLog(String line) {
         while (adapter.getCount() > 500)
