@@ -2,6 +2,9 @@ package ch.unibas.ccn_lite_android;
 
 import android.app.Activity;
 import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.method.ScrollingMovementMethod;
@@ -12,8 +15,12 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 
 
 public class CcnLiteAndroid extends Activity {
@@ -29,6 +36,12 @@ public class CcnLiteAndroid extends Activity {
     EditText portEditText;
     EditText contentEditText;
     TextView resultTextView;
+    int portInt;
+    String androidPeekResult;
+
+    boolean networkConnectionBool;
+    String netConnString;
+    String filename;
 
 
 
@@ -46,6 +59,7 @@ public class CcnLiteAndroid extends Activity {
         portEditText = (EditText) findViewById(R.id.portEditText);
         resultTextView = (TextView) findViewById(R.id.resultTextView);
         contentEditText = (EditText) findViewById(R.id.contentEditText);
+
     }
 
     @Override
@@ -59,32 +73,87 @@ public class CcnLiteAndroid extends Activity {
 
                 ipString = ipEditText.getText().toString();
                 portString = portEditText.getText().toString();
-                int portInt = Integer.parseInt(portString);
+                portInt = Integer.parseInt(portString);
                 contentString = contentEditText.getText().toString();
+                filename = contentString.replace("/", ""); //maybe file can't start with dash
+                androidPeekResult = "No Data Found";
                 mHandler = new Handler();
-                String androidPeekResult = androidPeek(ipString, portInt, contentString);
-                resultTextView.setMovementMethod(new ScrollingMovementMethod());
-                resultTextView.setText(androidPeekResult, TextView.BufferType.EDITABLE);
 
-                //temp files saving to be replaced by data base
-                String filename = "temp";
-                FileOutputStream outputStream;
+                //check if file exists
+                File file = new File(ccnLiteContext.getFilesDir(), filename);
+                if(file.exists()) {
+                    FileInputStream inputStream;
+                    try {
+                        inputStream = openFileInput(filename);
+                        //inputStream.read(contentString.getBytes());
+                        int c;
+                        String temp="";
+                        while( (c = inputStream.read()) != -1){
+                            temp = temp + Character.toString((char)c);
+                        }
+                        androidPeekResult = temp;
+                        inputStream.close();
+                        toast("result taken from file");
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    resultTextView.setText(androidPeekResult, TextView.BufferType.EDITABLE);
+                    resultTextView.setMovementMethod(new ScrollingMovementMethod());
+                } else {
+                    //if not do network op
+                    //TODO: make sure this happens in seperate thread
+                    //check network connection
+                    netConnString = "No Network Connection";
+                    ConnectivityManager connMgr = (ConnectivityManager)
+                            getSystemService(Context.CONNECTIVITY_SERVICE);
+                    NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+                    if (networkInfo != null && networkInfo.isConnected()) {
+                        new AndroidPeekTask().execute(androidPeekResult); //TODO: it's not actually using this content string
 
-                try {
-                    outputStream = openFileOutput(filename, Context.MODE_PRIVATE);
-                    outputStream.write(androidPeekResult.getBytes());
-                    outputStream.close();
-                } catch (Exception e) {
-                    e.printStackTrace();
+                    } else {
+                        // display error
+                        toast(netConnString);
+                        androidPeekResult = netConnString;
+                        resultTextView.setText(androidPeekResult, TextView.BufferType.EDITABLE);
+                    }
                 }
-                //end temp file saving
-
-
-
             }
         });
         mHandler = new Handler();
 
+    }
+
+    //executes the android peek function
+    private class AndroidPeekTask extends AsyncTask<String, Void, String> {
+        @Override
+        protected String doInBackground(String... urls) {
+            androidPeekResult = androidPeek(ipString, portInt, contentString);
+            return androidPeekResult;
+        }
+        // onPostExecute displays the results of the AsyncTask.
+        @Override
+        protected void onPostExecute(String result) {
+            resultTextView.setText(androidPeekResult, TextView.BufferType.EDITABLE);
+            resultTextView.setMovementMethod(new ScrollingMovementMethod());
+
+            //create file and store result
+            //temp files saving to be replaced by data base
+            FileOutputStream outputStream;
+            try {
+                outputStream = openFileOutput(filename, Context.MODE_PRIVATE);
+                outputStream.write(androidPeekResult.getBytes());
+                outputStream.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            //end temp file saving
+        }
+    }
+
+
+    public void toast(String text) {
+        Toast toast = Toast.makeText(ccnLiteContext, text, Toast.LENGTH_SHORT);
+        toast.show();
     }
 
     public void appendToLog(String line) {
