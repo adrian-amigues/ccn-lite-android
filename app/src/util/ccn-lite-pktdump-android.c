@@ -48,7 +48,7 @@ indent(char *s, int lev)
 
 void
 hexdump(int lev, unsigned char *base, unsigned char *cp, int len,
-        int rawxml, FILE* out)
+        int rawxml, FILE* out, char* pktContent)
 {
     int i, maxi, lastlen=-1;
     unsigned char cmp[8], star = 0;
@@ -61,6 +61,7 @@ hexdump(int lev, unsigned char *base, unsigned char *cp, int len,
                 if (lastlen == 8 && !memcmp(cmp, cp, 8)) {
                     if (!star) {
                         fprintf(out, "*\n");
+                        sprintf(pktContent, "%s*\n", pktContent);
                         star = 1;
                     }
                     cp += 8;
@@ -72,24 +73,27 @@ hexdump(int lev, unsigned char *base, unsigned char *cp, int len,
                 star = 0;
             }
             fprintf(out, "%04zx  ", cp - base);
+            sprintf(pktContent, "%s%04zx  ", pktContent, cp - base);
         }
 
         indent(NULL, lev);
         for (i = 0; i < 8; i++){
-            if (i < maxi)
-                    fprintf(out, "%02x ", cp[i]);
-            else
-                    fprintf(out, "   ");
+            if (i < maxi) {
+                    sprintf(pktContent, "%s%02x ", pktContent, cp[i]);
+                }
+            else {
+                    sprintf(pktContent, "%s   ", pktContent);
+                }
         }
         if (!rawxml) {
             for (i = 79 - 6 - 2*(lev+1) - 8*3 - 12; i > 0; i--)
-                fprintf(out, " ");
-            fprintf(out, "  |");
+                sprintf(pktContent, "%s ", pktContent);
+            sprintf(pktContent, "%s  |", pktContent);
             for (i = 0; i < maxi; i++, cp++)
-                fprintf(out, "%c", isprint(*cp) ? *cp : '.');
-            fprintf(out, "|\n");
+                sprintf(pktContent, "%s%c", pktContent, isprint(*cp) ? *cp : '.');
+            sprintf(pktContent, "%s|\n", pktContent);
         } else {
-            fprintf(out, "\n");
+            sprintf(pktContent, "%s\n", pktContent);
         }
 
         len -= maxi;
@@ -97,13 +101,15 @@ hexdump(int lev, unsigned char *base, unsigned char *cp, int len,
 }
 
 void
-base64dump(int lev, unsigned char *base, unsigned char *cp, int len, int rawxml, FILE* out) {
+base64dump(int lev, unsigned char *base, unsigned char *cp, int len, int rawxml, FILE* out, char* pktContent) {
     int encodedLen = -1;
     int i;
     for(i = 0; i < lev + 1; i++) {
         fprintf(out, "  ");
+        sprintf(pktContent, "%s  ", pktContent);
     }
     fprintf(out, "%s\n", base64_encode((char*)cp, len, (size_t*)&encodedLen));
+    sprintf(pktContent, "%s%s\n", pktContent, base64_encode((char*)cp, len, (size_t*)&encodedLen));
     cp += len;
     len = 0;
 }
@@ -113,7 +119,7 @@ base64dump(int lev, unsigned char *base, unsigned char *cp, int len, int rawxml,
 
 int
 ccnb_deheadAndPrint(int lev, unsigned char *base, unsigned char **buf,
-            int *len, int *num, int *typ, int rawxml, FILE* out)
+            int *len, int *num, int *typ, int rawxml, FILE* out, char* pktContent)
 {
     int i, val = 0;
 
@@ -123,14 +129,17 @@ ccnb_deheadAndPrint(int lev, unsigned char *base, unsigned char **buf,
 
     if (!rawxml) {
         fprintf(out, "%04zx  ", *buf - base);
+        sprintf(pktContent, "%s%04zx  ", pktContent, *buf - base);
     }
 
     for (i = 0; i < lev; i++) {
         fprintf(out, "  ");
+        sprintf(pktContent, "%s  ", pktContent);
     }
     if (**buf == 0) {
         if (!rawxml) {
             fprintf(out, "00 ");
+            sprintf(pktContent, "%s00 ", pktContent);
         }
         *num = *typ = 0;
         *buf += 1;
@@ -141,6 +150,7 @@ ccnb_deheadAndPrint(int lev, unsigned char *base, unsigned char **buf,
         unsigned char c = (*buf)[i];
         if (!rawxml) {
             fprintf(out, "%02x ", c);
+            sprintf(pktContent, "%s%02x ", pktContent, c);
         }
         if ( c & 0x80 ) {
             *num = (val << 4) | ((c >> 3) & 0xf);
@@ -153,6 +163,7 @@ ccnb_deheadAndPrint(int lev, unsigned char *base, unsigned char **buf,
     }
     if (!rawxml) {
         fprintf(out, "?decoding problem?\n");
+        sprintf(pktContent, "%s?decoding problem?\n", pktContent);
     }
     return -1;
 }
@@ -228,34 +239,39 @@ ccnb_dtag2name(int num)
 
 static int
 ccnb_parse_lev(int lev, unsigned char *base, unsigned char **buf,
-           int *len, char *cur_tag, int rawxml, FILE* out)
+           int *len, char *cur_tag, int rawxml, FILE* out, char* pktContent)
 {
     int num, typ = -1;
     char *next_tag;
 
-    while (ccnb_deheadAndPrint(lev, base, buf, len, &num, &typ, rawxml, out) == 0) {
+    while (ccnb_deheadAndPrint(lev, base, buf, len, &num, &typ, rawxml, out, pktContent) == 0) {
         switch (typ) {
         case CCN_TT_BLOB:
         case CCN_TT_UDATA:
             if (rawxml) {
                 fprintf(out, "<data ");
+                sprintf(pktContent, "%s", pktContent);
                 fprintf(out, "size=\"%i\" dt=\"binary.base64\"", num);
+                sprintf(pktContent, "%s", pktContent);
             } else {
                 fprintf(out, " -- <data (%d byte%s)", num, num > 1 ? "s" : "");
+                sprintf(pktContent, "%s", pktContent);
             }
             if (ccnb_must_recurse(/* work in progress */)) {
               if (!rawxml) {
                 fprintf(out, ", recursive decoding>\n");
+                sprintf(pktContent, "%s", pktContent);
               }
             // ...
     //      *buf += num;
     //      *len -= num;
             }
             fprintf(out, ">\n");
+            sprintf(pktContent, "%s", pktContent);
             if (!rawxml) {
-                hexdump(lev, base, *buf, num, rawxml, out);
+                hexdump(lev, base, *buf, num, rawxml, out, pktContent);
             } else {
-                base64dump(lev, base, *buf, num, rawxml, out);
+                base64dump(lev, base, *buf, num, rawxml, out, pktContent);
             }
     /*
             for (i = 0; i < num; i++) {
@@ -271,9 +287,12 @@ ccnb_parse_lev(int lev, unsigned char *base, unsigned char **buf,
             *len -= num;
             if (rawxml) {
                 int i;
-                for(i = 0; i < lev ; i++)
+                for(i = 0; i < lev ; i++) {
                     fprintf(out, "  ");
+                    sprintf(pktContent, "%s", pktContent);
+                }
                 fprintf(out, "</data>\n");
+                sprintf(pktContent, "%s", pktContent);
             }
             break;
         case CCN_TT_DTAG:
@@ -281,23 +300,28 @@ ccnb_parse_lev(int lev, unsigned char *base, unsigned char **buf,
             if (next_tag) {
                 if (!rawxml) {
                     fprintf(out, " -- <%s>\n", next_tag);
+                    sprintf(pktContent, "%s", pktContent);
                 } else {
                     fprintf(out, "<%s>\n", next_tag);
+                    sprintf(pktContent, "%s", pktContent);
                 }
             }
             else {
                 if (!rawxml) {
                     fprintf(out, " -- <unknown tt=%d num=%d>\n", typ, num);
+                    sprintf(pktContent, "%s", pktContent);
                 } else {
                     fprintf(out, "<unknown>\n");
+                    sprintf(pktContent, "%s", pktContent);
                 }
             }
-            if (ccnb_parse_lev(lev+1, base, buf, len, next_tag, rawxml, out) < 0) {
+            if (ccnb_parse_lev(lev+1, base, buf, len, next_tag, rawxml, out, pktContent) < 0) {
                 return -1;
             }
             if (lev == 0) {
                 if (*len > 0) {
                     fprintf(out, "\n");
+                    sprintf(pktContent, "%s", pktContent);
                 }
             }
             break;
@@ -305,35 +329,43 @@ ccnb_parse_lev(int lev, unsigned char *base, unsigned char **buf,
             if (num == 0 || cur_tag != NULL) { // end tag
                 if (!rawxml) {
                     fprintf(out, " -- </%s>\n", cur_tag);
+                    sprintf(pktContent, "%s", pktContent);
                 } else {
                     fprintf(out, "</%s>\n", cur_tag );
+                    sprintf(pktContent, "%s", pktContent);
                 }
                 return 0;
             }
         default:
             if (!rawxml) {
                 fprintf(out, "-- tt=%d num=%d not implemented yet\n", typ, num);
+                sprintf(pktContent, "%s", pktContent);
             } else {
                 fprintf(out, "=%d num=%d not implemented yet\n", typ, num);
+                sprintf(pktContent, "%s", pktContent);
             }
             break;
         }
     }
     if (cur_tag != NULL) {
         fprintf(out, "</%s>\n", cur_tag );
+        sprintf(pktContent, "%s", pktContent);
     }
     return 0;
 }
 
 
 void
-ccnb_parse(int lev, unsigned char *data, int len, int rawxml, FILE* out)
+ccnb_parse(int lev, unsigned char *data, int len, int rawxml, FILE* out, char* pktContent)
 {
     unsigned char *buf = data;
 
-    ccnb_parse_lev(lev, data, &buf, &len, NULL, rawxml, out);
-    if (!rawxml)
+    ccnb_parse_lev(lev, data, &buf, &len, NULL, rawxml, out, pktContent);
+    if (!rawxml) {
         fprintf(out, "%04zx  pkt.end\n", buf - data);
+        sprintf(pktContent, "%s", pktContent);
+    }
+
 }
 
 // ----------------------------------------------------------------------
@@ -489,7 +521,7 @@ ccnl_ccntlv_type2name(unsigned char ctx, unsigned int type, int rawxml)
 
 static int
 ccntlv_parse_sequence(int lev, unsigned char ctx, unsigned char *base,
-              unsigned char **buf, int *len, char *cur_tag, int rawxml, FILE* out)
+              unsigned char **buf, int *len, char *cur_tag, int rawxml, FILE* out, char* pktContent)
 {
     unsigned int typ;
     int i;
@@ -517,47 +549,51 @@ ccntlv_parse_sequence(int lev, unsigned char ctx, unsigned char *base,
         }
 
 
-        if(!rawxml)
-            fprintf(out, "%04zx  ", cp - base);
+        if(!rawxml) {
+            sprintf(pktContent, "%s%04zx  ", pktContent, cp - base);
+        }
         for (i = 0; i < lev; i++) {
-                fprintf(out, "  ");
+                sprintf(pktContent, "%s  ", pktContent);
         }
         for (; cp < *buf; cp++) {
-            if(!rawxml)
-                fprintf(out, "%02x ", *cp);
+            if(!rawxml) {
+                sprintf(pktContent, "%s%02x ", pktContent, *cp);
+            }
         }
-        if(!rawxml)
-            fprintf(out, "-- <%s, len=%d>\n", n, vallen);
+        if(!rawxml) {
+            sprintf(pktContent, "%s-- <%s, len=%d>\n", pktContent, n, vallen);
+        }
 
         // if(rawxml)
-        //     fprintf(out, "</%s>\n", n);
+        //     sprintf(pktContent, "%s</%s>\n", pktContent, n);
         ctx2 = ccntlv_must_recurse(ctx, typ);
         if (ctx2) {
-            if (rawxml)
-                fprintf(out, "<%s>\n", n);
+            if (rawxml) {
+                sprintf(pktContent, "%s<%s>\n", pktContent, n);
+            }
             *len -= vallen;
             i = vallen;
             strcpy(n_old, n);
             if (ccntlv_parse_sequence(lev+1, ctx2, base, buf, &i,
-                                                        n, rawxml, out) < 0)
+                                                        n, rawxml, out, pktContent) < 0)
                 return -1;
 
             if(rawxml) {
                 for (i = 0; i < lev; i++) {
-                        fprintf(out, "  ");
+                        sprintf(pktContent, "%s  ", pktContent);
                 }
-                fprintf(out, "</%s>\n", n_old);
+                sprintf(pktContent, "%s</%s>\n", pktContent, n_old);
             }
         } else {
             if (rawxml && vallen > 0) {
-                fprintf(out, "<%s size=\"%i\" dt=\"binary.base64\">\n", n, vallen);
-                base64dump(lev, base, *buf, vallen, rawxml, out);
+                sprintf(pktContent, "%s<%s size=\"%i\" dt=\"binary.base64\">\n", pktContent, n, vallen);
+                base64dump(lev, base, *buf, vallen, rawxml, out, pktContent);
                 for (i = 0; i < lev; i++) {
-                        fprintf(out, "  ");
+                        sprintf(pktContent, "%s  ", pktContent);
                 }
-                fprintf(out, "</%s>\n", n);
+                sprintf(pktContent, "%s</%s>\n", pktContent, n);
             } else
-                hexdump(lev, base, *buf, vallen, rawxml, out);
+                hexdump(lev, base, *buf, vallen, rawxml, out, pktContent);
             *buf += vallen;
             *len -= vallen;
         }
@@ -567,7 +603,7 @@ ccntlv_parse_sequence(int lev, unsigned char ctx, unsigned char *base,
 }
 
 void
-ccntlv_2015(int lev, unsigned char *data, int len, int rawxml, FILE* out)
+ccntlv_2015(int lev, unsigned char *data, int len, int rawxml, FILE* out, char* pktContent)
 {
     unsigned char *buf;
     char *mp;
@@ -610,13 +646,13 @@ ccntlv_2015(int lev, unsigned char *data, int len, int rawxml, FILE* out)
             fprintf(out, "%04zx  hdr.frag: seqnr=0x%05x ",
                     fp->fill - data, ntohs(*(uint16_t*)fp->fill) & 0x03fff);
             if ((fp->fill[0] >> 6) == 0x0)
-                fprintf(out, "MID\n");
+                sprintf(pktContent, "%sMID\n", pktContent);
             else if ((fp->fill[0] >> 6) == 0x1)
-                fprintf(out, "BEGIN\n");
+                sprintf(pktContent, "%sBEGIN\n", pktContent);
             else if ((fp->fill[0] >> 6) == 0x2)
-                fprintf(out, "END\n");
+                sprintf(pktContent, "%sEND\n", pktContent);
             else
-                fprintf(out, "SINGLE\n");
+                sprintf(pktContent, "%sSINGLE\n", pktContent);
         }
         fprintf(out, "%04zx  hdr.hdrlen=%d\n",
                 (unsigned char*) &(hp->hdrlen) - data, hdrlen);
@@ -635,15 +671,15 @@ ccntlv_2015(int lev, unsigned char *data, int len, int rawxml, FILE* out)
     len = buf - data;
     // if (len > 0) {
     //     ccntlv_parse_sequence(0, CTX_HOP, data, &buf, &len,
-    //                                                     "header", rawxml, out);
+    //                                                     "header", rawxml, out, pktContent);
     //     if (len != 0) {
     //         fprintf(stderr, "%d left over bytes in header\n", len);
     //     }
     // }
     if (!rawxml) {
-        fprintf(out, "%04zx", buf - data);
+        sprintf(pktContent, "%s%04zx", pktContent, buf - data);
         indent(NULL, lev);
-        fprintf(out, "hdr.end\n");
+        sprintf(pktContent, "%shdr.end\n", pktContent);
     }
 
     buf = data + hdrlen;
@@ -653,23 +689,23 @@ ccntlv_2015(int lev, unsigned char *data, int len, int rawxml, FILE* out)
 
         // dump the sequence of TLV fields of the message body
         ccntlv_parse_sequence(lev, CTX_TOPLEVEL, data, &buf, &len,
-                                                        "message", rawxml, out);
+                                                        "message", rawxml, out, pktContent);
     } else {
-        hexdump(lev, data, buf, len, rawxml, out);
+        hexdump(lev, data, buf, len, rawxml, out, pktContent);
         buf += len;
     }
 
     if (!rawxml) {
-        fprintf(out, "%04zx", buf - data);
+        sprintf(pktContent, "%s%04zx", pktContent, buf - data);
         indent(NULL, lev);
-        fprintf(out, "pkt.end\n");
+        sprintf(pktContent, "%spkt.end\n", pktContent);
     }
 }
 
 
 #ifdef OBSOLETE
 void
-ccntlv_201411(unsigned char *data, int len, int rawxml, FILE* out)
+ccntlv_201411(unsigned char *data, int len, int rawxml, FILE* out, char* pktContent)
 {
     unsigned char *buf;
     char *mp;
@@ -713,21 +749,21 @@ ccntlv_201411(unsigned char *data, int len, int rawxml, FILE* out)
     len = hp->hdrlen; // ntohs(hp->hdrlen);
     // if (len > 0) {
     //     ccntlv_parse_sequence(0, CTX_HOP, data, &buf, &len,
-    //                                                     "header", rawxml, out);
+    //                                                     "header", rawxml, out, pktContent);
     //     if (len != 0) {
     //         fprintf(stderr, "%d left over bytes in header\n", len);
     //     }
     // }
     if (!rawxml)
-        fprintf(out, "%04zx  hdr.end\n", buf - data);
+        sprintf(pktContent, "%s%04zx  hdr.end\n", pktContent, buf - data);
 
     // dump the sequence of TLV fields of the message (formerly called payload)
     len = payloadlen;
     buf = data + hdrlen;
     ccntlv_parse_sequence(0, CTX_TOPLEVEL, data, &buf, &len,
-                                                        "message", rawxml, out);
+                                                        "message", rawxml, out, pktContent);
     if (!rawxml)
-        fprintf(out, "%04zx  pkt.end\n", buf - data);
+        sprintf(pktContent, "%s%04zx  pkt.end\n", pktContent, buf - data);
 }
 #endif
 
@@ -839,7 +875,7 @@ ccnl_cistlv_type2name(unsigned char ctx, unsigned int type, int rawxml)
 
 static int
 cistlv_parse_sequence(int lev, unsigned char ctx, unsigned char *base,
-              unsigned char **buf, int *len, char *cur_tag, int rawxml, FILE* out)
+              unsigned char **buf, int *len, char *cur_tag, int rawxml, FILE* out, char* pktContent)
 {
     unsigned int vallen, typ;
     int i;
@@ -867,46 +903,46 @@ cistlv_parse_sequence(int lev, unsigned char ctx, unsigned char *base,
 
 
         if(!rawxml)
-            fprintf(out, "%04zx  ", cp - base);
+            sprintf(pktContent, "%s%04zx  ", pktContent, cp - base);
         for (i = 0; i < lev; i++) {
-                fprintf(out, "  ");
+                sprintf(pktContent, "%s  ", pktContent);
         }
         for (; cp < *buf; cp++) {
             if(!rawxml)
-                fprintf(out, "%02x ", *cp);
+                sprintf(pktContent, "%s%02x ", pktContent, *cp);
         }
         if(!rawxml)
-            fprintf(out, "-- <%s, len=%d>\n", n, vallen);
+            sprintf(pktContent, "%s-- <%s, len=%d>\n", pktContent, n, vallen);
 
         // if(rawxml)
-        //     fprintf(out, "</%s>\n", n);
+        //     sprintf(pktContent, "%s</%s>\n", pktContent, n);
         ctx2 = cistlv_must_recurse(ctx, typ);
         if (ctx2) {
             if (rawxml)
-                fprintf(out, "<%s>\n", n);
+                sprintf(pktContent, "%s<%s>\n", pktContent, n);
             *len -= vallen;
             i = vallen;
             strcpy(n_old, n);
             if (cistlv_parse_sequence(lev+1, ctx2, base, buf, &i,
-                                                        n, rawxml, out) < 0)
+                                                        n, rawxml, out, pktContent) < 0)
                 return -1;
 
             if(rawxml) {
                 for (i = 0; i < lev; i++) {
-                        fprintf(out, "  ");
+                        sprintf(pktContent, "%s  ", pktContent);
                 }
-                fprintf(out, "</%s>\n", n_old);
+                sprintf(pktContent, "%s</%s>\n", pktContent, n_old);
             }
         } else {
             if (rawxml && vallen > 0) {
-                fprintf(out, "<%s size=\"%i\" dt=\"binary.base64\">\n", n, vallen);
-                base64dump(lev, base, *buf, vallen, rawxml, out);
+                sprintf(pktContent, "%s<%s size=\"%i\" dt=\"binary.base64\">\n", pktContent, n, vallen);
+                base64dump(lev, base, *buf, vallen, rawxml, out, pktContent);
                 for (i = 0; i < lev; i++) {
-                        fprintf(out, "  ");
+                        sprintf(pktContent, "%s  ", pktContent);
                 }
-                fprintf(out, "</%s>\n", n);
+                sprintf(pktContent, "%s</%s>\n", pktContent, n);
             } else
-                hexdump(lev, base, *buf, vallen, rawxml, out);
+                hexdump(lev, base, *buf, vallen, rawxml, out, pktContent);
             *buf += vallen;
             *len -= vallen;
         }
@@ -916,7 +952,7 @@ cistlv_parse_sequence(int lev, unsigned char ctx, unsigned char *base,
 }
 
 void
-cistlv_201501(int lev, unsigned char *data, int len, int rawxml, FILE* out)
+cistlv_201501(int lev, unsigned char *data, int len, int rawxml, FILE* out, char* pktContent)
 {
     unsigned char *buf;
     char *mp;
@@ -956,20 +992,20 @@ cistlv_201501(int lev, unsigned char *data, int len, int rawxml, FILE* out)
     // dump the sequence of TLV fields of the optional header
     len = buf - data;
     if (!rawxml) {
-        fprintf(out, "%04zx", buf - data);
+        sprintf(pktContent, "%s%04zx", pktContent, buf - data);
         indent(NULL, lev);
-        fprintf(out, "hdr.end\n");
+        sprintf(pktContent, "%shdr.end\n", pktContent);
     }
 
     // dump the sequence of TLV fields of the message body
     buf = data + hdrlen;
     len = pktlen - hdrlen;
     cistlv_parse_sequence(lev, CIS_CTX_TOPLEVEL, data, &buf, &len,
-                                                        "message", rawxml, out);
+                                                        "message", rawxml, out, pktContent);
     if (!rawxml) {
-        fprintf(out, "%04zx", buf - data);
+        sprintf(pktContent, "%s%04zx", pktContent, buf - data);
         indent(NULL, lev);
-        fprintf(out, "pkt.end\n");
+        sprintf(pktContent, "%spkt.end\n", pktContent);
     }
 }
 
@@ -1101,7 +1137,7 @@ iottlv_must_recurse(char ctx, char typ)
 static int
 iottlv_parse_sequence(int lev, unsigned char ctx, unsigned char *base,
                       unsigned char **buf, int *len, char *cur_tag,
-                      int rawxml, FILE* out)
+                      int rawxml, FILE* out, char* pktContent)
 {
     int i, vallen;
     unsigned int typ;
@@ -1128,44 +1164,44 @@ iottlv_parse_sequence(int lev, unsigned char ctx, unsigned char *base,
         }
 
         if(!rawxml)
-            fprintf(out, "%04zx  ", cp - base);
+            sprintf(pktContent, "%s%04zx  ", pktContent, cp - base);
         for (i = 0; i < lev; i++) {
-            fprintf(out, "  ");
+            sprintf(pktContent, "%s  ", pktContent);
         }
         for (; cp < *buf; cp++) {
             if(!rawxml)
-                fprintf(out, "%02x ", *cp);
+                sprintf(pktContent, "%s%02x ", pktContent, *cp);
         }
         if(!rawxml)
-            fprintf(out, "-- <%s, len=%d>\n", n, vallen);
+            sprintf(pktContent, "%s-- <%s, len=%d>\n", pktContent, n, vallen);
 
         ctx2 = iottlv_must_recurse(ctx, typ);
         if (ctx2) {
             if (rawxml)
-                fprintf(out, "<%s>\n", n);
+                sprintf(pktContent, "%s<%s>\n", pktContent, n);
             *len -= vallen;
             i = vallen;
             strcpy(n_old, n);
             if (iottlv_parse_sequence(lev+1, ctx2, base, buf, &i,
-                                                        n, rawxml, out) < 0)
+                                                        n, rawxml, out, pktContent) < 0)
                 return -1;
 
             if(rawxml) {
                 for (i = 0; i < lev; i++) {
-                        fprintf(out, "  ");
+                        sprintf(pktContent, "%s  ", pktContent);
                 }
-                fprintf(out, "</%s>\n", n_old);
+                sprintf(pktContent, "%s</%s>\n", pktContent, n_old);
             }
         } else {
             if (rawxml && vallen > 0) {
-                fprintf(out, "<%s size=\"%i\" dt=\"binary.base64\">\n", n, vallen);
-                base64dump(lev, base, *buf, vallen, rawxml, out);
+                sprintf(pktContent, "%s<%s size=\"%i\" dt=\"binary.base64\">\n", pktContent, n, vallen);
+                base64dump(lev, base, *buf, vallen, rawxml, out, pktContent);
                 for (i = 0; i < lev; i++) {
-                        fprintf(out, "  ");
+                        sprintf(pktContent, "%s  ", pktContent);
                 }
-                fprintf(out, "</%s>\n", n);
+                sprintf(pktContent, "%s</%s>\n", pktContent, n);
             } else
-                hexdump(lev, base, *buf, vallen, rawxml, out);
+                hexdump(lev, base, *buf, vallen, rawxml, out, pktContent);
            *buf += vallen;
            *len -= vallen;
 
@@ -1177,13 +1213,13 @@ iottlv_parse_sequence(int lev, unsigned char ctx, unsigned char *base,
 
 void
 iottlv_201411(int lev, unsigned char *base, unsigned char *data,
-              int len, int rawxml, FILE* out)
+              int len, int rawxml, FILE* out, char* pktContent)
 {
     // dump the sequence of TLV fields
     iottlv_parse_sequence(lev, IOT_CTX_TOPLEVEL, base, &data, &len,
-                          "payload", rawxml, out);
+                          "payload", rawxml, out, pktContent);
     if (!rawxml)
-        fprintf(out, "%04x  pkt.end\n", (int)(data - base));
+        sprintf(pktContent, "%s%04x  pkt.end\n", pktContent, (int)(data - base));
 }
 
 // ----------------------------------------------------------------------
@@ -1234,7 +1270,7 @@ ndn_type2name(unsigned type)
 
 static int
 ndn_parse_sequence(int lev, unsigned char *base, unsigned char **buf,
-               int *len, char *cur_tag, int rawxml, FILE* out)
+               int *len, char *cur_tag, int rawxml, FILE* out, char* pktContent)
 {
     int i, maxi, vallen;
     int typ;
@@ -1259,38 +1295,38 @@ ndn_parse_sequence(int lev, unsigned char *base, unsigned char **buf,
         }
 
         if (!rawxml) {
-            fprintf(out, "%04zx  ", cp - base);
+            sprintf(pktContent, "%s%04zx  ", pktContent, cp - base);
         }
 
         for (i = 0; i < lev; i++)
-            fprintf(out, "  ");
+            sprintf(pktContent, "%s  ", pktContent);
         if (!rawxml) {
             for (; cp < *buf; cp++)
-                fprintf(out, "%02x ", *cp);
+                sprintf(pktContent, "%s%02x ", pktContent, *cp);
         }
 
         if (rawxml) {
-            fprintf(out, "<%s>\n", n);
+            sprintf(pktContent, "%s<%s>\n", pktContent, n);
         } else {
-            fprintf(out, "-- <%s, len=%d>\n", n, vallen);
+            sprintf(pktContent, "%s-- <%s, len=%d>\n", pktContent, n, vallen);
         }
 
         if (typ < NDN_TLV_MAX_TYPE && ndntlv_recurse[typ]) {
             *len -= vallen;
-            if (ndn_parse_sequence(lev+1, base, buf, &vallen, n, rawxml, out) < 0) {
+            if (ndn_parse_sequence(lev+1, base, buf, &vallen, n, rawxml, out, pktContent) < 0) {
                 return -1;
             }
             if (rawxml) {
-                fprintf(out, "</%s>\n", n);
+                sprintf(pktContent, "%s</%s>\n", pktContent, n);
             }
             continue;
         }
 
         // printf("BASE: %s\n", base);
         if (rawxml && vallen > 0) {
-            fprintf(out, "<data size=\"%i\" dt=\"binary.base64\">\n", vallen);
-            base64dump(lev, base, *buf, vallen, rawxml, out);
-            fprintf(out, "</data>\n");
+            sprintf(pktContent, "%s<data size=\"%i\" dt=\"binary.base64\">\n", pktContent, vallen);
+            base64dump(lev, base, *buf, vallen, rawxml, out, pktContent);
+            sprintf(pktContent, "%s</data>\n", pktContent);
 
             *len -= vallen;
             *buf += vallen;
@@ -1299,23 +1335,23 @@ ndn_parse_sequence(int lev, unsigned char *base, unsigned char **buf,
             while (vallen > 0) {
                 maxi = vallen > 8 ? 8 : vallen;
                 cp = *buf;
-                fprintf(out, "%04zx  ", cp - base);
+                sprintf(pktContent, "%s%04zx  ", pktContent, cp - base);
                 for (i = 0; i < lev+1; i++)
-                    fprintf(out, "  ");
+                    sprintf(pktContent, "%s  ", pktContent);
                 for (i = 0; i < 8; i++, cp++){
                         if (i < maxi)
-                                fprintf(out, "%02x ", *cp);
+                                sprintf(pktContent, "%s%02x ", pktContent, *cp);
                         else
-                                fprintf(out, "   ");
+                                sprintf(pktContent, "%s   ", pktContent);
                 }
                 cp = *buf;
                 for (i = 79 - 6 - 2*(lev+1) - 8*3 - 12; i > 0; i--)
-                fprintf(out, " ");
-                fprintf(out, "  |");
+                sprintf(pktContent, "%s ", pktContent);
+                sprintf(pktContent, "%s  |", pktContent);
                 for (i = 0; i < maxi; i++, cp++)
-                fprintf(out, "%c", isprint(*cp) ? *cp : '.');
-                fprintf(out, "|");
-                fprintf(out, "\n");
+                sprintf(pktContent, "%s%c", pktContent, isprint(*cp) ? *cp : '.');
+                sprintf(pktContent, "%s|", pktContent);
+                sprintf(pktContent, "%s\n", pktContent);
 
                 vallen -= maxi;
                 *buf += maxi;
@@ -1323,21 +1359,21 @@ ndn_parse_sequence(int lev, unsigned char *base, unsigned char **buf,
             }
         }
         if (rawxml) {
-            fprintf(out, "</%s>\n", n);
+            sprintf(pktContent, "%s</%s>\n", pktContent, n);
         }
     }
     return 0;
 }
 
 static void
-ndntlv_201311(unsigned char *data, int len, int rawxml, FILE* out)
+ndntlv_201311(unsigned char *data, int len, int rawxml, FILE* out, char* pktContent)
 {
     unsigned char *buf = data;
 
     // dump the sequence of TLV fields, should start with a name TLV
-    ndn_parse_sequence(0, data, &buf, &len, "payload", rawxml, out);
+    ndn_parse_sequence(0, data, &buf, &len, "payload", rawxml, out, pktContent);
     if (!rawxml) {
-        fprintf(out, "%04zx  pkt.end\n", buf - data);
+        sprintf(pktContent, "%s%04zx  pkt.end\n", pktContent, buf - data);
     }
 }
 
@@ -1360,7 +1396,7 @@ ndn_init()
 
 int
 localrpc_parse(int lev, unsigned char *base, unsigned char **buf, int *len,
-               int rawxml, FILE* out)
+               int rawxml, FILE* out, char* pktContent)
 {
     int typ, vallen, i;
     unsigned char *cp;
@@ -1426,7 +1462,7 @@ localrpc_parse(int lev, unsigned char *base, unsigned char **buf, int *len,
 
         if (dorecurse) {
             *len -= vallen;
-            localrpc_parse(lev+1, base, buf, &vallen, rawxml, out);
+            localrpc_parse(lev+1, base, buf, &vallen, rawxml, out, pktContent);
             continue;
         }
 
@@ -1447,7 +1483,7 @@ localrpc_parse(int lev, unsigned char *base, unsigned char **buf, int *len,
             strcpy(tmp + i + 1, vallen > i ? "\"..." : "\"");
             printf("%s\n", tmp);
         } else if (vallen > 0)
-            hexdump(lev, base, *buf, vallen, rawxml, out);
+            hexdump(lev, base, *buf, vallen, rawxml, out, pktContent);
         *buf += vallen;
         *len -= vallen;
     }
@@ -1455,7 +1491,7 @@ localrpc_parse(int lev, unsigned char *base, unsigned char **buf, int *len,
 }
 
 static void
-localrpc_201405(unsigned char *data, int len, int rawxml, FILE* out)
+localrpc_201405(unsigned char *data, int len, int rawxml, FILE* out, char* pktContent)
 {
     unsigned char *buf = data;
     int origlen = len, typ, vallen;
@@ -1477,11 +1513,11 @@ localrpc_201405(unsigned char *data, int len, int rawxml, FILE* out)
                ccnl_lrpc_nonNegInt(buf, vallen2));
         buf += vallen2;
         len = origlen - (buf - data);
-        localrpc_parse(1, data, &buf, &len, rawxml, out);
+        localrpc_parse(1, data, &buf, &len, rawxml, out, pktContent);
     } else { // RPC request
     */
         buf = data;
-        localrpc_parse(0, data, &buf, &origlen, rawxml, out);
+        localrpc_parse(0, data, &buf, &origlen, rawxml, out, pktContent);
     //    }
 
     printf("%04zx  pkt.end\n", buf - data);
@@ -1605,28 +1641,28 @@ dump_content(int lev, unsigned char *base, unsigned char *data,
             indent("#   ", lev);
             printf("%s CCNB format\n#\n", forced);
         }
-        ccnb_parse(lev, data, len, format == 1, outstd);
+        ccnb_parse(lev, data, len, format == 1, outstd, pktContent);
         break;
     case CCNL_SUITE_CCNTLV:
         if (format == 0) {
             indent("#   ", lev);
             printf("%s CCNx TLV format (as of Mar 2015)\n#\n", forced);
         }
-        ccntlv_2015(lev, data, len, format == 1, outstd);
+        ccntlv_2015(lev, data, len, format == 1, outstd, pktContent);
         break;
     case CCNL_SUITE_CISTLV:
         if (format == 0) {
             indent("#   ", lev);
             printf("%s Cisco TLV format (as of Jan 2015)\n#\n", forced);
         }
-        cistlv_201501(lev, data, len, format == 1, outstd);
+        cistlv_201501(lev, data, len, format == 1, outstd, pktContent);
         break;
     case CCNL_SUITE_IOTTLV:
         if (format == 0) {
             indent("#   ", lev);
             printf("%s IOT TLV format (as of Nov 2014)\n#\n", forced);
         }
-        iottlv_201411(lev, base, data, len, format == 1, outstd);
+        iottlv_201411(lev, base, data, len, format == 1, outstd, pktContent);
         break;
     case CCNL_SUITE_LOCALRPC:
         if (format == 0) {
@@ -1634,14 +1670,14 @@ dump_content(int lev, unsigned char *base, unsigned char *data,
             printf("%s local RPC format (Dec 2014, with NDNTLV encoding)\n#\n",
                    forced);
         }
-        localrpc_201405(data, len, format == 1, outstd);
+        localrpc_201405(data, len, format == 1, outstd, pktContent);
         break;
     case CCNL_SUITE_NDNTLV:
         if (format == 0) {
             indent("#   ", lev);
             printf("%s NDN TLV format (as of Mar 2014)\n#\n", forced);
         }
-        ndntlv_201311(data, len, format == 1, outstd);
+        ndntlv_201311(data, len, format == 1, outstd, pktContent);
         break;
     default:
         rc = -1;
@@ -1649,7 +1685,7 @@ dump_content(int lev, unsigned char *base, unsigned char *data,
             indent("#   ", lev);
             printf("unknown pkt format, showing plain hex\n");
         }
-        hexdump(-1, data, data, len, format == 1, outstd);
+        hexdump(-1, data, data, len, format == 1, outstd, pktContent);
 done:
         if (format == 0) {
             printf("%04x", (int)(data - base));
@@ -1664,83 +1700,84 @@ done:
 
 // ----------------------------------------------------------------------
 
-#ifndef USE_JNI_LIB
+// #ifndef USE_JNI_LIB
 
-int
-main(int argc, char *argv[])
-{
-    int opt, rc;
-    unsigned char data[64*1024];
-    int len, maxlen, suite = -1, format = 0;
-    FILE *out = stdout;
+// int
+// main(int argc, char *argv[])
+// {
+//     int opt, rc;
+//     unsigned char data[64*1024];
+//     int len, maxlen, suite = -1, format = 0;
+//     FILE *out = stdout;
 
-    ndn_init();
-    while ((opt = getopt(argc, argv, "hs:f:v:")) != -1) {
-        switch (opt) {
-        case 's':
-            suite = ccnl_str2suite(optarg);
-            if (!ccnl_isSuite(suite))
-                goto help;
-            break;
-        case 'f':
-            format = atoi(optarg);
-            break;
-        case 'v':
-#ifdef USE_LOGGING
-            if (isdigit(optarg[0]))
-                debug_level = atoi(optarg);
-            else
-                debug_level = ccnl_debug_str2level(optarg);
-#endif
-            break;
-        default:
-help:
-            fprintf(stderr,
-                    "usage: %s [options] <encoded_data\n"
-                    "  -f FORMAT    (0=readable, 1=rawxml, 2=content, 3=content+newline)\n"
-                    "  -h           this help\n"
-                    "  -s SUITE     (ccnb, ccnx2015, cisco2015, iot2014, ndn2013)\n"
-#ifdef USE_LOGGING
-                    "  -v DEBUG_LEVEL (fatal, error, warning, info, debug, verbose, trace)\n"
-#endif
-                    ,
-                    argv[0]);
-            exit(1);
-        }
-    }
+//     ndn_init();
+//     while ((opt = getopt(argc, argv, "hs:f:v:")) != -1) {
+//         switch (opt) {
+//         case 's':
+//             suite = ccnl_str2suite(optarg);
+//             if (!ccnl_isSuite(suite))
+//                 goto help;
+//             break;
+//         case 'f':
+//             format = atoi(optarg);
+//             break;
+//         case 'v':
+// #ifdef USE_LOGGING
+//             if (isdigit(optarg[0]))
+//                 debug_level = atoi(optarg);
+//             else
+//                 debug_level = ccnl_debug_str2level(optarg);
+// #endif
+//             break;
+//         default:
+// help:
+//             fprintf(stderr,
+//                     "usage: %s [options] <encoded_data\n"
+//                     "  -f FORMAT    (0=readable, 1=rawxml, 2=content, 3=content+newline)\n"
+//                     "  -h           this help\n"
+//                     "  -s SUITE     (ccnb, ccnx2015, cisco2015, iot2014, ndn2013)\n"
+// #ifdef USE_LOGGING
+//                     "  -v DEBUG_LEVEL (fatal, error, warning, info, debug, verbose, trace)\n"
+// #endif
+//                     ,
+//                     argv[0]);
+//             exit(1);
+//         }
+//     }
 
-    if (argv[optind])
-        goto help;
+//     if (argv[optind])
+//         goto help;
 
-    len = 0;
-    maxlen = sizeof(data);
-    // reads maxlen bytes from stdin, puts them into data
-    while (maxlen > 0) {
-        rc = read(0, data+len, maxlen);
-        if (rc == 0)
-            break;
-        if (rc < 0) {
-            perror("read");
-            return 1;
-        }
-        len += rc;
-        maxlen -= rc;
-    }
+//     len = 0;
+//     maxlen = sizeof(data);
+//     // reads maxlen bytes from stdin, puts them into data
+//     while (maxlen > 0) {
+//         rc = read(0, data+len, maxlen);
+//         if (rc == 0)
+//             break;
+//         if (rc < 0) {
+//             perror("read");
+//             return 1;
+//         }
+//         len += rc;
+//         maxlen -= rc;
+//     }
 
-    if (format == 0)
-        printf("# ccn-lite-pktdump, parsing %d byte%s\n", len, len!=1 ? "s":"");
+//     if (format == 0)
+//         printf("# ccn-lite-pktdump, parsing %d byte%s\n", len, len!=1 ? "s":"");
 
-    // May have to replace last argument NULL with a char*
-    return dump_content(0, data, data, len, format, suite, out, NULL);
-}
-#endif
+//     // May have to replace last argument NULL with a char*
+//     return dump_content(0, data, data, len, format, suite, out, NULL);
+// }
+// #endif
 
 char* pktdump_android(unsigned char* data, int len, int format, int suite) {
-    unsigned char pktContent[2000];
-    FILE *outstd = stdout;
-    // data = (unsigned char *)malloc(sizeof(out));
-    // memcpy(data, out, sizeof(out));
-    dump_content(0, data, data, len, format, -1, outstd, pktContent);
+    unsigned char pktContent[2000]; // Will be returned with the content of the content-object
+    FILE *dummy = stdout;
+    if (!ccnl_isSuite(suite)) {
+        suite = -1;
+    }
+    dump_content(0, data, data, len, format, suite, dummy, pktContent);
 
     return pktContent;
 }
