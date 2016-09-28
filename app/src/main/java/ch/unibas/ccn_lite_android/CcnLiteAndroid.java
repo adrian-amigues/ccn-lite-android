@@ -37,17 +37,18 @@ public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener
     ArrayAdapter adapter;
     String hello;
     Context ccnLiteContext;
-    int newData;
     SQLiteDatabase sensorDatabase;
     String resultValue;
 
-    String ipString;
-    String portString;
-    String contentString;
+    String ipString; // var for server ip
+    String portString; //port
+    String contentString;//Interest Object Name
     private Handler mHandler;
 
 
-
+    /**
+     * @desc create new activity and init relay with CCN
+     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,7 +57,7 @@ public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener
         adapter = new ArrayAdapter(this, R.layout.logtextview, 0);
         adapter.notifyDataSetChanged();
 
-
+        /*this part make dropdown list for testing options*/
         String arraySpinner[] = new String[] {
                 "CCNx2015", "NDN2013", "CCNB", "IOT2014", "LOCALRPC", "LOCALRPC"
         };
@@ -67,14 +68,14 @@ public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener
 
         s.setAdapter(adapter);
 
-
-        hello = relayInit();
+        hello = relayInit();//Here we init our relay
         ccnLiteContext = this;
     }
 
     @Override
     public void onStart() {
         ListView lv;
+        //Create SQLdb connection for history
         sensorDatabase = openOrCreateDatabase("SENSORDATABASE",MODE_PRIVATE,null);
         sensorDatabase.execSQL("CREATE TABLE IF NOT EXISTS sensorTable(sensorValue VARCHAR);");
 
@@ -83,7 +84,6 @@ public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener
         b.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 RelativeLayout myLayout = (RelativeLayout) findViewById(R.id.myLayout);
-               // myLayout.setBackgroundColor(Color.rgb(1,0,0));
                 EditText ip = (EditText) findViewById(R.id.IPEditText);
                 ipString = ip.getText().toString();
                 EditText port = (EditText) findViewById(R.id.portEditText);
@@ -92,14 +92,13 @@ public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener
                 EditText content = (EditText) findViewById(R.id.contentEditText);
                 contentString = content.getText().toString();
                 mHandler = new Handler();
-                resultValue = androidPeek(ipString, portInt, contentString);
+                resultValue = androidPeek(ipString, portInt, contentString);//Send interest Request to jni file
                 TextView result = (TextView) findViewById(R.id.resultTextView);
                 result.setMovementMethod(new ScrollingMovementMethod());
                 result.setText(resultValue, TextView.BufferType.EDITABLE);
 
             }
         });
-
         ImageView imageViewMenu = (ImageView) findViewById(R.id.imageViewMenu);
         imageViewMenu.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
@@ -108,6 +107,9 @@ public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener
         });
         mHandler = new Handler();
     }
+    /**
+     * @desc insert values into DB by lick button
+     */
     public boolean onMenuItemClick(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_add:
@@ -128,7 +130,6 @@ public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener
 
                     }
                 }
-
                 Intent intent = new Intent(this, DisplayDatabaseHistory.class);
                 intent.putExtra("sensorHistory", sensorValue);
                 intent.putExtra("countOfItems", count);
@@ -160,7 +161,7 @@ public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener
         adapter.add(line);
         adapter.notifyDataSetChanged();
     }
-
+//This is declaration of native c functions
     public native String relayInit();
 
     public native String androidPeek(String ipString, int portString, String contentString);
