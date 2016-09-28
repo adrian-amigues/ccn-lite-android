@@ -147,7 +147,6 @@
        android:layout_height="wrap_content"
        android:layout_marginTop="30dp"
        android:id="@+id/sendButton"
-       android:onClick="sendRequest"
        android:layout_marginStart="25dp"
        android:layout_below="@id/formatTextView"
        android:layout_alignStart="@+id/contentEditText" />

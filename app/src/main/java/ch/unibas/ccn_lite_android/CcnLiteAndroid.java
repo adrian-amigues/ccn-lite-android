@@ -2,14 +2,14 @@ package ch.unibas.ccn_lite_android;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
-import android.content.Intent;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.text.method.ScrollingMovementMethod;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -21,10 +21,10 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.PopupMenu;
+import android.widget.PopupMenu.OnMenuItemClickListener;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.PopupMenu.OnMenuItemClickListener;
 
 public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener
 {
@@ -70,38 +70,11 @@ public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener
         s.setAdapter(adapter);
 
         ccnLiteContext = this;
-
         ipEditText = (EditText) findViewById(R.id.IPEditText);
         portEditText = (EditText) findViewById(R.id.portEditText);
         resultTextView = (TextView) findViewById(R.id.resultTextView);
         contentEditText = (EditText) findViewById(R.id.contentEditText);
 
-    }
-
-    public void sendRequest(View v) {
-
-        ipString = ipEditText.getText().toString();
-        portString = portEditText.getText().toString();
-        portInt = Integer.parseInt(portString);
-        contentString = contentEditText.getText().toString();
-        filename = contentString.replace("/", ""); //maybe file can't start with dash
-        androidPeekResult = "No Data Found";
-        mHandler = new Handler();
-        //if not do network op
-        //check network connection
-        netConnString = "No Network Connection";
-        ConnectivityManager connMgr = (ConnectivityManager)
-                getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
-        if (networkInfo != null && networkInfo.isConnected()) {
-            new AndroidPeekTask().execute(); //TODO: it's not actually using this content string
-
-        } else {
-            // display error
-            toast(netConnString);
-            androidPeekResult = netConnString;
-            resultTextView.setText(androidPeekResult, TextView.BufferType.EDITABLE);
-        }
     }
 
     @Override
@@ -111,12 +84,17 @@ public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener
         sensorDatabase.execSQL("CREATE TABLE IF NOT EXISTS sensorTable(sensorValue VARCHAR);");
 
         super.onStart();
-
-        ImageView imageViewMenu = (ImageView) findViewById(R.id.imageViewMenu);
-        imageViewMenu.setOnClickListener(new View.OnClickListener(){
-            public void onClick(View v){
-                showPopUp(v);
-
+        super.onStart();
+        Button b = (Button) findViewById(R.id.sendButton);
+        b.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                ipString = ipEditText.getText().toString();
+                portString = portEditText.getText().toString();
+                portInt = Integer.parseInt(portString);
+                contentString = contentEditText.getText().toString();
+                filename = contentString.replace("/", ""); //maybe file can't start with dash
+                androidPeekResult = "No Data Found";
+                mHandler = new Handler();
                 //if not do network op
                 //check network connection
                 netConnString = "No Network Connection";
@@ -125,6 +103,7 @@ public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener
                 NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
                 if (networkInfo != null && networkInfo.isConnected()) {
                     new AndroidPeekTask().execute(); //TODO: it's not actually using this content string
+
                 } else {
                     // display error
                     toast(netConnString);
@@ -132,6 +111,13 @@ public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener
                     resultTextView.setText(androidPeekResult, TextView.BufferType.EDITABLE);
                 }
 
+            }
+        });
+
+        ImageView imageViewMenu = (ImageView) findViewById(R.id.imageViewMenu);
+        imageViewMenu.setOnClickListener(new View.OnClickListener(){
+            public void onClick(View v){
+                showPopUp(v);
             }
         });
         mHandler = new Handler();
