@@ -78,6 +78,32 @@ public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener
 
     }
 
+    public void sendRequest(View v) {
+
+        ipString = ipEditText.getText().toString();
+        portString = portEditText.getText().toString();
+        portInt = Integer.parseInt(portString);
+        contentString = contentEditText.getText().toString();
+        filename = contentString.replace("/", ""); //maybe file can't start with dash
+        androidPeekResult = "No Data Found";
+        mHandler = new Handler();
+        //if not do network op
+        //check network connection
+        netConnString = "No Network Connection";
+        ConnectivityManager connMgr = (ConnectivityManager)
+                getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+        if (networkInfo != null && networkInfo.isConnected()) {
+            new AndroidPeekTask().execute(); //TODO: it's not actually using this content string
+
+        } else {
+            // display error
+            toast(netConnString);
+            androidPeekResult = netConnString;
+            resultTextView.setText(androidPeekResult, TextView.BufferType.EDITABLE);
+        }
+    }
+
     @Override
     public void onStart() {
         ListView lv;
@@ -85,34 +111,6 @@ public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener
         sensorDatabase.execSQL("CREATE TABLE IF NOT EXISTS sensorTable(sensorValue VARCHAR);");
 
         super.onStart();
-        Button b = (Button) findViewById(R.id.sendButton);
-        b.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-
-                ipString = ipEditText.getText().toString();
-                portString = portEditText.getText().toString();
-                portInt = Integer.parseInt(portString);
-                contentString = contentEditText.getText().toString();
-                filename = contentString.replace("/", ""); //maybe file can't start with dash
-                androidPeekResult = "No Data Found";
-                mHandler = new Handler();
-                //if not do network op
-                //check network connection
-                netConnString = "No Network Connection";
-                ConnectivityManager connMgr = (ConnectivityManager)
-                        getSystemService(Context.CONNECTIVITY_SERVICE);
-                NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
-                if (networkInfo != null && networkInfo.isConnected()) {
-                    new AndroidPeekTask().execute(androidPeekResult); //TODO: it's not actually using this content string
-
-                } else {
-                    // display error
-                    toast(netConnString);
-                    androidPeekResult = netConnString;
-                    resultTextView.setText(androidPeekResult, TextView.BufferType.EDITABLE);
-                }
-            }
-        });
 
         ImageView imageViewMenu = (ImageView) findViewById(R.id.imageViewMenu);
         imageViewMenu.setOnClickListener(new View.OnClickListener(){
@@ -126,7 +124,7 @@ public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener
                         getSystemService(Context.CONNECTIVITY_SERVICE);
                 NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
                 if (networkInfo != null && networkInfo.isConnected()) {
-                    new AndroidPeekTask().execute(androidPeekResult); //TODO: it's not actually using this content string
+                    new AndroidPeekTask().execute(); //TODO: it's not actually using this content string
                 } else {
                     // display error
                     toast(netConnString);
@@ -183,9 +181,9 @@ public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener
     }
 
     //executes the android peek function
-    private class AndroidPeekTask extends AsyncTask<String, Void, String> {
+    private class AndroidPeekTask extends AsyncTask<Void, Void, String> {
         @Override
-        protected String doInBackground(String... urls) {
+        protected String doInBackground(Void... urls) {
             androidPeekResult = androidPeek(ipString, portInt, contentString);
             return androidPeekResult;
         }
@@ -194,7 +192,6 @@ public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener
         protected void onPostExecute(String result) {
             resultTextView.setText(androidPeekResult, TextView.BufferType.EDITABLE);
             resultTextView.setMovementMethod(new ScrollingMovementMethod());
-
         }
     }
 
