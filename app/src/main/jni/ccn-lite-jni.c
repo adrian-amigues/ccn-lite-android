@@ -42,6 +42,12 @@ Java_ch_unibas_ccn_1lite_1android_CcnLiteAndroid_relayInit(JNIEnv* env,
   * @return String - content Object
 */
 
+
+/**
+ * androidPeek
+ * calls the ccnl_android_peek function from ccnl-lite-android-peek.c
+ * returns the string returned from that function
+ */
 JNIEXPORT jstring JNICALL
 Java_ch_unibas_ccn_1lite_1android_CcnLiteAndroid_androidPeek(JNIEnv* env,
                                                                 jobject thiz, jstring ipString, jint portString, jstring contentString)

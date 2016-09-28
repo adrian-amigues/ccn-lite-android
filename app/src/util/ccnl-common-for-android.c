@@ -18,6 +18,9 @@
  *
  * File history:
  * 2016-09-16 created, extended from ccnl-common.c by the Uppsala University CSproject 2016 team
+ *
+ * This is a clone of ccnl-common.c, modified minly through commenting includes that 
+ * conflicted with others from different project files
  */
 
 
@@ -65,7 +68,6 @@
 #include "../ccnl-ext.h"
 
 // #include "../ccnl-ext-debug.c"
- 
 // #include "../ccnl-os-time.c"
 // #include "../ccnl-ext-logging.c"
 
@@ -122,8 +124,6 @@ extern int ccnl_suite2defaultPort(int suite);
 #endif
 
 #endif // CCNL_UAPI_H_
-// #include "ccn-lite-pktdump-android.c"
-
 
 // ----------------------------------------------------------------------
 

@@ -25,12 +25,7 @@
 
 #include "util/ccnl-common-for-android.c"
 #include "util/ccnl-socket.c"
-
-
 #include "util/ccn-lite-pktdump-android.c"
-
-
-
 
 #define USE_URI_TO_PREFIX
 
@@ -43,7 +38,21 @@ unsigned char out[8*CCNL_MAX_PACKET_SIZE];
 int outlen;
 
 
-// Main function for peeking with android
+/**
+ * Main function for the communication with CCN
+ * Behavior from ccn-lite-peek.c
+ *
+ * Input: 
+ *  suiteStr = which suite to use (ccnx2015, ndn2013)
+ *  addr = the udp address to send the interest to
+ *  port = the port to use
+ *  uri = the name of the object to querry for
+ *
+ * Output: the content of the content-object
+ * 
+ * The function creates an Interest and sends it to the specified udp address,
+ * it waits for the return of a content packet and prints it
+ */
 char* ccnl_android_peek(char* suiteStr, char* addr, int port, char* uri) {
     static char uri_static[100];
     static char response[400];
@@ -203,15 +212,8 @@ char* ccnl_android_peek(char* suiteStr, char* addr, int port, char* uri) {
             len = outlen;
         }
 
-#endif
+#endif // USE_FRAG
 
-/*
-    {
-        int fd = open("incoming.bin", O_WRONLY|O_CREAT|O_TRUNC);
-        write(fd, out, len);
-        close(fd);
-    }
-*/
         rc = isContent(out, len);
         if (rc < 0) {
             DEBUGMSG(ERROR, "error when checking type of packet\n");
