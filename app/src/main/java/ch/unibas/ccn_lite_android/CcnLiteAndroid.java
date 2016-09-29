@@ -109,7 +109,13 @@ public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener
         mHandler = new Handler();
     }
     public boolean onMenuItemClick(MenuItem item) {
+        Intent intent;
         switch (item.getItemId()) {
+            case R.id.menu_showSensors:
+                intent = new Intent(this, MapsActivity.class);
+                startActivity(intent);
+                return true;
+
             case R.id.menu_add:
                 sensorDatabase.execSQL("INSERT INTO sensorTable VALUES('" + resultValue + "');");
                 return true;
@@ -129,7 +135,7 @@ public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener
                     }
                 }
 
-                Intent intent = new Intent(this, DisplayDatabaseHistory.class);
+                intent = new Intent(this, DisplayDatabaseHistory.class);
                 intent.putExtra("sensorHistory", sensorValue);
                 intent.putExtra("countOfItems", count);
                 startActivity(intent);

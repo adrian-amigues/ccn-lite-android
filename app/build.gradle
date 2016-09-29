@@ -13,6 +13,9 @@ android {
         versionCode 1
         versionName "1.0"
 
+        // Enabling multidex support.
+        multiDexEnabled true
+
         ndk {
             moduleName "ccn-lite-android"
         }
@@ -45,5 +48,7 @@ android {
     }
 }
 dependencies {
-    compile 'com.android.support:appcompat-v7:23.+'
+    compile 'com.android.support:appcompat-v7:23.4.0'
+    compile 'com.google.android.gms:play-services:9.4.0'
+    compile 'com.android.support:multidex:1.0.0'
 }
