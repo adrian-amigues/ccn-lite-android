@@ -24,6 +24,7 @@ import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.PopupMenu.OnMenuItemClickListener;
+import android.widget.AdapterView.OnItemClickListener;
 
 
 import android.os.Bundle;
@@ -32,8 +33,7 @@ import android.os.Handler;
 import static android.provider.AlarmClock.EXTRA_MESSAGE;
 
 
-public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener
-{
+public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener {
     ArrayAdapter adapter;
     String hello;
     Context ccnLiteContext;
@@ -44,6 +44,7 @@ public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener
     String portString; //port
     String contentString;//Interest Object Name
     private Handler mHandler;
+    Spinner ex;
 
 
     /**
@@ -61,12 +62,21 @@ public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener
         String arraySpinner[] = new String[] {
                 "CCNx2015", "NDN2013", "CCNB", "IOT2014", "LOCALRPC", "LOCALRPC"
         };
+        String ContentExamples[] = new String[] {
+                "/android/test/mycontent", "/ccn/sensor/tmp"
+        };
+
 
         Spinner s = (Spinner) findViewById(R.id.formatSpinner);
+        ex = (Spinner) findViewById(R.id.test_example);
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
                 android.R.layout.simple_spinner_item, arraySpinner);
+        ArrayAdapter<String> adapter_ex = new ArrayAdapter<String>(this,
+                android.R.layout.simple_spinner_item, ContentExamples);
 
         s.setAdapter(adapter);
+        ex.setAdapter(adapter_ex);
+
 
         hello = relayInit();//Here we init our relay
         ccnLiteContext = this;
@@ -84,15 +94,24 @@ public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener
         b.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 RelativeLayout myLayout = (RelativeLayout) findViewById(R.id.myLayout);
-                EditText ip = (EditText) findViewById(R.id.IPEditText);
-                ipString = ip.getText().toString();
-                EditText port = (EditText) findViewById(R.id.portEditText);
-                portString = port.getText().toString();
-                int portInt = Integer.parseInt(portString);
+                //EditText ip = (EditText) findViewById(R.id.IPEditText);
+               // ipString = ip.getText().toString();
+                //EditText port = (EditText) findViewById(R.id.portEditText);
+               // portString = port.getText().toString();
+                //int portInt = Integer.parseInt(portString);
+                TextView textView = (TextView)ex.getSelectedView();
+                String name = textView.getText().toString();
+              /*  switch(name){
+                    case :
+                    resultValue = androidPeek("130.238.15.221",9999, name);
+                    case:
+                    resultValue = androidPeek("130.238.15.225",9999, name);
+                }
+*/
                 EditText content = (EditText) findViewById(R.id.contentEditText);
                 contentString = content.getText().toString();
                 mHandler = new Handler();
-                resultValue = androidPeek(ipString, portInt, contentString);//Send interest Request to jni file
+                //resultValue = androidPeek("130.238.15.225",9999, contentString);//Send interest Request to jni file
                 TextView result = (TextView) findViewById(R.id.resultTextView);
                 result.setMovementMethod(new ScrollingMovementMethod());
                 result.setText(resultValue, TextView.BufferType.EDITABLE);
@@ -144,6 +163,7 @@ public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener
                 return super.onOptionsItemSelected(item);
         }
     }
+
 
     public void showPopUp(View v){
         PopupMenu popup = new PopupMenu(CcnLiteAndroid.this, v);

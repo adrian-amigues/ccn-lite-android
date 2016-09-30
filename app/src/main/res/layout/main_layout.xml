@@ -16,12 +16,10 @@
        android:text="/android/test/mycontent"
        android:ems="10"
        android:id="@+id/contentEditText"
-       android:layout_alignBaseline="@+id/ContentTextView"
-       android:layout_alignBottom="@+id/ContentTextView"
-       android:layout_alignStart="@+id/portEditText"
-       android:textColor="@android:color/darker_gray"
-       android:layout_marginTop="30dp" />
-
+       android:layout_alignTop="@+id/ContentTextView"
+       android:layout_centerHorizontal="true" />@android:color/darker_gray"
+       android:layout_marginTop="5dp" />
+<!--
    <EditText
        android:layout_width="wrap_content"
        android:layout_height="wrap_content"
@@ -46,7 +44,7 @@
        android:layout_marginStart="49dp"
        android:layout_alignParentTop="true"
        android:layout_alignParentStart="true" />
-
+-->
    <TextView
        android:layout_width="match_parent"
        android:layout_height="wrap_content"
@@ -72,7 +70,7 @@
        android:id="@+id/resultTitleTextView"
        android:textColor="@android:color/black"
        android:textSize="18sp" />
-
+<!--
    <EditText
        android:layout_width="wrap_content"
        android:layout_height="wrap_content"
@@ -84,29 +82,29 @@
        android:layout_alignBaseline="@+id/PortTextView"
        android:layout_alignBottom="@+id/PortTextView"
        android:layout_alignStart="@+id/IPEditText" />
-
+-->
    <TextView
        android:text="Content:"
        android:layout_width="wrap_content"
        android:layout_height="wrap_content"
-       android:layout_marginTop="37dp"
+       android:layout_marginTop="89dp"
        android:id="@+id/ContentTextView"
        android:textColor="@android:color/black"
        android:textStyle="normal|bold"
-       android:layout_below="@+id/portEditText"
-       android:layout_alignStart="@+id/PortTextView" />
+       android:layout_alignParentTop="true"
+       android:layout_alignParentStart="true" />
 
    <TextView
        android:text="Format:"
        android:layout_width="wrap_content"
        android:layout_height="wrap_content"
-       android:layout_marginTop="34dp"
        android:id="@+id/formatTextView"
        android:textColor="@android:color/black"
-       android:layout_below="@+id/contentEditText"
-       android:layout_alignStart="@+id/ContentTextView"
-       android:textStyle="normal|bold" />
-
+       android:textStyle="normal|bold"
+       android:layout_alignBaseline="@+id/formatSpinner"
+       android:layout_alignBottom="@+id/formatSpinner"
+       android:layout_alignEnd="@+id/resultTitleTextView" />
+<!--
    <TextView
        android:text="Port:"
        android:layout_width="wrap_content"
@@ -117,13 +115,14 @@
        android:textColor="@android:color/background_dark"
        android:layout_below="@+id/IPEditText"
        android:layout_alignStart="@+id/IPTextView" />
-
+-->
    <RelativeLayout
        android:layout_width="match_parent"
        android:layout_height="wrap_content"
+       android:background="#cc0000"
+       android:id="@+id/relativeLayout"
        android:layout_alignParentTop="true"
-       android:layout_centerHorizontal="true"
-       android:background="#cc0000">
+       android:layout_centerHorizontal="true">
 
       <ImageView android:layout_width="200sp"
                  android:layout_height="50sp"
@@ -132,37 +131,53 @@
                  android:src="@drawable/ccn_lite_logo_712x184_tmp"
           android:layout_marginLeft="5dp"
           android:layout_marginRight="5dp"
-          android:layout_alignParentTop="true"
-          android:layout_alignParentEnd="true"
-          android:layout_marginEnd="14dp"
           android:clickable="true"
           android:onClick="showPopUp"
-          android:id="@+id/imageViewMenu" />
+          android:id="@+id/imageViewMenu"
+          android:layout_alignParentTop="true"
+          android:layout_alignParentEnd="true" />
+
    </RelativeLayout>
 
    <Button
        android:text="Send Interest Message"
        android:layout_width="wrap_content"
        android:layout_height="wrap_content"
-       android:layout_marginTop="30dp"
+       android:layout_marginTop="52dp"
        android:id="@+id/sendButton"
        android:onClick="sendInterest"
-       android:layout_marginStart="25dp"
-       android:layout_below="@id/formatTextView"
-       android:layout_alignStart="@+id/contentEditText" />
+       android:layout_below="@+id/formatSpinner"
+       android:layout_alignParentEnd="true" />
 
    <Spinner
        android:layout_width="match_parent"
        android:layout_height="wrap_content"
        android:id="@+id/formatSpinner"
        android:textColor="@android:color/background_dark"
-       android:layout_alignBaseline="@+id/formatTextView"
-       android:layout_alignBottom="@+id/formatTextView"
-       android:layout_alignStart="@+id/contentEditText"
-       android:layout_alignEnd="@+id/contentEditText"
-       android:layout_marginTop="30dp"
        android:spinnerMode="dropdown"
-       android:popupBackground="@android:color/darker_gray" />
+       android:popupBackground="@android:color/darker_gray"
+       android:layout_below="@+id/test_example"
+       android:layout_alignParentEnd="true"
+       android:layout_marginTop="41dp"
+       android:layout_alignStart="@+id/contentEditText" />
+
+   <TextView
+       android:text="Test Examples"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:id="@+id/textView"
+       android:textColor="@android:color/black"
+       android:textStyle="normal|bold"
+       android:layout_marginTop="37dp"
+       android:layout_below="@+id/contentEditText"
+       android:layout_alignParentStart="true" />
+
+   <Spinner
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:id="@+id/test_example"
+       android:layout_below="@+id/textView"
+       android:layout_toEndOf="@+id/textView" />
 
 
 </RelativeLayout>
