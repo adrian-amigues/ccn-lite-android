@@ -1,5 +1,6 @@
 package ch.unibas.ccn_lite_android;
 
+import android.content.Intent;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.widget.Toast;
@@ -12,12 +13,15 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.GoogleMap.OnInfoWindowClickListener;
+import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener;
+
+import java.util.ArrayList;
 
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, OnInfoWindowClickListener {
+public class MapsActivity extends FragmentActivity implements OnMapReadyCallback,  OnMarkerClickListener{
 
     private GoogleMap mMap;
-
+    ArrayList<Marker> markers = new ArrayList<Marker>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,44 +46,113 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
+
         // Add a marker in Stockholm and move the camera
         LatLng stockholm = new LatLng(59.3293235, 18.0685808);
-        mMap.addMarker(new MarkerOptions().position(stockholm).title("Sensor No. 1 in Stockholm"));
+        markers.add(0, mMap.addMarker(new MarkerOptions().position(stockholm).title("Sensor in Stockholm")));
+        markers.get(0).setTag("Stockholm");
         mMap.moveCamera(CameraUpdateFactory.newLatLng(stockholm));
 
         LatLng uppsala = new LatLng(59.8586926, 17.6459759);
-        mMap.addMarker(new MarkerOptions().position(uppsala).title("Sensor No. 2 in Uppsala"));
+        markers.add(1, mMap.addMarker(new MarkerOptions().position(uppsala).title("Sensor in Uppsala")));
+        markers.get(1).setTag("Uppsala");
         mMap.moveCamera(CameraUpdateFactory.newLatLng(uppsala));
 
         LatLng lund = new LatLng(55.70466016, 13.1910073);
-        mMap.addMarker(new MarkerOptions().position(lund).title("Sensor No. 3 in lund"));
+        markers.add(2, mMap.addMarker(new MarkerOptions().position(lund).title("Sensor in Lund")));
+        markers.get(2).setTag("Lund");
         mMap.moveCamera(CameraUpdateFactory.newLatLng(lund));
-        mMap.setOnInfoWindowClickListener(this);
+
 
         LatLng gavle = new LatLng(60.6748796, 17.1412726);
-        mMap.addMarker(new MarkerOptions().position(gavle).title("Sensor No. 1 in Gävle"));
+        markers.add(3, mMap.addMarker(new MarkerOptions().position(gavle).title("Sensor in Gävle")));
+        markers.get(3).setTag("Gävle");
         mMap.moveCamera(CameraUpdateFactory.newLatLng(gavle));
 
         LatLng linkoping = new LatLng(58.410807, 15.6213727);
-        mMap.addMarker(new MarkerOptions().position(linkoping).title("Sensor No. 1 in Linköping"));
+        markers.add(4, mMap.addMarker(new MarkerOptions().position(linkoping).title("Sensor in Linköping")));
+        markers.get(4).setTag("Linköping");
         mMap.moveCamera(CameraUpdateFactory.newLatLng(linkoping));
 
         LatLng orebro = new LatLng(59.2752626, 15.2134105);
-        mMap.addMarker(new MarkerOptions().position(orebro).title("Sensor No. 1 in Örebro"));
+        markers.add(5, mMap.addMarker(new MarkerOptions().position(orebro).title("Sensor in Örebro")));
+        markers.get(5).setTag("Örebro");
         mMap.moveCamera(CameraUpdateFactory.newLatLng(orebro));
 
         LatLng vasteras = new LatLng(59.6099005, 16.5448091);
-        mMap.addMarker(new MarkerOptions().position(vasteras).title("Sensor No. 1 in Västerås"));
+        markers.add(6, mMap.addMarker(new MarkerOptions().position(vasteras).title("Sensor in Västerås")));
+        markers.get(6).setTag("Västerås");
         mMap.moveCamera(CameraUpdateFactory.newLatLng(vasteras));
 
+        mMap.setOnMarkerClickListener(this);
     }
 
+    public boolean onMarkerClick(Marker marker) {
+        Intent intent = new Intent(this, DisplaySensorInfo.class);
+        String sensorInfo;
+        if(marker.getTag().equals("Stockholm")){
+            sensorInfo = "Sensor is located in Stockholm.\nNo. 1\nBluetooth\nWifi";
+            intent.putExtra("sensorInfo", sensorInfo);
+            startActivity(intent);
+        }else if(marker.getTag().equals("Uppsala")){
+            sensorInfo = "Sensor is located in Uppsala.\nNo. 2\nBluetooth\nWifi";
+            intent.putExtra("sensorInfo", sensorInfo);
+            startActivity(intent);
+        }else if(marker.getTag().equals("Lund")){
+            sensorInfo = "Sensor is located in Lund.\nNo. 3\nBluetooth\nWifi";
+            intent.putExtra("sensorInfo", sensorInfo);
+            startActivity(intent);
+        }else if(marker.getTag().equals("Gävle")){
+            sensorInfo = "Sensor is located in Gävle.\nNo. 4\nBluetooth\nWifi";
+            intent.putExtra("sensorInfo", sensorInfo);
+            startActivity(intent);
+        }else if(marker.getTag().equals("Linköping")){
+            sensorInfo = "Sensor is located in Linköping.\nNo. 5\nBluetooth\nWifi";
+            intent.putExtra("sensorInfo", sensorInfo);
+            startActivity(intent);
+        }else if(marker.getTag().equals("Örebro")){
+            sensorInfo = "Sensor is located in Örebro.\nNo. 6\nBluetooth\nWifi";
+            intent.putExtra("sensorInfo", sensorInfo);
+            startActivity(intent);
+        }else if(marker.getTag().equals("Västerås")){
+            sensorInfo = "Sensor is located in Västerås.\nNo. 7\nBluetooth\nWifi";
+            intent.putExtra("sensorInfo", sensorInfo);
+            startActivity(intent);
+        }else{
+            sensorInfo = "No Info.";
+            intent.putExtra("sensorInfo", sensorInfo);
+            startActivity(intent);
+        }
+        return false;
+    }
 
-
-    @Override
+   /* @Override
     public void onInfoWindowClick(Marker marker) {
-        Toast.makeText(this, "Info window clicked",
+
+        if(marker.getTag().equals("Stockholm"))
+            Toast.makeText(this, "Stockholm\nNo.1",
                 Toast.LENGTH_LONG).show();
-    }
+        else if(marker.getTag().equals("Uppsala"))
+        Toast.makeText(this, "Uppsala\nNo.2",
+                Toast.LENGTH_LONG).show();
+        else if(marker.getTag().equals("Lund"))
+            Toast.makeText(this, "Lund\nNo.3",
+                    Toast.LENGTH_LONG).show();
+        else if(marker.getTag().equals("Gävle"))
+            Toast.makeText(this, "Gävle\nNo.4",
+                    Toast.LENGTH_LONG).show();
+        else if(marker.getTag().equals("Linköping"))
+            Toast.makeText(this, "Linköping\nNo.5",
+                    Toast.LENGTH_LONG).show();
+        else if(marker.getTag().equals("Örebro"))
+            Toast.makeText(this, "Örebro\nNo.6",
+                    Toast.LENGTH_LONG).show();
+        else if(marker.getTag().equals("Västerås"))
+            Toast.makeText(this, "Västerås\nNo.7",
+                    Toast.LENGTH_LONG).show();
+        else
+            Toast.makeText(this, "No Info.",
+                    Toast.LENGTH_LONG).show();
+    }*/
 
 }
