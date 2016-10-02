@@ -24,8 +24,11 @@ import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.PopupMenu.OnMenuItemClickListener;
-import android.widget.AdapterView.OnItemClickListener;
-
+import android.widget.Toast;
+import android.widget.AdapterView.OnItemSelectedListener;
+import android.widget.AdapterView;
+import java.util.List;
+import java.util.ArrayList;
 
 import android.os.Bundle;
 import android.os.Handler;
@@ -33,7 +36,7 @@ import android.os.Handler;
 import static android.provider.AlarmClock.EXTRA_MESSAGE;
 
 
-public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener {
+public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener,OnItemSelectedListener{
     ArrayAdapter adapter;
     String hello;
     Context ccnLiteContext;
@@ -68,14 +71,21 @@ public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener 
 
 
         Spinner s = (Spinner) findViewById(R.id.formatSpinner);
-        ex = (Spinner) findViewById(R.id.test_example);
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
-                android.R.layout.simple_spinner_item, arraySpinner);
-        ArrayAdapter<String> adapter_ex = new ArrayAdapter<String>(this,
-                android.R.layout.simple_spinner_item, ContentExamples);
-
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,R.layout.spinner_item, arraySpinner);
         s.setAdapter(adapter);
-        ex.setAdapter(adapter_ex);
+
+
+        ex = (Spinner) findViewById(R.id.test_example);
+        List<String> list = new ArrayList<String>();
+        list.add("/android/test/mycontent");
+        list.add("/ccn/sensor/tmp");
+        ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>
+                (this, R.layout.spinner_item,list);
+
+        dataAdapter.setDropDownViewResource
+                (android.R.layout.simple_spinner_dropdown_item);
+
+        ex.setAdapter(dataAdapter);
 
 
         hello = relayInit();//Here we init our relay
@@ -90,28 +100,22 @@ public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener 
         sensorDatabase.execSQL("CREATE TABLE IF NOT EXISTS sensorTable(sensorValue VARCHAR);");
 
         super.onStart();
+
         Button b = (Button) findViewById(R.id.sendButton);
         b.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 RelativeLayout myLayout = (RelativeLayout) findViewById(R.id.myLayout);
-                //EditText ip = (EditText) findViewById(R.id.IPEditText);
-               // ipString = ip.getText().toString();
-                //EditText port = (EditText) findViewById(R.id.portEditText);
-               // portString = port.getText().toString();
-                //int portInt = Integer.parseInt(portString);
-                TextView textView = (TextView)ex.getSelectedView();
-                String name = textView.getText().toString();
-              /*  switch(name){
-                    case :
-                    resultValue = androidPeek("130.238.15.221",9999, name);
-                    case:
-                    resultValue = androidPeek("130.238.15.225",9999, name);
-                }
-*/
-                EditText content = (EditText) findViewById(R.id.contentEditText);
-                contentString = content.getText().toString();
+                String text = ex.getSelectedItem().toString();//get value of example spinner
+               // EditText content = (EditText) findViewById(R.id.contentEditText);
+               // contentString = content.getText().toString();
                 mHandler = new Handler();
-                //resultValue = androidPeek("130.238.15.225",9999, contentString);//Send interest Request to jni file
+                if(text.equals("/android/test/mycontent")){
+                    resultValue = androidPeek("130.238.15.221",9999, text);//Send interest Request to jni file
+                }
+                else
+                    resultValue = androidPeek("130.238.15.225",9999, text);//Send interest Request to jni file
+
+
                 TextView result = (TextView) findViewById(R.id.resultTextView);
                 result.setMovementMethod(new ScrollingMovementMethod());
                 result.setText(resultValue, TextView.BufferType.EDITABLE);
@@ -125,6 +129,16 @@ public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener 
             }
         });
         mHandler = new Handler();
+    }
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        // On selecting a spinner item
+        String item = parent.getItemAtPosition(position).toString();
+
+        // Showing selected spinner item
+        Toast.makeText(parent.getContext(), "Selected: " + item, Toast.LENGTH_LONG).show();
+    }
+    public void onNothingSelected(AdapterView<?> arg0) {
+        // TODO Auto-generated method stub
     }
     /**
      * @desc insert values into DB by lick button

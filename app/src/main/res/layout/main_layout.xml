@@ -16,7 +16,6 @@
        android:text="/android/test/mycontent"
        android:ems="10"
        android:id="@+id/contentEditText"
-       android:layout_alignTop="@+id/ContentTextView"
        android:layout_centerHorizontal="true" />@android:color/darker_gray"
        android:layout_marginTop="5dp" />
 <!--
@@ -52,20 +51,18 @@
        android:textSize="18sp"
        android:scrollbars = "vertical"
        android:maxLines="7"
-       android:layout_below="@+id/sendButton"
-       android:layout_marginTop="52dp"
        android:layout_alignEnd="@+id/contentEditText"
-       android:layout_alignStart="@+id/ContentTextView"
        android:layout_weight="1.12"
-       android:layout_marginBottom="30dp"
-       android:textColor="@android:color/black" />
+       android:textColor="@android:color/black"
+       android:layout_below="@+id/resultTitleTextView"
+       android:layout_alignParentBottom="true"
+       android:layout_alignStart="@+id/formatSpinner" />
 
    <TextView
        android:text="Result:"
        android:layout_width="wrap_content"
        android:layout_height="wrap_content"
        android:layout_below="@+id/sendButton"
-       android:layout_alignStart="@+id/ContentTextView"
        android:layout_marginTop="16dp"
        android:id="@+id/resultTitleTextView"
        android:textColor="@android:color/black"
@@ -83,16 +80,6 @@
        android:layout_alignBottom="@+id/PortTextView"
        android:layout_alignStart="@+id/IPEditText" />
 -->
-   <TextView
-       android:text="Content:"
-       android:layout_width="wrap_content"
-       android:layout_height="wrap_content"
-       android:layout_marginTop="89dp"
-       android:id="@+id/ContentTextView"
-       android:textColor="@android:color/black"
-       android:textStyle="normal|bold"
-       android:layout_alignParentTop="true"
-       android:layout_alignParentStart="true" />
 
    <TextView
        android:text="Format:"
@@ -143,7 +130,6 @@
        android:text="Send Interest Message"
        android:layout_width="wrap_content"
        android:layout_height="wrap_content"
-       android:layout_marginTop="52dp"
        android:id="@+id/sendButton"
        android:onClick="sendInterest"
        android:layout_below="@+id/formatSpinner"
@@ -162,15 +148,15 @@
        android:layout_alignStart="@+id/contentEditText" />
 
    <TextView
-       android:text="Test Examples"
+       android:text="Content Objects"
        android:layout_width="wrap_content"
        android:layout_height="wrap_content"
        android:id="@+id/textView"
        android:textColor="@android:color/black"
        android:textStyle="normal|bold"
-       android:layout_marginTop="37dp"
-       android:layout_below="@+id/contentEditText"
-       android:layout_alignParentStart="true" />
+       android:layout_below="@+id/relativeLayout"
+       android:layout_alignStart="@+id/formatTextView"
+       android:layout_marginTop="52dp" />
 
    <Spinner
        android:layout_width="wrap_content"
