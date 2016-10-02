@@ -24,12 +24,12 @@
 
     <application
         android:debuggable="true"
-        android:icon="@drawable/icon"
-        android:label="@string/app_name">
+        android:icon="@drawable/logo"
+        android:label="Progect CS 2016">
         <activity
             android:name=".CcnLiteAndroid"
             android:configChanges="orientation|keyboardHidden"
-            android:label="@string/app_name">
+            android:label="Project CS 2016">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

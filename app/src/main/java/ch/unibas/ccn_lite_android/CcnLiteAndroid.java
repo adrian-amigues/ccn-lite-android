@@ -24,6 +24,7 @@ import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.PopupMenu.OnMenuItemClickListener;
+import android.widget.AdapterView.OnItemClickListener;
 
 
 import android.os.Bundle;
@@ -32,22 +33,23 @@ import android.os.Handler;
 import static android.provider.AlarmClock.EXTRA_MESSAGE;
 
 
-public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener
-{
+public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener {
     ArrayAdapter adapter;
     String hello;
     Context ccnLiteContext;
-    int newData;
     SQLiteDatabase sensorDatabase;
     String resultValue;
 
-    String ipString;
-    String portString;
-    String contentString;
+    String ipString; // var for server ip
+    String portString; //port
+    String contentString;//Interest Object Name
     private Handler mHandler;
+    Spinner ex;
 
 
-
+    /**
+     * @desc create new activity and init relay with CCN
+     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,25 +58,34 @@ public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener
         adapter = new ArrayAdapter(this, R.layout.logtextview, 0);
         adapter.notifyDataSetChanged();
 
-
+        /*this part make dropdown list for testing options*/
         String arraySpinner[] = new String[] {
                 "CCNx2015", "NDN2013", "CCNB", "IOT2014", "LOCALRPC", "LOCALRPC"
         };
+        String ContentExamples[] = new String[] {
+                "/android/test/mycontent", "/ccn/sensor/tmp"
+        };
+
 
         Spinner s = (Spinner) findViewById(R.id.formatSpinner);
+        ex = (Spinner) findViewById(R.id.test_example);
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
                 android.R.layout.simple_spinner_item, arraySpinner);
+        ArrayAdapter<String> adapter_ex = new ArrayAdapter<String>(this,
+                android.R.layout.simple_spinner_item, ContentExamples);
 
         s.setAdapter(adapter);
+        ex.setAdapter(adapter_ex);
 
 
-        hello = relayInit();
+        hello = relayInit();//Here we init our relay
         ccnLiteContext = this;
     }
 
     @Override
     public void onStart() {
         ListView lv;
+        //Create SQLdb connection for history
         sensorDatabase = openOrCreateDatabase("SENSORDATABASE",MODE_PRIVATE,null);
         sensorDatabase.execSQL("CREATE TABLE IF NOT EXISTS sensorTable(sensorValue VARCHAR);");
 
@@ -83,23 +94,30 @@ public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener
         b.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 RelativeLayout myLayout = (RelativeLayout) findViewById(R.id.myLayout);
-               // myLayout.setBackgroundColor(Color.rgb(1,0,0));
-                EditText ip = (EditText) findViewById(R.id.IPEditText);
-                ipString = ip.getText().toString();
-                EditText port = (EditText) findViewById(R.id.portEditText);
-                portString = port.getText().toString();
-                int portInt = Integer.parseInt(portString);
+                //EditText ip = (EditText) findViewById(R.id.IPEditText);
+               // ipString = ip.getText().toString();
+                //EditText port = (EditText) findViewById(R.id.portEditText);
+               // portString = port.getText().toString();
+                //int portInt = Integer.parseInt(portString);
+                TextView textView = (TextView)ex.getSelectedView();
+                String name = textView.getText().toString();
+              /*  switch(name){
+                    case :
+                    resultValue = androidPeek("130.238.15.221",9999, name);
+                    case:
+                    resultValue = androidPeek("130.238.15.225",9999, name);
+                }
+*/
                 EditText content = (EditText) findViewById(R.id.contentEditText);
                 contentString = content.getText().toString();
                 mHandler = new Handler();
-                resultValue = androidPeek(ipString, portInt, contentString);
+                //resultValue = androidPeek("130.238.15.225",9999, contentString);//Send interest Request to jni file
                 TextView result = (TextView) findViewById(R.id.resultTextView);
                 result.setMovementMethod(new ScrollingMovementMethod());
                 result.setText(resultValue, TextView.BufferType.EDITABLE);
 
             }
         });
-
         ImageView imageViewMenu = (ImageView) findViewById(R.id.imageViewMenu);
         imageViewMenu.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
@@ -108,6 +126,9 @@ public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener
         });
         mHandler = new Handler();
     }
+    /**
+     * @desc insert values into DB by lick button
+     */
     public boolean onMenuItemClick(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_add:
@@ -128,7 +149,6 @@ public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener
 
                     }
                 }
-
                 Intent intent = new Intent(this, DisplayDatabaseHistory.class);
                 intent.putExtra("sensorHistory", sensorValue);
                 intent.putExtra("countOfItems", count);
@@ -143,6 +163,7 @@ public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener
                 return super.onOptionsItemSelected(item);
         }
     }
+
 
     public void showPopUp(View v){
         PopupMenu popup = new PopupMenu(CcnLiteAndroid.this, v);
@@ -160,7 +181,7 @@ public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener
         adapter.add(line);
         adapter.notifyDataSetChanged();
     }
-
+//This is declaration of native c functions
     public native String relayInit();
 
     public native String androidPeek(String ipString, int portString, String contentString);
