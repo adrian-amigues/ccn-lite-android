@@ -65,9 +65,6 @@ public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener,
         String arraySpinner[] = new String[] {
                 "CCNx2015", "NDN2013", "CCNB", "IOT2014", "LOCALRPC", "LOCALRPC"
         };
-        String ContentExamples[] = new String[] {
-                "/android/test/mycontent", "/ccn/sensor/tmp"
-        };
 
 
         Spinner s = (Spinner) findViewById(R.id.formatSpinner);
