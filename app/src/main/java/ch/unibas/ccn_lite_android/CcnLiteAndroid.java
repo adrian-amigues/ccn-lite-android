@@ -1,15 +1,16 @@
 package ch.unibas.ccn_lite_android;
 
-import java.util.UUID;
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Color;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.os.Handler;
 import android.text.method.ScrollingMovementMethod;
-import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -20,32 +21,33 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.PopupMenu;
-import android.widget.RelativeLayout;
+import android.widget.PopupMenu.OnMenuItemClickListener;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.PopupMenu.OnMenuItemClickListener;
-
-
-import android.os.Bundle;
-import android.os.Handler;
-
-import static android.provider.AlarmClock.EXTRA_MESSAGE;
-
+import android.widget.Toast;
 
 public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener
 {
-    ArrayAdapter adapter;
-    String hello;
-    Context ccnLiteContext;
-    int newData;
-    SQLiteDatabase sensorDatabase;
-    String resultValue;
 
+    ArrayAdapter adapter;
+
+    Context ccnLiteContext;
+
+    SQLiteDatabase sensorDatabase;
     String ipString;
     String portString;
     String contentString;
     private Handler mHandler;
 
+    EditText ipEditText;
+    EditText portEditText;
+    EditText contentEditText;
+    TextView resultTextView;
+    int portInt;
+    String androidPeekResult;
+
+    String netConnString;
+    String filename;
 
 
     @Override
@@ -67,9 +69,12 @@ public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener
 
         s.setAdapter(adapter);
 
-
-        hello = relayInit();
         ccnLiteContext = this;
+        ipEditText = (EditText) findViewById(R.id.IPEditText);
+        portEditText = (EditText) findViewById(R.id.portEditText);
+        resultTextView = (TextView) findViewById(R.id.resultTextView);
+        contentEditText = (EditText) findViewById(R.id.contentEditText);
+
     }
 
     @Override
@@ -79,23 +84,32 @@ public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener
         sensorDatabase.execSQL("CREATE TABLE IF NOT EXISTS sensorTable(sensorValue VARCHAR);");
 
         super.onStart();
+        super.onStart();
         Button b = (Button) findViewById(R.id.sendButton);
         b.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                RelativeLayout myLayout = (RelativeLayout) findViewById(R.id.myLayout);
-               // myLayout.setBackgroundColor(Color.rgb(1,0,0));
-                EditText ip = (EditText) findViewById(R.id.IPEditText);
-                ipString = ip.getText().toString();
-                EditText port = (EditText) findViewById(R.id.portEditText);
-                portString = port.getText().toString();
-                int portInt = Integer.parseInt(portString);
-                EditText content = (EditText) findViewById(R.id.contentEditText);
-                contentString = content.getText().toString();
+                ipString = ipEditText.getText().toString();
+                portString = portEditText.getText().toString();
+                portInt = Integer.parseInt(portString);
+                contentString = contentEditText.getText().toString();
+                filename = contentString.replace("/", ""); //maybe file can't start with dash
+                androidPeekResult = "No Data Found";
                 mHandler = new Handler();
-                resultValue = androidPeek(ipString, portInt, contentString);
-                TextView result = (TextView) findViewById(R.id.resultTextView);
-                result.setMovementMethod(new ScrollingMovementMethod());
-                result.setText(resultValue, TextView.BufferType.EDITABLE);
+                //if not do network op
+                //check network connection
+                netConnString = "No Network Connection";
+                ConnectivityManager connMgr = (ConnectivityManager)
+                        getSystemService(Context.CONNECTIVITY_SERVICE);
+                NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+                if (networkInfo != null && networkInfo.isConnected()) {
+                    new AndroidPeekTask().execute(); //TODO: it's not actually using this content string
+
+                } else {
+                    // display error
+                    toast(netConnString);
+                    androidPeekResult = netConnString;
+                    resultTextView.setText(androidPeekResult, TextView.BufferType.EDITABLE);
+                }
 
             }
         });
@@ -111,7 +125,7 @@ public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener
     public boolean onMenuItemClick(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_add:
-                sensorDatabase.execSQL("INSERT INTO sensorTable VALUES('" + resultValue + "');");
+                sensorDatabase.execSQL("INSERT INTO sensorTable VALUES('" + androidPeekResult + "');");
                 return true;
 
             case R.id.menu_history:
@@ -152,7 +166,26 @@ public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener
         popup.show();
     }
 
+    //executes the android peek function
+    private class AndroidPeekTask extends AsyncTask<Void, Void, String> {
+        @Override
+        protected String doInBackground(Void... urls) {
+            androidPeekResult = androidPeek(ipString, portInt, contentString);
+            return androidPeekResult;
+        }
+        // onPostExecute displays the results of the AsyncTask.
+        @Override
+        protected void onPostExecute(String result) {
+            resultTextView.setText(androidPeekResult, TextView.BufferType.EDITABLE);
+            resultTextView.setMovementMethod(new ScrollingMovementMethod());
+        }
+    }
 
+
+    public void toast(String text) {
+        Toast toast = Toast.makeText(ccnLiteContext, text, Toast.LENGTH_SHORT);
+        toast.show();
+    }
 
     public void appendToLog(String line) {
         while (adapter.getCount() > 500)
@@ -160,8 +193,6 @@ public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener
         adapter.add(line);
         adapter.notifyDataSetChanged();
     }
-
-    public native String relayInit();
 
     public native String androidPeek(String ipString, int portString, String contentString);
 

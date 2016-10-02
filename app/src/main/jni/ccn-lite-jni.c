@@ -55,7 +55,7 @@ Java_ch_unibas_ccn_1lite_1android_CcnLiteAndroid_androidPeek(JNIEnv* env,
     char buf[128];
     const char *ip = (*env)->GetStringUTFChars(env, ipString, 0);
     int port = (int) portString;
-    const char *content = (*env)->GetStringUTFChars(env, contentString, 0);
+    const char *content = (*env)->GetStringUTFChars(env, contentString, NULL); //jsnider changed 0 to NULL
     return (*env)->NewStringUTF(env, ccnl_android_peek("ccnx2015", ip, port, content));
 }
 
