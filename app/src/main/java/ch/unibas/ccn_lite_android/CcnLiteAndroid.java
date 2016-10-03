@@ -3,11 +3,14 @@ package ch.unibas.ccn_lite_android;
 import java.util.UUID;
 
 import android.app.Activity;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
+import android.os.IBinder;
 import android.text.method.ScrollingMovementMethod;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -28,6 +31,7 @@ import android.widget.PopupMenu.OnMenuItemClickListener;
 
 import android.os.Bundle;
 import android.os.Handler;
+import android.widget.Toast;
 
 import static android.provider.AlarmClock.EXTRA_MESSAGE;
 
@@ -45,6 +49,10 @@ public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener
     String portString;
     String contentString;
     private Handler mHandler;
+
+//    For service
+    RelayService mService;
+    boolean mBound = false;
 
 
 
@@ -74,11 +82,17 @@ public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener
 
     @Override
     public void onStart() {
+        super.onStart();
+
         ListView lv;
         sensorDatabase = openOrCreateDatabase("SENSORDATABASE",MODE_PRIVATE,null);
         sensorDatabase.execSQL("CREATE TABLE IF NOT EXISTS sensorTable(sensorValue VARCHAR);");
 
-        super.onStart();
+        // Bind to RelayService
+        Intent intent = new Intent(this, RelayService.class);
+        bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+        Toast.makeText(this, "mBound = " + mBound, Toast.LENGTH_SHORT).show();
+
         Button b = (Button) findViewById(R.id.sendButton);
         b.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -108,6 +122,17 @@ public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener
         });
         mHandler = new Handler();
     }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        // Unbind from the service
+        if (mBound) {
+            unbindService(mConnection);
+            mBound = false;
+        }
+    }
+
     public boolean onMenuItemClick(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_add:
@@ -144,6 +169,18 @@ public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener
         }
     }
 
+    /** Called when a button is clicked (the button in the layout file attaches to
+     * this method with the android:onClick attribute) */
+    public void onServiceButtonClick(View v) {
+        if (mBound) {
+            // Call a method from the LocalService.
+            // However, if this call were something that might hang, then this request should
+            // occur in a separate thread to avoid slowing down the activity performance.
+            int num = mService.getRandomNumber();
+            Toast.makeText(this, "number: " + num, Toast.LENGTH_SHORT).show();
+        }
+    }
+
     public void showPopUp(View v){
         PopupMenu popup = new PopupMenu(CcnLiteAndroid.this, v);
         popup.setOnMenuItemClickListener(CcnLiteAndroid.this);
@@ -160,6 +197,24 @@ public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener
         adapter.add(line);
         adapter.notifyDataSetChanged();
     }
+
+    /** Defines callbacks for service binding, passed to bindService() */
+    private ServiceConnection mConnection = new ServiceConnection() {
+
+        @Override
+        public void onServiceConnected(ComponentName className,
+                                       IBinder service) {
+            // We've bound to RelayService, cast the IBinder and get RelayService instance
+            RelayService.LocalBinder binder = (RelayService.LocalBinder) service;
+            mService = binder.getService();
+            mBound = true;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName arg0) {
+            mBound = false;
+        }
+    };
 
     public native String relayInit();
 
