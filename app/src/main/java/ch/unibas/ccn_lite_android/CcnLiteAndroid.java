@@ -10,6 +10,7 @@ import android.content.ServiceConnection;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.IBinder;
 import android.text.method.ScrollingMovementMethod;
 import android.view.Menu;
@@ -49,6 +50,7 @@ public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener
     String portString;
     String contentString;
     private Handler mHandler;
+    TextView resultView;
 
 //    For service
     RelayService mService;
@@ -109,10 +111,11 @@ public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener
                 EditText content = (EditText) findViewById(R.id.contentEditText);
                 contentString = content.getText().toString();
                 mHandler = new Handler();
-                resultValue = mService.startAndroidPeek(ipString, portInt, contentString);
-                TextView result = (TextView) findViewById(R.id.resultTextView);
-                result.setMovementMethod(new ScrollingMovementMethod());
-                result.setText(resultValue, TextView.BufferType.EDITABLE);
+                resultView = (TextView) findViewById(R.id.resultTextView);
+                new AndroidPeek().execute(ipString, Integer.toString(portInt), contentString);
+//                resultValue = mService.startAndroidPeek(ipString, portInt, contentString);
+//                resultView.setMovementMethod(new ScrollingMovementMethod());
+//                resultView.setText(resultValue, TextView.BufferType.EDITABLE);
 
             }
         });
@@ -229,4 +232,24 @@ public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener
     static {
         System.loadLibrary("ccn-lite-android");
     }
+
+    private class AndroidPeek extends AsyncTask<String, Void, String> {
+        /** The system calls this to perform work in a worker thread and
+         * delivers it the parameters given to AsyncTask.execute() */
+        protected String doInBackground(String... params) {
+            String ipString = params[0];
+            int portInt = Integer.parseInt(params[1]);
+            String contentString = params[2];
+            return mService.startAndroidPeek(ipString, portInt, contentString);
+        }
+
+        /** The system calls this to perform work in the UI thread and delivers
+         * the result from doInBackground() */
+        protected void onPostExecute(String result) {
+            resultView.setMovementMethod(new ScrollingMovementMethod());
+            resultView.setText(result, TextView.BufferType.EDITABLE);
+        }
+    }
 }
+
+
