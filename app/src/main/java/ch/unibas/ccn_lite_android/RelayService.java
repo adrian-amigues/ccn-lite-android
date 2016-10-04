@@ -33,11 +33,6 @@ public class RelayService extends Service{
         return mBinder;
     }
 
-    /** method for clients */
-    public int getRandomNumber() {
-        return mGenerator.nextInt(100);
-    }
-
     public void startRely() {
         relayInit();
     }

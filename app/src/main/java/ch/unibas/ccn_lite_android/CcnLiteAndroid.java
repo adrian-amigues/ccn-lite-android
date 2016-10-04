@@ -175,18 +175,6 @@ public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener
         }
     }
 
-    /** Called when a button is clicked (the button in the layout file attaches to
-     * this method with the android:onClick attribute) */
-    public void onServiceButtonClick(View v) {
-        if (mBound) {
-            // Call a method from the LocalService.
-            // However, if this call were something that might hang, then this request should
-            // occur in a separate thread to avoid slowing down the activity performance.
-            int num = mService.getRandomNumber();
-            Toast.makeText(this, "number: " + num, Toast.LENGTH_SHORT).show();
-        }
-    }
-
     public void showPopUp(View v){
         PopupMenu popup = new PopupMenu(CcnLiteAndroid.this, v);
         popup.setOnMenuItemClickListener(CcnLiteAndroid.this);
@@ -247,7 +235,7 @@ public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener
          * the result from doInBackground() */
         protected void onPostExecute(String result) {
             resultView.setMovementMethod(new ScrollingMovementMethod());
-            resultView.setText(result, TextView.BufferType.EDITABLE);
+            resultView.append(result);
         }
     }
 }

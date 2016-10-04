@@ -38,7 +38,7 @@
        android:text="IP:"
        android:layout_width="wrap_content"
        android:layout_height="wrap_content"
-       android:layout_marginTop="121dp"
+       android:layout_marginTop="80dp"
        android:id="@+id/IPTextView"
        android:textStyle="normal|bold"
        android:textColor="@android:color/background_dark"
@@ -53,7 +53,7 @@
        android:textSize="18sp"
        android:scrollbars = "vertical"
        android:maxLines="7"
-       android:layout_below="@+id/serviceButton"
+       android:layout_below="@+id/sendButton"
        android:layout_marginTop="52dp"
        android:layout_alignEnd="@+id/contentEditText"
        android:layout_alignStart="@+id/ContentTextView"
@@ -66,7 +66,7 @@
        android:text="Result:"
        android:layout_width="wrap_content"
        android:layout_height="wrap_content"
-       android:layout_below="@+id/serviceButton"
+       android:layout_below="@+id/sendButton"
        android:layout_alignStart="@+id/ContentTextView"
        android:layout_marginTop="16dp"
        android:id="@+id/resultTitleTextView"
@@ -149,16 +149,6 @@
        android:onClick="sendInterest"
        android:layout_marginStart="25dp"
        android:layout_below="@id/formatTextView"
-       android:layout_alignStart="@+id/contentEditText" />
-   <Button
-       android:text="Connect to relay service"
-       android:layout_width="wrap_content"
-       android:layout_height="wrap_content"
-       android:layout_marginTop="30dp"
-       android:id="@+id/serviceButton"
-       android:onClick="onServiceButtonClick"
-       android:layout_marginStart="25dp"
-       android:layout_below="@id/sendButton"
        android:layout_alignStart="@+id/contentEditText" />
 
    <Spinner
