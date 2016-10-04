@@ -37,4 +37,22 @@ public class RelayService extends Service{
     public int getRandomNumber() {
         return mGenerator.nextInt(100);
     }
+
+    public void startRely() {
+        relayInit();
+    }
+
+    public String startAndroidPeek(String ipString, int portInt, String contentString) {
+        return androidPeek(ipString, portInt, contentString);
+    }
+
+
+    // JNI declarations
+    public native String relayInit();
+
+    public native String androidPeek(String ipString, int portString, String contentString);
+
+    static {
+        System.loadLibrary("ccn-lite-android");
+    }
 }

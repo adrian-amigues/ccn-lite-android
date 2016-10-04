@@ -76,7 +76,10 @@ public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener
         s.setAdapter(adapter);
 
 
-        hello = relayInit();
+//        hello = relayInit();
+        if(mBound) {
+            mService.startRely();
+        }
         ccnLiteContext = this;
     }
 
@@ -106,7 +109,7 @@ public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener
                 EditText content = (EditText) findViewById(R.id.contentEditText);
                 contentString = content.getText().toString();
                 mHandler = new Handler();
-                resultValue = androidPeek(ipString, portInt, contentString);
+                resultValue = mService.startAndroidPeek(ipString, portInt, contentString);
                 TextView result = (TextView) findViewById(R.id.resultTextView);
                 result.setMovementMethod(new ScrollingMovementMethod());
                 result.setText(resultValue, TextView.BufferType.EDITABLE);
@@ -189,8 +192,6 @@ public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener
         popup.show();
     }
 
-
-
     public void appendToLog(String line) {
         while (adapter.getCount() > 500)
             adapter.remove(adapter.getItem(0));
@@ -227,6 +228,5 @@ public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener
      */
     static {
         System.loadLibrary("ccn-lite-android");
-
     }
 }
