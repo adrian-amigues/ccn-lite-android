@@ -3,11 +3,15 @@ package ch.unibas.ccn_lite_android;
 import java.util.UUID;
 
 import android.app.Activity;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
+import android.os.AsyncTask;
+import android.os.IBinder;
 import android.text.method.ScrollingMovementMethod;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -28,6 +32,7 @@ import android.widget.PopupMenu.OnMenuItemClickListener;
 
 import android.os.Bundle;
 import android.os.Handler;
+import android.widget.Toast;
 
 import static android.provider.AlarmClock.EXTRA_MESSAGE;
 
@@ -45,6 +50,11 @@ public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener
     String portString;
     String contentString;
     private Handler mHandler;
+    TextView resultView;
+
+//    For service
+    RelayService mService;
+    boolean mBound = false;
 
 
 
@@ -68,17 +78,26 @@ public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener
         s.setAdapter(adapter);
 
 
-        hello = relayInit();
+//        hello = relayInit();
+        if(mBound) {
+            mService.startRely();
+        }
         ccnLiteContext = this;
     }
 
     @Override
     public void onStart() {
+        super.onStart();
+
         ListView lv;
         sensorDatabase = openOrCreateDatabase("SENSORDATABASE",MODE_PRIVATE,null);
         sensorDatabase.execSQL("CREATE TABLE IF NOT EXISTS sensorTable(sensorValue VARCHAR);");
 
-        super.onStart();
+        // Bind to RelayService
+        Intent intent = new Intent(this, RelayService.class);
+        bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+        Toast.makeText(this, "mBound = " + mBound, Toast.LENGTH_SHORT).show();
+
         Button b = (Button) findViewById(R.id.sendButton);
         b.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -92,10 +111,11 @@ public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener
                 EditText content = (EditText) findViewById(R.id.contentEditText);
                 contentString = content.getText().toString();
                 mHandler = new Handler();
-                resultValue = androidPeek(ipString, portInt, contentString);
-                TextView result = (TextView) findViewById(R.id.resultTextView);
-                result.setMovementMethod(new ScrollingMovementMethod());
-                result.setText(resultValue, TextView.BufferType.EDITABLE);
+                resultView = (TextView) findViewById(R.id.resultTextView);
+                new AndroidPeek().execute(ipString, Integer.toString(portInt), contentString);
+//                resultValue = mService.startAndroidPeek(ipString, portInt, contentString);
+//                resultView.setMovementMethod(new ScrollingMovementMethod());
+//                resultView.setText(resultValue, TextView.BufferType.EDITABLE);
 
             }
         });
@@ -108,6 +128,17 @@ public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener
         });
         mHandler = new Handler();
     }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        // Unbind from the service
+        if (mBound) {
+            unbindService(mConnection);
+            mBound = false;
+        }
+    }
+
     public boolean onMenuItemClick(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_add:
@@ -152,14 +183,30 @@ public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener
         popup.show();
     }
 
-
-
     public void appendToLog(String line) {
         while (adapter.getCount() > 500)
             adapter.remove(adapter.getItem(0));
         adapter.add(line);
         adapter.notifyDataSetChanged();
     }
+
+    /** Defines callbacks for service binding, passed to bindService() */
+    private ServiceConnection mConnection = new ServiceConnection() {
+
+        @Override
+        public void onServiceConnected(ComponentName className,
+                                       IBinder service) {
+            // We've bound to RelayService, cast the IBinder and get RelayService instance
+            RelayService.LocalBinder binder = (RelayService.LocalBinder) service;
+            mService = binder.getService();
+            mBound = true;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName arg0) {
+            mBound = false;
+        }
+    };
 
     public native String relayInit();
 
@@ -172,6 +219,25 @@ public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener
      */
     static {
         System.loadLibrary("ccn-lite-android");
+    }
 
+    private class AndroidPeek extends AsyncTask<String, Void, String> {
+        /** The system calls this to perform work in a worker thread and
+         * delivers it the parameters given to AsyncTask.execute() */
+        protected String doInBackground(String... params) {
+            String ipString = params[0];
+            int portInt = Integer.parseInt(params[1]);
+            String contentString = params[2];
+            return mService.startAndroidPeek(ipString, portInt, contentString);
+        }
+
+        /** The system calls this to perform work in the UI thread and delivers
+         * the result from doInBackground() */
+        protected void onPostExecute(String result) {
+            resultView.setMovementMethod(new ScrollingMovementMethod());
+            resultView.append(result);
+        }
     }
 }
+
+
