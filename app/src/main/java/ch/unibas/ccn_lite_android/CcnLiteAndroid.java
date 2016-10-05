@@ -13,6 +13,7 @@ import android.graphics.Color;
 
 import android.app.Fragment;
 import android.support.v4.widget.DrawerLayout;
+
 import android.text.method.ScrollingMovementMethod;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -37,6 +38,14 @@ import android.widget.PopupMenu.OnMenuItemClickListener;
 
 import android.os.Bundle;
 import android.os.Handler;
+
+import com.google.android.gms.maps.MapFragment;
+
+import ch.unibas.ccn_lite_android.fragments.DeleteDatabaseFragment;
+import ch.unibas.ccn_lite_android.fragments.HistoryFragment;
+import ch.unibas.ccn_lite_android.fragments.HomeFragment;
+import ch.unibas.ccn_lite_android.fragments.PreferencesFragment;
+import ch.unibas.ccn_lite_android.fragments.addToDatabase;
 
 import static android.provider.AlarmClock.EXTRA_MESSAGE;
 
@@ -113,15 +122,70 @@ public class CcnLiteAndroid extends Activity //implements OnMenuItemClickListene
 
 
     private void selectItemFromDrawer(int position) {
-        Fragment fragment = new PreferencesFragment();
+        Fragment fragment;
+        if(position == 0){//Home
+            fragment = new HomeFragment();
+            FragmentManager fragmentManager = getFragmentManager();
+            fragmentManager.beginTransaction()
+                    .replace(R.id.mainContent, fragment)
+                    .commit();
 
-        FragmentManager fragmentManager = getFragmentManager();
-        fragmentManager.beginTransaction()
-                .replace(R.id.mainContent, fragment)
-                .commit();
+            mDrawerList.setItemChecked(position, true);
+            setTitle(mNavItems.get(position).mTitle);
+        }else if(position == 1){//Add
+            sensorDatabase.execSQL("INSERT INTO sensorTable VALUES('" + resultValue + "');");
+            fragment = new addToDatabase();
+            FragmentManager fragmentManager = getFragmentManager();
+            fragmentManager.beginTransaction()
+                    .replace(R.id.mainContent, fragment)
+                    .commit();
 
-        mDrawerList.setItemChecked(position, true);
-        setTitle(mNavItems.get(position).mTitle);
+            mDrawerList.setItemChecked(position, true);
+            setTitle(mNavItems.get(position).mTitle);
+        }else if(position == 2){//Delete
+            sensorDatabase.execSQL("DELETE FROM sensorTable;");
+            fragment = new DeleteDatabaseFragment();
+            FragmentManager fragmentManager = getFragmentManager();
+            fragmentManager.beginTransaction()
+                    .replace(R.id.mainContent, fragment)
+                    .commit();
+
+            mDrawerList.setItemChecked(position, true);
+            setTitle(mNavItems.get(position).mTitle);
+        }else if(position == 3){//History
+            Cursor resultSet = sensorDatabase.rawQuery("Select * from sensorTable",null);
+            String sensorValue="";
+            int count = 0;
+            if(resultSet != null) {
+                resultSet.moveToFirst();
+                while (count < resultSet.getCount()) {
+                    count++;
+                    sensorValue += count + ": ";
+                    sensorValue += resultSet.getString(0) + "\n";
+                    resultSet.moveToNext();
+
+                }
+            }
+            fragment = new HistoryFragment();
+            FragmentManager fragmentManager = getFragmentManager();
+            fragmentManager.beginTransaction()
+                    .replace(R.id.mainContent, fragment)
+                    .commit();
+
+            TextView historyLocation = (TextView) findViewById(R.id.historyShowTextView2);
+           // historyLocation.setMovementMethod(new ScrollingMovementMethod());
+           // historyLocation.setText("Number of Items: " + count + "\n" + sensorValue , TextView.BufferType.EDITABLE);
+
+
+            mDrawerList.setItemChecked(position, true);
+            setTitle(mNavItems.get(position).mTitle);
+        }else if(position == 4){//Sensors
+            Intent intent = new Intent(this, MapsActivity.class);
+            startActivity(intent);
+        }
+
+
+
 
         // Close the drawer
         mDrawerLayout.closeDrawer(mDrawerPane);
@@ -153,9 +217,9 @@ public class CcnLiteAndroid extends Activity //implements OnMenuItemClickListene
                 result.setText(resultValue, TextView.BufferType.EDITABLE);
 
             }
-        });
+        });*/
 
-        ImageView imageViewMenu = (ImageView) findViewById(R.id.imageViewMenu);
+       /* ImageView imageViewMenu = (ImageView) findViewById(R.id.imageViewMenu);
         imageViewMenu.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
                 showPopUp(v);

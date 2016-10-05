@@ -1,10 +1,8 @@
-<?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
-    android:layout_height="match_parent" tools:context="ch.unibas.ccn_lite_android.fragments.PreferencesFragment">
-
-    <!-- TODO: Update blank fragment layout -->
-
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="ch.unibas.ccn_lite_android.fragments.HomeFragment">
 
     <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
@@ -171,7 +169,5 @@
             android:popupBackground="@android:color/darker_gray" />
 
     </RelativeLayout>
-
-
 
 </FrameLayout>
