@@ -1,20 +1,29 @@
 package ch.unibas.ccn_lite_android;
 
+import java.util.ArrayList;
 import java.util.UUID;
 
 import android.app.Activity;
+import android.app.FragmentManager;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
+
+import android.app.Fragment;
+import android.support.v4.widget.DrawerLayout;
 import android.text.method.ScrollingMovementMethod;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -32,7 +41,7 @@ import android.os.Handler;
 import static android.provider.AlarmClock.EXTRA_MESSAGE;
 
 
-public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener
+public class CcnLiteAndroid extends Activity //implements OnMenuItemClickListener
 {
     ArrayAdapter adapter;
     String hello;
@@ -46,7 +55,14 @@ public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener
     String contentString;
     private Handler mHandler;
 
+    private static String TAG = CcnLiteAndroid.class.getSimpleName();
 
+    ListView mDrawerList;
+    RelativeLayout mDrawerPane;
+    //private ActionBarDrawerToggle mDrawerToggle;
+    private DrawerLayout mDrawerLayout;
+
+    ArrayList<NavItem> mNavItems = new ArrayList<NavItem>();
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -56,8 +72,31 @@ public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener
         adapter = new ArrayAdapter(this, R.layout.logtextview, 0);
         adapter.notifyDataSetChanged();
 
+        mNavItems.add(new NavItem("Home", "Send request", R.drawable.ic_home_black_24dp));
+        mNavItems.add(new NavItem("Add", "Add to database", R.drawable.ic_add_black_24dp));
+        mNavItems.add(new NavItem("Delete", "Delete from datasbase", R.drawable.ic_delete_black_24dp));
+        mNavItems.add(new NavItem("History", "Previous sensor values", R.drawable.ic_history_black_24dp));
+        mNavItems.add(new NavItem("Sensors", "See on GoogleMap", R.drawable.ic_place_black_24dp));
 
-        String arraySpinner[] = new String[] {
+
+        // DrawerLayout
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
+
+        // Populate the Navigtion Drawer with options
+        mDrawerPane = (RelativeLayout) findViewById(R.id.drawerPane);
+        mDrawerList = (ListView) findViewById(R.id.navList);
+        DrawerListAdapter adapter2 = new DrawerListAdapter(this, mNavItems);
+        mDrawerList.setAdapter(adapter2);
+
+        // Drawer Item click listeners
+        mDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                selectItemFromDrawer(position);
+            }
+        });
+
+       /* String arraySpinner[] = new String[] {
                 "CCNx2015", "NDN2013", "CCNB", "IOT2014", "LOCALRPC", "LOCALRPC"
         };
 
@@ -66,10 +105,26 @@ public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener
                 android.R.layout.simple_spinner_item, arraySpinner);
 
         s.setAdapter(adapter);
-
+*/
 
         hello = relayInit();
         ccnLiteContext = this;
+    }
+
+
+    private void selectItemFromDrawer(int position) {
+        Fragment fragment = new PreferencesFragment();
+
+        FragmentManager fragmentManager = getFragmentManager();
+        fragmentManager.beginTransaction()
+                .replace(R.id.mainContent, fragment)
+                .commit();
+
+        mDrawerList.setItemChecked(position, true);
+        setTitle(mNavItems.get(position).mTitle);
+
+        // Close the drawer
+        mDrawerLayout.closeDrawer(mDrawerPane);
     }
 
     @Override
@@ -79,7 +134,7 @@ public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener
         sensorDatabase.execSQL("CREATE TABLE IF NOT EXISTS sensorTable(sensorValue VARCHAR);");
 
         super.onStart();
-        Button b = (Button) findViewById(R.id.sendButton);
+       /* Button b = (Button) findViewById(R.id.sendButton);
         b.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 RelativeLayout myLayout = (RelativeLayout) findViewById(R.id.myLayout);
@@ -105,9 +160,10 @@ public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener
             public void onClick(View v){
                 showPopUp(v);
             }
-        });
+        });*/
         mHandler = new Handler();
     }
+    /*
     public boolean onMenuItemClick(MenuItem item) {
         Intent intent;
         switch (item.getItemId()) {
@@ -157,7 +213,7 @@ public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener
         inflater.inflate(R.menu.menu_items, popup.getMenu());
         popup.show();
     }
-
+*/
 
 
     public void appendToLog(String line) {
@@ -179,5 +235,66 @@ public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener
     static {
         System.loadLibrary("ccn-lite-android");
 
+    }
+}
+
+class NavItem {
+    String mTitle;
+    String mSubtitle;
+    int mIcon;
+
+    public NavItem(String title, String subtitle, int icon) {
+        mTitle = title;
+        mSubtitle = subtitle;
+        mIcon = icon;
+    }
+}
+
+class DrawerListAdapter extends BaseAdapter {
+
+    Context mContext;
+    ArrayList<NavItem> mNavItems;
+
+    public DrawerListAdapter(Context context, ArrayList<NavItem> navItems) {
+        mContext = context;
+        mNavItems = navItems;
+    }
+
+    @Override
+    public int getCount() {
+        return mNavItems.size();
+    }
+
+    @Override
+    public Object getItem(int position) {
+        return mNavItems.get(position);
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return 0;
+    }
+
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent) {
+        View view;
+
+        if (convertView == null) {
+            LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            view = inflater.inflate(R.layout.drawer_item, null);
+        }
+        else {
+            view = convertView;
+        }
+
+        TextView titleView = (TextView) view.findViewById(R.id.navTitle);
+        TextView subtitleView = (TextView) view.findViewById(R.id.navSubTitle);
+        ImageView iconView = (ImageView) view.findViewById(R.id.icon2);
+
+        titleView.setText( mNavItems.get(position).mTitle );
+        subtitleView.setText( mNavItems.get(position).mSubtitle );
+        iconView.setImageResource(mNavItems.get(position).mIcon);
+
+        return view;
     }
 }
