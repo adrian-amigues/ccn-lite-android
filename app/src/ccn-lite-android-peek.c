@@ -82,7 +82,7 @@ char* ccnl_android_peek(char* suiteStr, char* addr, int port, char* uri) {
     suite = ccnl_str2suite(suiteStr);
     isContent = ccnl_suite2isContentFunc(suite);
     if (!isContent) {
-        exit(-1);
+        return "Suite is not valid\n";
     }
 
     // Transforming prefix if needed
@@ -90,7 +90,7 @@ char* ccnl_android_peek(char* suiteStr, char* addr, int port, char* uri) {
     prefix = ccnl_URItoPrefix(uri_static, suite, NULL, NULL);
     if (!prefix) {
         DEBUGMSG(ERROR, "no URI found, aborting\n");
-        return -1;
+        return "no URI found, aborting\n";
     }
     // sprintf(response, "%s prefix <%s> became %s\n", response, uri, ccnl_prefix_to_path(prefix));
 
@@ -151,7 +151,7 @@ char* ccnl_android_peek(char* suiteStr, char* addr, int port, char* uri) {
             int len3;
             DEBUGMSG(DEBUG, "  fragment, %d bytes\n", len2);
             sprintf(response, "%s fragment, %d bytes\n", response, len2);
-            return response;
+            return response; // TODO: remove that and test fragmenting
             switch(suite) {
             case CCNL_SUITE_CCNTLV: {
                 struct ccnx_tlvhdr_ccnx2015_s *hp;
