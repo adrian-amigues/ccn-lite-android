@@ -9,11 +9,9 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.IBinder;
 import android.text.method.ScrollingMovementMethod;
-import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -24,7 +22,6 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.PopupMenu;
-import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.PopupMenu.OnMenuItemClickListener;
@@ -34,15 +31,14 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.widget.Toast;
 
-import static android.provider.AlarmClock.EXTRA_MESSAGE;
+import static android.R.attr.port;
+import static ch.unibas.ccn_lite_android.R.id.resultTextView;
 
 
 public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener
 {
     ArrayAdapter adapter;
-    String hello;
     Context ccnLiteContext;
-    int newData;
     SQLiteDatabase sensorDatabase;
     String resultValue;
 
@@ -50,11 +46,14 @@ public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener
     String portString;
     String contentString;
     private Handler mHandler;
-    TextView resultView;
 
-//    For service
+    //    For service
     RelayService mService;
     boolean mBound = false;
+    EditText ipEditText;
+    TextView resultTextView;
+    EditText portEditText;
+    EditText contentEditText;
 
 
 
@@ -66,6 +65,10 @@ public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener
         adapter = new ArrayAdapter(this, R.layout.logtextview, 0);
         adapter.notifyDataSetChanged();
 
+        ipEditText = (EditText) findViewById(R.id.IPEditText);
+        portEditText = (EditText) findViewById(R.id.portEditText);
+        contentEditText = (EditText) findViewById(R.id.contentEditText);
+        resultTextView = (TextView) findViewById(R.id.resultTextView);
 
         String arraySpinner[] = new String[] {
                 "CCNx2015", "NDN2013", "CCNB", "IOT2014", "LOCALRPC", "LOCALRPC"
@@ -101,21 +104,12 @@ public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener
         Button b = (Button) findViewById(R.id.sendButton);
         b.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                RelativeLayout myLayout = (RelativeLayout) findViewById(R.id.myLayout);
-               // myLayout.setBackgroundColor(Color.rgb(1,0,0));
-                EditText ip = (EditText) findViewById(R.id.IPEditText);
-                ipString = ip.getText().toString();
-                EditText port = (EditText) findViewById(R.id.portEditText);
-                portString = port.getText().toString();
+                ipString = ipEditText.getText().toString();
+                portString = portEditText.getText().toString();
                 int portInt = Integer.parseInt(portString);
-                EditText content = (EditText) findViewById(R.id.contentEditText);
-                contentString = content.getText().toString();
+                contentString = contentEditText.getText().toString();
                 mHandler = new Handler();
-                resultView = (TextView) findViewById(R.id.resultTextView);
                 new AndroidPeek().execute(ipString, Integer.toString(portInt), contentString);
-//                resultValue = mService.startAndroidPeek(ipString, portInt, contentString);
-//                resultView.setMovementMethod(new ScrollingMovementMethod());
-//                resultView.setText(resultValue, TextView.BufferType.EDITABLE);
 
             }
         });
@@ -234,8 +228,8 @@ public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener
         /** The system calls this to perform work in the UI thread and delivers
          * the result from doInBackground() */
         protected void onPostExecute(String result) {
-            resultView.setMovementMethod(new ScrollingMovementMethod());
-            resultView.append(result);
+            resultTextView.setMovementMethod(new ScrollingMovementMethod());
+            resultTextView.append(result);
         }
     }
 }
