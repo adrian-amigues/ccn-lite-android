@@ -22,6 +22,7 @@
  */
 
 #include <string.h>
+#include <time.h>
 
 #include "util/ccnl-common-for-android.c"
 #include "util/ccnl-socket.c"
@@ -32,6 +33,7 @@
 // Function prototypes
 int frag_cb(struct ccnl_relay_s *relay, struct ccnl_face_s *from,
         unsigned char **data, int *len);
+double timeDiff(time_t begin);
 
 // Global variables
 unsigned char out[8*CCNL_MAX_PACKET_SIZE];
@@ -69,12 +71,12 @@ char* ccnl_android_peek(char* suiteStr, char* addr, int port, char* uri) {
     char *path;
     struct sockaddr sa;
     float wait = 3.0;
-
+    clock_t begin = clock();
 
     time(&curtime);
 
     DEBUGMSG(TRACE, "using udp address %s/%d\n", addr, port);
-    sprintf(response, " using udp address %s/%d\n", addr, port);
+    // sprintf(response, " using udp address %s/%d\n", addr, port);
 
     // Getting the suite integer value
     suite = ccnl_str2suite(suiteStr);
@@ -90,12 +92,12 @@ char* ccnl_android_peek(char* suiteStr, char* addr, int port, char* uri) {
         DEBUGMSG(ERROR, "no URI found, aborting\n");
         return -1;
     }
-    sprintf(response, "%s prefix <%s> became %s\n", response, uri, ccnl_prefix_to_path(prefix));
+    // sprintf(response, "%s prefix <%s> became %s\n", response, uri, ccnl_prefix_to_path(prefix));
 
 
     // Make the interest
     len = ccntlv_mkInterest(prefix, &nonce, out, sizeof(out));
-    sprintf(response, "%s interest has %d bytes\n", response, len);
+    // sprintf(response, "%s interest has %d bytes\n", response, len);
 
     // Initialize network functionalities
     struct sockaddr_in *si = (struct sockaddr_in*) &sa;
@@ -106,28 +108,30 @@ char* ccnl_android_peek(char* suiteStr, char* addr, int port, char* uri) {
     socksize = sizeof(struct sockaddr_in);
 
     // Sending Interest
-    sprintf(response, "%s sendto: sock=%d, len out=%d, out=%s\n", response, sock, strlen(out), out);
+    // sprintf(response, "%s sendto: sock=%d, len out=%d, out=%s\n", response, sock, strlen(out), out);
     rc = sendto(sock, out, len, 0, (struct sockaddr*)&sa, socksize);
     if (rc < 0) {
         perror("sendto");
         return "rc < 0";
     }
     DEBUGMSG(DEBUG, "sendto returned %d\n", rc);
-    sprintf(response, "%s sendto returned %d\n", response, rc);
+    // sprintf(response, "%s sendto returned %d\n", response, rc);
 
     for (;;) { // wait for a content pkt (ignore interests)
         unsigned char *cp = out;
         int enc, suite2, len2;
         DEBUGMSG(TRACE, "  waiting for packet\n");
-        sprintf(response, "%s waiting for packet\n", response);
+        sprintf(response, "%s [%f] - before block_on_read\n", response, timeDiff(begin));
 
-        if (block_on_read(sock, wait) <= 0) // timeout
+        if (block_on_read(sock, wait) <= 0) {// timeout
+            sprintf(response, "%s bor <= 0\n", response);
             break;
-        sprintf(response, "%s between block_on_read and recv\n", response);
+        }
+        sprintf(response, "%s [%f] - between block_on_read and recv\n", response, timeDiff(begin));
         len = recv(sock, out, sizeof(out), 0);
 
         DEBUGMSG(DEBUG, "received %d bytes\n", len);
-        sprintf(response, "%s received %d bytes\n", response, len);
+        sprintf(response, "%s [%f] - received %d bytes\n", response, timeDiff(begin), len);
 
         suite2 = -1;
         len2 = len;
@@ -141,6 +145,7 @@ char* ccnl_android_peek(char* suiteStr, char* addr, int port, char* uri) {
         }
 
 #ifdef USE_FRAG
+        // sprintf(response, "%s USE_FRAG\n", response);
         if (isFragment && isFragment(cp, len2)) {
             int t;
             int len3;
@@ -224,12 +229,17 @@ char* ccnl_android_peek(char* suiteStr, char* addr, int port, char* uri) {
             DEBUGMSG(WARNING, "skipping non-data packet\n");
             continue;
         }
-        
+        if (rc == 1) { // Added by Adrian
+            sprintf(response, "%s rc == 1\n", response);
+            break;
+        }
     }
 
 
     // sprintf(response, "%s Returning response, len = %d, strlen(out) = %d\n", response, len, strlen(out));
     // sprintf(response, "%s out = %s\n", response, pktdump_android(out, len, format, suite));
+    sprintf(response, "%s [%f] - return response\n", response, timeDiff(begin));
+    sprintf(response, "%s\n->%s\n", response, pktdump_android(out, len, format, suite));
     sprintf(response, "->%s\n", pktdump_android(out, len, format, suite));
     return response;
 done:
@@ -247,4 +257,8 @@ frag_cb(struct ccnl_relay_s *relay, struct ccnl_face_s *from,
     memcpy(out, *data, *len);
     outlen = *len;
     return 0;
+}
+
+double timeDiff(time_t begin) {
+    return (double)(clock() - begin) / CLOCKS_PER_SEC;
 }
