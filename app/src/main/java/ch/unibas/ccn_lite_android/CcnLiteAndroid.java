@@ -3,13 +3,15 @@ package ch.unibas.ccn_lite_android;
 import java.util.UUID;
 
 import android.app.Activity;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Color;
+import android.os.AsyncTask;
+import android.os.IBinder;
 import android.text.method.ScrollingMovementMethod;
-import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -32,13 +34,14 @@ import java.util.ArrayList;
 
 import android.os.Bundle;
 import android.os.Handler;
+import android.widget.Toast;
 
-import static android.provider.AlarmClock.EXTRA_MESSAGE;
+import static android.R.attr.port;
+import static ch.unibas.ccn_lite_android.R.id.resultTextView;
 
 
 public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener,OnItemSelectedListener{
     ArrayAdapter adapter;
-    String hello;
     Context ccnLiteContext;
     SQLiteDatabase sensorDatabase;
     String resultValue;
@@ -48,6 +51,14 @@ public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener,
     String contentString;//Interest Object Name
     private Handler mHandler;
     Spinner ex;
+
+    //    For service
+    RelayService mService;
+    boolean mBound = false;
+    EditText ipEditText;
+    TextView resultTextView;
+    EditText portEditText;
+    EditText contentEditText;
 
 
     /**
@@ -60,16 +71,6 @@ public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener,
         setContentView(R.layout.main_layout);
         adapter = new ArrayAdapter(this, R.layout.logtextview, 0);
         adapter.notifyDataSetChanged();
-
-        /*this part make dropdown list for testing options*/
-        String arraySpinner[] = new String[] {
-                "CCNx2015", "NDN2013", "CCNB", "IOT2014", "LOCALRPC", "LOCALRPC"
-        };
-
-
-        Spinner s = (Spinner) findViewById(R.id.formatSpinner);
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,R.layout.spinner_item, arraySpinner);
-        s.setAdapter(adapter);
 
 
         ex = (Spinner) findViewById(R.id.test_example);
@@ -85,40 +86,38 @@ public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener,
         ex.setAdapter(dataAdapter);
 
 
-        hello = relayInit();//Here we init our relay
+        if(mBound) {
+            mService.startRely();
+        }
+
         ccnLiteContext = this;
     }
 
     @Override
     public void onStart() {
+        super.onStart();
+
         ListView lv;
-        //Create SQLdb connection for history
         sensorDatabase = openOrCreateDatabase("SENSORDATABASE",MODE_PRIVATE,null);
         sensorDatabase.execSQL("CREATE TABLE IF NOT EXISTS sensorTable(sensorValue VARCHAR);");
 
-        super.onStart();
+        // Bind to RelayService
+        Intent intent = new Intent(this, RelayService.class);
+        bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+        Toast.makeText(this, "mBound = " + mBound, Toast.LENGTH_SHORT).show();
 
         Button b = (Button) findViewById(R.id.sendButton);
         b.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                RelativeLayout myLayout = (RelativeLayout) findViewById(R.id.myLayout);
-                String text = ex.getSelectedItem().toString();//get value of example spinner
-               // EditText content = (EditText) findViewById(R.id.contentEditText);
-               // contentString = content.getText().toString();
+                String text = ex.getSelectedItem().toString();
                 mHandler = new Handler();
-                if(text.equals("/android/test/mycontent")){
-                    resultValue = androidPeek("130.238.15.221",9999, text);//Send interest Request to jni file
+                if(text.equals("/android/test/mycontent")) {
+                    new AndroidPeek().execute("130.238.15.221", "9999", text);
                 }
-                else
-                    resultValue = androidPeek("130.238.15.225",9999, text);//Send interest Request to jni file
-
-
-                TextView result = (TextView) findViewById(R.id.resultTextView);
-                result.setMovementMethod(new ScrollingMovementMethod());
-                result.setText(resultValue, TextView.BufferType.EDITABLE);
-
+                else new AndroidPeek().execute("130.238.15.225", "9999", text);
             }
         });
+
         ImageView imageViewMenu = (ImageView) findViewById(R.id.imageViewMenu);
         imageViewMenu.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
@@ -127,19 +126,17 @@ public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener,
         });
         mHandler = new Handler();
     }
-    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        // On selecting a spinner item
-        String item = parent.getItemAtPosition(position).toString();
 
-        // Showing selected spinner item
-        Toast.makeText(parent.getContext(), "Selected: " + item, Toast.LENGTH_LONG).show();
+    @Override
+    protected void onStop() {
+        super.onStop();
+        // Unbind from the service
+        if (mBound) {
+            unbindService(mConnection);
+            mBound = false;
+        }
     }
-    public void onNothingSelected(AdapterView<?> arg0) {
-        // TODO Auto-generated method stub
-    }
-    /**
-     * @desc insert values into DB by lick button
-     */
+
     public boolean onMenuItemClick(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_add:
@@ -160,6 +157,7 @@ public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener,
 
                     }
                 }
+
                 Intent intent = new Intent(this, DisplayDatabaseHistory.class);
                 intent.putExtra("sensorHistory", sensorValue);
                 intent.putExtra("countOfItems", count);
@@ -175,7 +173,6 @@ public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener,
         }
     }
 
-
     public void showPopUp(View v){
         PopupMenu popup = new PopupMenu(CcnLiteAndroid.this, v);
         popup.setOnMenuItemClickListener(CcnLiteAndroid.this);
@@ -184,15 +181,31 @@ public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener,
         popup.show();
     }
 
-
-
     public void appendToLog(String line) {
         while (adapter.getCount() > 500)
             adapter.remove(adapter.getItem(0));
         adapter.add(line);
         adapter.notifyDataSetChanged();
     }
-//This is declaration of native c functions
+
+    /** Defines callbacks for service binding, passed to bindService() */
+    private ServiceConnection mConnection = new ServiceConnection() {
+
+        @Override
+        public void onServiceConnected(ComponentName className,
+                                       IBinder service) {
+            // We've bound to RelayService, cast the IBinder and get RelayService instance
+            RelayService.LocalBinder binder = (RelayService.LocalBinder) service;
+            mService = binder.getService();
+            mBound = true;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName arg0) {
+            mBound = false;
+        }
+    };
+
     public native String relayInit();
 
     public native String androidPeek(String ipString, int portString, String contentString);
@@ -204,6 +217,39 @@ public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener,
      */
     static {
         System.loadLibrary("ccn-lite-android");
-
     }
+
+    private class AndroidPeek extends AsyncTask<String, Void, String> {
+        /** The system calls this to perform work in a worker thread and
+         * delivers it the parameters given to AsyncTask.execute() */
+        protected String doInBackground(String... params) {
+            String ipString = params[0];
+            int portInt = Integer.parseInt(params[1]);
+            String contentString = params[2];
+            return mService.startAndroidPeek(ipString, portInt, contentString);
+        }
+
+        /** The system calls this to perform work in the UI thread and delivers
+         * the result from doInBackground() */
+        protected void onPostExecute(String result) {
+            resultTextView.setMovementMethod(new ScrollingMovementMethod());
+            resultTextView.append(result);
+        }
+    }
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        // On selecting a spinner item
+        String item = parent.getItemAtPosition(position).toString();
+
+        // Showing selected spinner item
+        Toast.makeText(parent.getContext(), "Selected: " + item, Toast.LENGTH_LONG).show();
+    }
+    public void onNothingSelected(AdapterView<?> arg0) {
+        // TODO Auto-generated method stub
+    }
+    /**
+     * @desc insert values into DB by lick button
+     */
+
 }
+
+

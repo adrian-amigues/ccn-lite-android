@@ -2,7 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="ch.unibas.ccn_lite_android"
     android:versionCode="1"
-    android:versionName="1.0">
+    android:versionName="1.0"
+    android:theme="@android:style/Theme.NoTitleBar.Fullscreen">
 
     <uses-sdk
         android:maxSdkVersion="24"
@@ -36,6 +37,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <service android:name=".RelayService" />
         <activity android:name=".DisplayDatabaseHistory"></activity>
     </application>
 

@@ -43,6 +43,9 @@ Java_ch_unibas_ccn_1lite_1android_CcnLiteAndroid_relayInit(JNIEnv* env,
 */
 
 
+
+
+
 /**
  * androidPeek
  * calls the ccnl_android_peek function from ccnl-lite-android-peek.c
@@ -58,6 +61,25 @@ Java_ch_unibas_ccn_1lite_1android_CcnLiteAndroid_androidPeek(JNIEnv* env,
     const char *content = (*env)->GetStringUTFChars(env, contentString, 0);
     return (*env)->NewStringUTF(env, ccnl_android_peek("ccnx2015", ip, port, content));
 }
+
+/**
+ * androidPeek
+ * calls the ccnl_android_peek function from ccnl-lite-android-peek.c
+ * returns the string returned from that function
+ */
+JNIEXPORT jstring JNICALL
+Java_ch_unibas_ccn_1lite_1android_RelayService_androidPeek(JNIEnv* env,
+                                                                jobject thiz, jstring ipString, jint portString, jstring contentString)
+{
+    char buf[128];
+    const char *ip = (*env)->GetStringUTFChars(env, ipString, 0);
+    int port = (int) portString;
+    const char *content = (*env)->GetStringUTFChars(env, contentString, 0);
+    return (*env)->NewStringUTF(env, ccnl_android_peek("ccnx2015", ip, port, content));
+}
+
+
+
 
 
 void jni_append_to_log(char *line)

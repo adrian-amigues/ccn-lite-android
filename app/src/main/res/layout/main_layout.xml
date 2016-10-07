@@ -16,8 +16,7 @@
        android:text="/android/test/mycontent"
        android:ems="10"
        android:id="@+id/contentEditText"
-       android:layout_centerHorizontal="true" />@android:color/darker_gray"
-       android:layout_marginTop="5dp" />
+       android:layout_centerHorizontal="true" />
 <!--
    <EditText
        android:layout_width="wrap_content"
@@ -36,7 +35,7 @@
        android:text="IP:"
        android:layout_width="wrap_content"
        android:layout_height="wrap_content"
-       android:layout_marginTop="121dp"
+       android:layout_marginTop="80dp"
        android:id="@+id/IPTextView"
        android:textStyle="normal|bold"
        android:textColor="@android:color/background_dark"
