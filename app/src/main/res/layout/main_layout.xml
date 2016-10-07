@@ -1,170 +1,154 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-              android:id="@+id/myLayout"
-              android:layout_width="fill_parent"
-              android:layout_height="fill_parent"
-              android:orientation="vertical"
-              android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
-              android:background="#ffffff"
-              tools:context="ch.unibas.ccn_lite_android.CcnLiteAndroid">
 
-   <EditText
-       android:layout_width="wrap_content"
-       android:layout_height="wrap_content"
-       android:inputType="textPersonName"
-       android:text="/android/test/mycontent"
-       android:ems="10"
-       android:id="@+id/contentEditText"
-       android:layout_centerHorizontal="true" />
-<!--
-   <EditText
-       android:layout_width="wrap_content"
-       android:layout_height="wrap_content"
-       android:inputType="textPersonName"
-       android:text="130.238.15.221"
-       android:ems="10"
-       android:id="@+id/IPEditText"
-       android:textColor="@android:color/darker_gray"
-       android:layout_alignBaseline="@+id/IPTextView"
-       android:layout_alignBottom="@+id/IPTextView"
-       android:layout_alignParentEnd="true"
-       android:layout_marginEnd="38dp" />
+<android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/drawerLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF">
 
-   <TextView
-       android:text="IP:"
-       android:layout_width="wrap_content"
-       android:layout_height="wrap_content"
-       android:layout_marginTop="80dp"
-       android:id="@+id/IPTextView"
-       android:textStyle="normal|bold"
-       android:textColor="@android:color/background_dark"
-       android:layout_marginStart="49dp"
-       android:layout_alignParentTop="true"
-       android:layout_alignParentStart="true" />
--->
-   <TextView
-       android:layout_width="match_parent"
-       android:layout_height="wrap_content"
-       android:id="@+id/resultTextView"
-       android:textSize="18sp"
-       android:scrollbars = "vertical"
-       android:maxLines="7"
-       android:layout_alignEnd="@+id/contentEditText"
-       android:layout_weight="1.12"
-       android:textColor="@android:color/black"
-       android:layout_below="@+id/resultTitleTextView"
-       android:layout_alignParentBottom="true"
-       android:layout_alignStart="@+id/formatSpinner" />
-
-   <TextView
-       android:text="Result:"
-       android:layout_width="wrap_content"
-       android:layout_height="wrap_content"
-       android:layout_below="@+id/sendButton"
-       android:layout_marginTop="16dp"
-       android:id="@+id/resultTitleTextView"
-       android:textColor="@android:color/black"
-       android:textSize="18sp" />
-<!--
-   <EditText
-       android:layout_width="wrap_content"
-       android:layout_height="wrap_content"
-       android:inputType="textPersonName"
-       android:text="9999"
-       android:ems="10"
-       android:id="@+id/portEditText"
-       android:textColor="@android:color/darker_gray"
-       android:layout_alignBaseline="@+id/PortTextView"
-       android:layout_alignBottom="@+id/PortTextView"
-       android:layout_alignStart="@+id/IPEditText" />
--->
-
-   <TextView
-       android:text="Format:"
-       android:layout_width="wrap_content"
-       android:layout_height="wrap_content"
-       android:id="@+id/formatTextView"
-       android:textColor="@android:color/black"
-       android:textStyle="normal|bold"
-       android:layout_alignBaseline="@+id/formatSpinner"
-       android:layout_alignBottom="@+id/formatSpinner"
-       android:layout_alignEnd="@+id/resultTitleTextView" />
-<!--
-   <TextView
-       android:text="Port:"
-       android:layout_width="wrap_content"
-       android:layout_height="wrap_content"
-       android:layout_marginTop="34dp"
-       android:id="@+id/PortTextView"
-       android:textStyle="normal|bold"
-       android:textColor="@android:color/background_dark"
-       android:layout_below="@+id/IPEditText"
-       android:layout_alignStart="@+id/IPTextView" />
--->
+   <!-- The main content view -->
    <RelativeLayout
+       android:id="@+id/mainContent"
        android:layout_width="match_parent"
-       android:layout_height="wrap_content"
-       android:background="#cc0000"
-       android:id="@+id/relativeLayout"
-       android:layout_alignParentTop="true"
-       android:layout_centerHorizontal="true">
+       android:layout_height="match_parent" >
+       <RelativeLayout
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:layout_alignParentTop="true"
+           android:layout_centerHorizontal="true"
+           android:background="#991b0d"
+           android:id="@+id/relativeLayout">
 
-      <ImageView android:layout_width="200sp"
-                 android:layout_height="50sp"
-                 android:layout_gravity="center"
-          android:paddingTop="15dp"
-                 android:src="@drawable/ccn_lite_logo_712x184_tmp"
-          android:layout_marginLeft="5dp"
-          android:layout_marginRight="5dp"
-          android:clickable="true"
-          android:onClick="showPopUp"
-          android:id="@+id/imageViewMenu"
-          android:layout_alignParentTop="true"
-          android:layout_alignParentEnd="true" />
+           <ImageView android:layout_width="200sp"
+               android:layout_height="50sp"
+               android:layout_gravity="center"
+               android:paddingTop="15dp"
+               android:src="@drawable/ccn_lite_logo_712x184_tmp"
+               android:layout_marginLeft="5dp"
+               android:layout_marginRight="5dp"
+               android:layout_alignParentTop="true"
+               android:layout_alignParentEnd="true"
+               android:layout_marginEnd="14dp"
+               android:id="@+id/imageViewMenu" />
+       </RelativeLayout>
+
+       <TextView
+           android:text="Content Objects"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:id="@+id/textView"
+           android:textColor="@android:color/black"
+           android:textStyle="normal|bold"
+           android:layout_marginTop="38dp"
+           android:layout_below="@+id/relativeLayout"
+           android:layout_toStartOf="@+id/sendButton" />
+
+       <Spinner
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:id="@+id/test_example"
+           android:layout_below="@+id/textView"
+           android:layout_alignStart="@+id/resultTitleTextView" />
+       <Button
+           android:text="Send Interest Message"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:id="@+id/sendButton"
+           android:onClick="sendInterest"
+           android:layout_below="@+id/test_example"
+           android:layout_alignParentEnd="true"
+           android:layout_marginEnd="36dp" />
+       <TextView
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:id="@+id/resultTextView"
+           android:textSize="18sp"
+           android:scrollbars = "vertical"
+           android:maxLines="7"
+           android:layout_weight="1.12"
+           android:background="#eeeaf1"
+           android:layout_below="@+id/resultTitleTextView"
+           android:layout_alignStart="@+id/textView" />
+
+       <TextView
+           android:text="Result:"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:id="@+id/resultTitleTextView"
+           android:textColor="@android:color/black"
+           android:textSize="18sp"
+           android:layout_marginTop="62dp"
+           android:layout_below="@+id/sendButton"
+           android:layout_alignEnd="@+id/textView" />
+
+
+       </RelativeLayout>
+
+   <!-- The navigation drawer -->
+   <RelativeLayout
+       android:layout_width="280dp"
+       android:layout_height="match_parent"
+       android:id="@+id/drawerPane"
+       android:layout_gravity="start">
+
+      <!-- Profile Box -->
+
+      <RelativeLayout
+          android:id="@+id/profileBox"
+          android:layout_width="match_parent"
+          android:layout_height="100dp"
+          android:background="#991b0d"
+          android:padding="8dp" >
+
+         <ImageView
+             android:id="@+id/avatar"
+             android:layout_width="50dp"
+             android:layout_height="50dp"
+             android:layout_marginTop="15dp" />
+
+         <LinearLayout
+             android:layout_width="wrap_content"
+             android:layout_height="42dp"
+             android:layout_centerVertical="true"
+             android:layout_marginLeft="15dp"
+             android:layout_toRightOf="@+id/avatar"
+             android:orientation="vertical" >
+
+            <TextView
+                android:id="@+id/userName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="CCN"
+                android:textColor="#fff"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/desc"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:layout_marginTop="4dp"
+                android:text="CS Project 2016"
+                android:textColor="#fff"
+                android:textSize="12sp" />
+         </LinearLayout>
+      </RelativeLayout>
+
+
+
+      <!-- List of Actions (pages) -->
+      <ListView
+          android:id="@+id/navList"
+          android:layout_width="280dp"
+          android:layout_height="match_parent"
+          android:layout_below="@+id/profileBox"
+          android:choiceMode="singleChoice"
+          android:background="#ffffffff" />
 
    </RelativeLayout>
 
-   <Button
-       android:text="Send Interest Message"
-       android:layout_width="wrap_content"
-       android:layout_height="wrap_content"
-       android:id="@+id/sendButton"
-       android:onClick="sendInterest"
-       android:layout_below="@+id/formatSpinner"
-       android:layout_alignParentEnd="true" />
-
-   <Spinner
-       android:layout_width="match_parent"
-       android:layout_height="wrap_content"
-       android:id="@+id/formatSpinner"
-       android:textColor="@android:color/background_dark"
-       android:spinnerMode="dropdown"
-       android:popupBackground="@android:color/darker_gray"
-       android:layout_below="@+id/test_example"
-       android:layout_alignParentEnd="true"
-       android:layout_marginTop="41dp"
-       android:layout_alignStart="@+id/contentEditText" />
-
-   <TextView
-       android:text="Content Objects"
-       android:layout_width="wrap_content"
-       android:layout_height="wrap_content"
-       android:id="@+id/textView"
-       android:textColor="@android:color/black"
-       android:textStyle="normal|bold"
-       android:layout_below="@+id/relativeLayout"
-       android:layout_alignStart="@+id/formatTextView"
-       android:layout_marginTop="52dp" />
-
-   <Spinner
-       android:layout_width="wrap_content"
-       android:layout_height="wrap_content"
-       android:id="@+id/test_example"
-       android:layout_below="@+id/textView"
-       android:layout_toEndOf="@+id/textView" />
-
-
-</RelativeLayout>
+</android.support.v4.widget.DrawerLayout>
 
 

@@ -1,22 +1,41 @@
 package ch.unibas.ccn_lite_android;
 
+import java.util.ArrayList;
 import java.util.UUID;
 
 import android.app.Activity;
+
 import android.content.ComponentName;
+
+import android.app.FragmentManager;
+
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+
 import android.os.AsyncTask;
 import android.os.IBinder;
 import android.text.method.ScrollingMovementMethod;
+
+import android.graphics.Color;
+
+import android.app.Fragment;
+import android.support.v4.widget.DrawerLayout;
+
+import android.text.method.ScrollingMovementMethod;
+import android.view.LayoutInflater;
+import android.view.Menu;
+
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -36,11 +55,26 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.widget.Toast;
 
+
 import static android.R.attr.port;
 import static ch.unibas.ccn_lite_android.R.id.resultTextView;
 
 
-public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener,OnItemSelectedListener{
+
+import com.google.android.gms.maps.MapFragment;
+
+import ch.unibas.ccn_lite_android.fragments.DeleteDatabaseFragment;
+import ch.unibas.ccn_lite_android.fragments.HistoryFragment;
+import ch.unibas.ccn_lite_android.fragments.HomeFragment;
+import ch.unibas.ccn_lite_android.fragments.PreferencesFragment;
+import ch.unibas.ccn_lite_android.fragments.addToDatabase;
+
+import static android.provider.AlarmClock.EXTRA_MESSAGE;
+
+
+public class CcnLiteAndroid extends Activity //implements OnMenuItemClickListener
+{
+
     ArrayAdapter adapter;
     Context ccnLiteContext;
     SQLiteDatabase sensorDatabase;
@@ -52,14 +86,23 @@ public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener,
     private Handler mHandler;
     Spinner ex;
 
+
     //    For service
     RelayService mService;
     boolean mBound = false;
-    EditText ipEditText;
-    TextView resultTextView;
-    EditText portEditText;
-    EditText contentEditText;
 
+    TextView resultTextView;
+
+
+    private static String TAG = CcnLiteAndroid.class.getSimpleName();
+
+
+    ListView mDrawerList;
+    RelativeLayout mDrawerPane;
+    //private ActionBarDrawerToggle mDrawerToggle;
+    private DrawerLayout mDrawerLayout;
+
+    ArrayList<NavItem> mNavItems = new ArrayList<NavItem>();
 
     /**
      * @desc create new activity and init relay with CCN
@@ -72,6 +115,16 @@ public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener,
         adapter = new ArrayAdapter(this, R.layout.logtextview, 0);
         adapter.notifyDataSetChanged();
 
+        mNavItems.add(new NavItem("Home", "Send request", R.drawable.ic_home_black_24dp));
+        mNavItems.add(new NavItem("Add", "Add to database", R.drawable.ic_add_black_24dp));
+        mNavItems.add(new NavItem("Delete", "Delete from datasbase", R.drawable.ic_delete_black_24dp));
+        mNavItems.add(new NavItem("History", "Previous sensor values", R.drawable.ic_history_black_24dp));
+        mNavItems.add(new NavItem("Sensors", "See on GoogleMap", R.drawable.ic_place_black_24dp));
+
+
+        // DrawerLayout
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
+
 
         ex = (Spinner) findViewById(R.id.test_example);
         List<String> list = new ArrayList<String>();
@@ -80,17 +133,96 @@ public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener,
         ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>
                 (this, R.layout.spinner_item,list);
 
-        dataAdapter.setDropDownViewResource
-                (android.R.layout.simple_spinner_dropdown_item);
+        // Populate the Navigtion Drawer with options
+        mDrawerPane = (RelativeLayout) findViewById(R.id.drawerPane);
+        mDrawerList = (ListView) findViewById(R.id.navList);
+        DrawerListAdapter adapter2 = new DrawerListAdapter(this, mNavItems);
+        mDrawerList.setAdapter(adapter2);
 
-        ex.setAdapter(dataAdapter);
-
+        // Drawer Item click listeners
+        mDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                selectItemFromDrawer(position);
+            }
+        });
 
         if(mBound) {
             mService.startRely();
         }
 
         ccnLiteContext = this;
+    }
+
+
+    private void selectItemFromDrawer(int position) {
+        Fragment fragment;
+        if(position == 0){//Home
+            fragment = new HomeFragment();
+            FragmentManager fragmentManager = getFragmentManager();
+            fragmentManager.beginTransaction()
+                    .replace(R.id.mainContent, fragment)
+                    .commit();
+
+            mDrawerList.setItemChecked(position, true);
+            setTitle(mNavItems.get(position).mTitle);
+        }else if(position == 1){//Add
+            sensorDatabase.execSQL("INSERT INTO sensorTable VALUES('" + resultValue + "');");
+            fragment = new addToDatabase();
+            FragmentManager fragmentManager = getFragmentManager();
+            fragmentManager.beginTransaction()
+                    .replace(R.id.mainContent, fragment)
+                    .commit();
+
+            mDrawerList.setItemChecked(position, true);
+            setTitle(mNavItems.get(position).mTitle);
+        }else if(position == 2){//Delete
+            sensorDatabase.execSQL("DELETE FROM sensorTable;");
+            fragment = new DeleteDatabaseFragment();
+            FragmentManager fragmentManager = getFragmentManager();
+            fragmentManager.beginTransaction()
+                    .replace(R.id.mainContent, fragment)
+                    .commit();
+
+            mDrawerList.setItemChecked(position, true);
+            setTitle(mNavItems.get(position).mTitle);
+        }else if(position == 3){//History
+            Cursor resultSet = sensorDatabase.rawQuery("Select * from sensorTable",null);
+            String sensorValue="";
+            int count = 0;
+            if(resultSet != null) {
+                resultSet.moveToFirst();
+                while (count < resultSet.getCount()) {
+                    count++;
+                    sensorValue += count + ": ";
+                    sensorValue += resultSet.getString(0) + "\n";
+                    resultSet.moveToNext();
+
+                }
+            }
+            fragment = new HistoryFragment();
+            FragmentManager fragmentManager = getFragmentManager();
+            fragmentManager.beginTransaction()
+                    .replace(R.id.mainContent, fragment)
+                    .commit();
+
+            TextView historyLocation = (TextView) findViewById(R.id.historyShowTextView2);
+           // historyLocation.setMovementMethod(new ScrollingMovementMethod());
+           // historyLocation.setText("Number of Items: " + count + "\n" + sensorValue , TextView.BufferType.EDITABLE);
+
+
+            mDrawerList.setItemChecked(position, true);
+            setTitle(mNavItems.get(position).mTitle);
+        }else if(position == 4){//Sensors
+            Intent intent = new Intent(this, MapsActivity.class);
+            startActivity(intent);
+        }
+
+
+
+
+        // Close the drawer
+        mDrawerLayout.closeDrawer(mDrawerPane);
     }
 
     @Override
@@ -107,6 +239,9 @@ public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener,
         Toast.makeText(this, "mBound = " + mBound, Toast.LENGTH_SHORT).show();
 
         Button b = (Button) findViewById(R.id.sendButton);
+
+        super.onStart();
+
         b.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 String text = ex.getSelectedItem().toString();
@@ -118,14 +253,15 @@ public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener,
             }
         });
 
-        ImageView imageViewMenu = (ImageView) findViewById(R.id.imageViewMenu);
+       /* ImageView imageViewMenu = (ImageView) findViewById(R.id.imageViewMenu);
         imageViewMenu.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
                 showPopUp(v);
             }
-        });
+        });*/
         mHandler = new Handler();
     }
+
 
     @Override
     protected void onStop() {
@@ -137,49 +273,9 @@ public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener,
         }
     }
 
-    public boolean onMenuItemClick(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.menu_add:
-                sensorDatabase.execSQL("INSERT INTO sensorTable VALUES('" + resultValue + "');");
-                return true;
 
-            case R.id.menu_history:
-                Cursor resultSet = sensorDatabase.rawQuery("Select * from sensorTable",null);
-                String sensorValue="";
-                int count = 0;
-                if(resultSet != null) {
-                    resultSet.moveToFirst();
-                    while (count < resultSet.getCount()) {
-                        count++;
-                        sensorValue += count + ": ";
-                        sensorValue += resultSet.getString(0) + "\n";
-                        resultSet.moveToNext();
 
-                    }
-                }
 
-                Intent intent = new Intent(this, DisplayDatabaseHistory.class);
-                intent.putExtra("sensorHistory", sensorValue);
-                intent.putExtra("countOfItems", count);
-                startActivity(intent);
-
-                return true;
-
-            case R.id.menu_reset:
-                sensorDatabase.execSQL("DELETE FROM sensorTable;");
-
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
-
-    public void showPopUp(View v){
-        PopupMenu popup = new PopupMenu(CcnLiteAndroid.this, v);
-        popup.setOnMenuItemClickListener(CcnLiteAndroid.this);
-        MenuInflater inflater = popup.getMenuInflater();
-        inflater.inflate(R.menu.menu_items, popup.getMenu());
-        popup.show();
-    }
 
     public void appendToLog(String line) {
         while (adapter.getCount() > 500)
@@ -252,4 +348,65 @@ public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener,
 
 }
 
+
+class NavItem {
+    String mTitle;
+    String mSubtitle;
+    int mIcon;
+
+    public NavItem(String title, String subtitle, int icon) {
+        mTitle = title;
+        mSubtitle = subtitle;
+        mIcon = icon;
+    }
+}
+
+class DrawerListAdapter extends BaseAdapter {
+
+    Context mContext;
+    ArrayList<NavItem> mNavItems;
+
+    public DrawerListAdapter(Context context, ArrayList<NavItem> navItems) {
+        mContext = context;
+        mNavItems = navItems;
+    }
+
+    @Override
+    public int getCount() {
+        return mNavItems.size();
+    }
+
+    @Override
+    public Object getItem(int position) {
+        return mNavItems.get(position);
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return 0;
+    }
+
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent) {
+        View view;
+
+        if (convertView == null) {
+            LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            view = inflater.inflate(R.layout.drawer_item, null);
+        }
+        else {
+            view = convertView;
+        }
+
+        TextView titleView = (TextView) view.findViewById(R.id.navTitle);
+        TextView subtitleView = (TextView) view.findViewById(R.id.navSubTitle);
+        ImageView iconView = (ImageView) view.findViewById(R.id.icon2);
+
+        titleView.setText( mNavItems.get(position).mTitle );
+        subtitleView.setText( mNavItems.get(position).mSubtitle );
+        iconView.setImageResource(mNavItems.get(position).mIcon);
+
+        return view;
+    }
+}
 

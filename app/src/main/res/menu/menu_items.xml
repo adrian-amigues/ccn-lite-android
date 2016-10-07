@@ -4,16 +4,21 @@
     <!-- Single menu item
          Set id, icon and Title for each menu item
     -->
+    <item android:id="@+id/menu_showSensors"
+        android:title="Show Sensors"
+        android:enabled="true"
+        app:showAsAction="never"/>
+
     <item android:id="@+id/menu_add"
         android:title="Add to Database"
         android:enabled="true"
-        android:showAsAction="never"/>
+        app:showAsAction="never"/>
 
     <item android:id="@+id/menu_history"
         android:title="History"
-        android:showAsAction="never"/>
+        app:showAsAction="never"/>
 
     <item android:id="@+id/menu_reset"
         android:title="Reset Database"
-        android:showAsAction="never"/>
+        app:showAsAction="never"/>
 </menu>
