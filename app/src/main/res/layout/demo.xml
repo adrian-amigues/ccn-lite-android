@@ -1,0 +1,60 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/drawerLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF">
+<RelativeLayout
+    android:id="@+id/demo"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+    <TextView
+        android:text="Content Objects"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/textView"
+        android:textColor="@android:color/black"
+        android:textStyle="normal|bold"
+        android:layout_marginTop="38dp"
+        android:layout_toStartOf="@+id/sendButton" />
+
+    <Spinner
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/test_example"
+        android:layout_below="@+id/textView"
+        android:layout_alignStart="@+id/resultTitleTextView" />
+    <Button
+        android:text="Send Interest Message"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/sendButton"
+        android:onClick="sendInterest"
+        android:layout_below="@+id/test_example"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="36dp" />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/resultTextView"
+        android:textSize="18sp"
+        android:scrollbars = "vertical"
+        android:maxLines="7"
+        android:layout_weight="1.12"
+        android:background="#eeeaf1"
+        android:layout_below="@+id/resultTitleTextView"
+        android:layout_alignStart="@+id/textView" />
+
+    <TextView
+        android:text="Result:"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/resultTitleTextView"
+        android:textColor="@android:color/black"
+        android:textSize="18sp"
+        android:layout_marginTop="62dp"
+        android:layout_below="@+id/sendButton"
+        android:layout_alignEnd="@+id/textView" />
+
+</RelativeLayout>
+    </FrameLayout>
