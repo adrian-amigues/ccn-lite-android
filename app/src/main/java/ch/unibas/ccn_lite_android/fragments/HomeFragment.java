@@ -4,6 +4,8 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.text.method.ScrollingMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -100,6 +102,8 @@ public class HomeFragment extends Fragment {
                 result.setText(resultValue, TextView.BufferType.EDITABLE);
             }
         });
+
+
     }
 
     // TODO: Rename method, update argument and hook method into UI event

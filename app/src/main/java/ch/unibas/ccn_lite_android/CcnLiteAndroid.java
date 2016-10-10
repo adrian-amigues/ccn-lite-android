@@ -14,6 +14,8 @@ import android.graphics.Color;
 import android.app.Fragment;
 import android.support.v4.widget.DrawerLayout;
 
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.text.method.ScrollingMovementMethod;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -50,7 +52,7 @@ import ch.unibas.ccn_lite_android.fragments.addToDatabase;
 import static android.provider.AlarmClock.EXTRA_MESSAGE;
 
 
-public class CcnLiteAndroid extends Activity //implements OnMenuItemClickListener
+public class CcnLiteAndroid extends AppCompatActivity //implements OnMenuItemClickListener
 {
     ArrayAdapter adapter;
     String hello;
@@ -78,6 +80,10 @@ public class CcnLiteAndroid extends Activity //implements OnMenuItemClickListene
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.main_layout);
+
+        Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
+        //setSupportActionBar(myToolbar);
+
         adapter = new ArrayAdapter(this, R.layout.logtextview, 0);
         adapter.notifyDataSetChanged();
 
@@ -115,6 +121,13 @@ public class CcnLiteAndroid extends Activity //implements OnMenuItemClickListene
 
         s.setAdapter(adapter);
 */
+
+        Fragment fragment = new HomeFragment();
+        FragmentManager fragmentManager = getFragmentManager();
+        fragmentManager.beginTransaction()
+                .replace(R.id.mainContent, fragment)
+                .commit();
+
 
         hello = relayInit();
         ccnLiteContext = this;
