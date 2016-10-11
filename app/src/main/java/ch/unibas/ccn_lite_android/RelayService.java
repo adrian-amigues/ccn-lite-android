@@ -37,15 +37,15 @@ public class RelayService extends Service{
         relayInit();
     }
 
-    public String startAndroidPeek(String ipString, int portInt, String contentString) {
-        return androidPeek(ipString, portInt, contentString);
+    public String startAndroidPeek(String ipString, int portInt, String contentString, String formatString) {
+        return androidPeek(ipString, portInt, contentString, formatString);
     }
 
 
     // JNI declarations
     public native String relayInit();
 
-    public native String androidPeek(String ipString, int portString, String contentString);
+    public native String androidPeek(String ipString, int portString, String contentString, String formatString);
 
     static {
         System.loadLibrary("ccn-lite-android");

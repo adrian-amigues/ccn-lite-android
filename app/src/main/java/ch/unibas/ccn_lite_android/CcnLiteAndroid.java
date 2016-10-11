@@ -1,9 +1,6 @@
 package ch.unibas.ccn_lite_android;
 
-import java.util.ArrayList;
-import java.util.UUID;
-
-import android.app.Activity;
+import android.app.Fragment;
 import android.app.FragmentManager;
 import android.content.ComponentName;
 import android.content.Context;
@@ -11,20 +8,12 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Color;
-
-import android.app.Fragment;
-import android.support.v4.widget.DrawerLayout;
-
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.text.method.ScrollingMovementMethod;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.os.AsyncTask;
+import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
-import android.text.method.ScrollingMovementMethod;
-import android.view.MenuInflater;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.AppCompatActivity;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,31 +21,18 @@ import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.PopupMenu;
 import android.widget.RelativeLayout;
-import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.PopupMenu.OnMenuItemClickListener;
-
-
-import android.os.Bundle;
-import android.os.Handler;
 import android.widget.Toast;
-import com.google.android.gms.maps.MapFragment;
+
+import java.util.ArrayList;
 
 import ch.unibas.ccn_lite_android.fragments.DeleteDatabaseFragment;
 import ch.unibas.ccn_lite_android.fragments.HistoryFragment;
 import ch.unibas.ccn_lite_android.fragments.HomeFragment;
-import ch.unibas.ccn_lite_android.fragments.PreferencesFragment;
 import ch.unibas.ccn_lite_android.fragments.addToDatabase;
-
-import static android.provider.AlarmClock.EXTRA_MESSAGE;
-import static android.R.attr.port;
-import static ch.unibas.ccn_lite_android.R.id.resultTextView;
 
 
 public class CcnLiteAndroid extends AppCompatActivity //implements OnMenuItemClickListener
@@ -71,18 +47,12 @@ public class CcnLiteAndroid extends AppCompatActivity //implements OnMenuItemCli
     String contentString;
     private Handler mHandler;
 
-    private static String TAG = CcnLiteAndroid.class.getSimpleName();
     //    For service
     RelayService mService;
     boolean mBound = false;
-    EditText ipEditText;
-    TextView resultTextView;
-    EditText portEditText;
-    EditText contentEditText;
 
     ListView mDrawerList;
     RelativeLayout mDrawerPane;
-    //private ActionBarDrawerToggle mDrawerToggle;
     private DrawerLayout mDrawerLayout;
 
     ArrayList<NavItem> mNavItems = new ArrayList<NavItem>();
@@ -99,9 +69,6 @@ public class CcnLiteAndroid extends AppCompatActivity //implements OnMenuItemCli
                 .replace(R.id.mainContent, fragment)
                 .commit();
 
-        Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
-        //setSupportActionBar(myToolbar);
-
         adapter = new ArrayAdapter(this, R.layout.logtextview, 0);
         adapter.notifyDataSetChanged();
 
@@ -110,11 +77,6 @@ public class CcnLiteAndroid extends AppCompatActivity //implements OnMenuItemCli
         mNavItems.add(new NavItem("Delete", "Delete from datasbase", R.drawable.ic_delete_black_24dp));
         mNavItems.add(new NavItem("History", "Previous sensor values", R.drawable.ic_history_black_24dp));
         mNavItems.add(new NavItem("Sensors", "See on GoogleMap", R.drawable.ic_place_black_24dp));
-
-        ipEditText = (EditText) findViewById(R.id.IPEditText);
-        portEditText = (EditText) findViewById(R.id.portEditText);
-        contentEditText = (EditText) findViewById(R.id.contentEditText);
-        resultTextView = (TextView) findViewById(R.id.resultTextView);
 
         // DrawerLayout
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
@@ -133,16 +95,6 @@ public class CcnLiteAndroid extends AppCompatActivity //implements OnMenuItemCli
             }
         });
 
-       /* String arraySpinner[] = new String[] {
-                "CCNx2015", "NDN2013", "CCNB", "IOT2014", "LOCALRPC", "LOCALRPC"
-        };
-
-        Spinner s = (Spinner) findViewById(R.id.formatSpinner);
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
-                android.R.layout.simple_spinner_item, arraySpinner);
-
-        s.setAdapter(adapter);
-*/
 
 
 //        hello = relayInit();
@@ -235,31 +187,6 @@ public class CcnLiteAndroid extends AppCompatActivity //implements OnMenuItemCli
         Intent intent = new Intent(this, RelayService.class);
         bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
         Toast.makeText(this, "mBound = " + mBound, Toast.LENGTH_SHORT).show();
-
-        Button b = (Button) findViewById(R.id.sendButton);
-
-        b.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                ipEditText = (EditText) findViewById(R.id.IPEditText);
-                portEditText = (EditText) findViewById(R.id.portEditText);
-                contentEditText = (EditText) findViewById(R.id.contentEditText);
-                resultTextView = (TextView) findViewById(R.id.resultTextView);
-                ipString = ipEditText.getText().toString();
-                portString = portEditText.getText().toString();
-                int portInt = Integer.parseInt(portString);
-                contentString = contentEditText.getText().toString();
-                mHandler = new Handler();
-                new AndroidPeek().execute(ipString, Integer.toString(portInt), contentString);
-
-            }
-        });
-
-       /* ImageView imageViewMenu = (ImageView) findViewById(R.id.imageViewMenu);
-        imageViewMenu.setOnClickListener(new View.OnClickListener(){
-            public void onClick(View v){
-                showPopUp(v);
-            }
-        });*/
         mHandler = new Handler();
     }
 
@@ -316,17 +243,6 @@ public class CcnLiteAndroid extends AppCompatActivity //implements OnMenuItemCli
         }
     }
 
-    /*public void showPopUp(View v){
-        PopupMenu popup = new PopupMenu(CcnLiteAndroid.this, v);
-        popup.setOnMenuItemClickListener(CcnLiteAndroid.this);
-        MenuInflater inflater = popup.getMenuInflater();
-        inflater.inflate(R.menu.menu_items, popup.getMenu());
-        popup.show();
-    }*/
-
-
-
-
     public void appendToLog(String line) {
         while (adapter.getCount() > 500)
             adapter.remove(adapter.getItem(0));
@@ -352,9 +268,6 @@ public class CcnLiteAndroid extends AppCompatActivity //implements OnMenuItemCli
         }
     };
 
-    public native String relayInit();
-
-    public native String androidPeek(String ipString, int portString, String contentString);
 
     /* this is used to load the 'ccn-lite-android' library on application
      * startup. The library has already been unpacked into
@@ -365,23 +278,24 @@ public class CcnLiteAndroid extends AppCompatActivity //implements OnMenuItemCli
         System.loadLibrary("ccn-lite-android");
     }
 
-    private class AndroidPeek extends AsyncTask<String, Void, String> {
-        /** The system calls this to perform work in a worker thread and
-         * delivers it the parameters given to AsyncTask.execute() */
+    /*private class AndroidPeek extends AsyncTask<String, Void, String> {
+        *//** The system calls this to perform work in a worker thread and
+         * delivers it the parameters given to AsyncTask.execute() *//*
         protected String doInBackground(String... params) {
             String ipString = params[0];
             int portInt = Integer.parseInt(params[1]);
             String contentString = params[2];
-            return mService.startAndroidPeek(ipString, portInt, contentString);
+            String formatString = params[3];
+            return mService.startAndroidPeek(ipString, portInt, contentString, formatString);
         }
 
-        /** The system calls this to perform work in the UI thread and delivers
-         * the result from doInBackground() */
+        *//** The system calls this to perform work in the UI thread and delivers
+         * the result from doInBackground() *//*
         protected void onPostExecute(String result) {
             resultTextView.setMovementMethod(new ScrollingMovementMethod());
             resultTextView.append(result);
         }
-    }
+    }*/
 }
 
 

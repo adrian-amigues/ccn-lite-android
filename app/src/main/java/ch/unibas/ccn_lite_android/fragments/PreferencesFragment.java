@@ -1,16 +1,11 @@
 package ch.unibas.ccn_lite_android.fragments;
 
-import android.os.Bundle;
 import android.app.Fragment;
-import android.text.method.ScrollingMovementMethod;
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.TextView;
 
-import ch.unibas.ccn_lite_android.CcnLiteAndroid;
 import ch.unibas.ccn_lite_android.R;
 
 
@@ -41,7 +36,8 @@ public class PreferencesFragment extends Fragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        Button b = (Button) rootView.findViewById(R.id.sendButton);
+
+      /*  Button b = (Button) rootView.findViewById(R.id.sendButton);
         b.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 EditText ip = (EditText) rootView.findViewById(R.id.IPEditText);
@@ -59,5 +55,6 @@ public class PreferencesFragment extends Fragment {
                 result.setText(resultValue, TextView.BufferType.EDITABLE);
             }
         });
+        */
     }
 }

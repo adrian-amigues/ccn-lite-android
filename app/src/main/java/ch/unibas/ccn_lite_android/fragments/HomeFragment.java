@@ -1,33 +1,25 @@
 package ch.unibas.ccn_lite_android.fragments;
 
+import android.app.Fragment;
 import android.content.Context;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
-import android.app.Fragment;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.text.method.ScrollingMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import ch.unibas.ccn_lite_android.CcnLiteAndroid;
 import ch.unibas.ccn_lite_android.R;
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link HomeFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link HomeFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
+
 public class HomeFragment extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
@@ -35,9 +27,13 @@ public class HomeFragment extends Fragment {
     String ipString;
     String portString;
     String contentString;
-    // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+    EditText ipEditText;
+    TextView resultTextView;
+    EditText portEditText;
+    EditText contentEditText;
+    Spinner formatSpinner;
 
     private OnFragmentInteractionListener mListener;
 
@@ -45,15 +41,6 @@ public class HomeFragment extends Fragment {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment HomeFragment.
-     */
-    // TODO: Rename and change types and number of parameters
     public static HomeFragment newInstance(String param1, String param2) {
         HomeFragment fragment = new HomeFragment();
         Bundle args = new Bundle();
@@ -75,31 +62,38 @@ public class HomeFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
         // Inflate the layout for this fragment
         rootView = inflater.inflate(R.layout.fragment_home, container, false);
+        ipEditText = (EditText) rootView.findViewById(R.id.IPEditText);
+        portEditText = (EditText) rootView.findViewById(R.id.portEditText);
+        contentEditText = (EditText) rootView.findViewById(R.id.contentEditText);
+        resultTextView = (TextView) rootView.findViewById(R.id.resultTextView);
+        formatSpinner = (Spinner) rootView.findViewById(R.id.formatSpinner);
         return rootView;
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
+
+        String arraySpinner[] = new String[] {
+                "CCNx2015", "NDN2013", "CCNB", "IOT2014", "LOCALRPC", "LOCALRPC"
+        };
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this.getActivity(),
+                android.R.layout.simple_spinner_item, arraySpinner);
+
+        formatSpinner.setAdapter(adapter);
+
         super.onActivityCreated(savedInstanceState);
         Button b = (Button) rootView.findViewById(R.id.sendButton);
         b.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                EditText ip = (EditText) rootView.findViewById(R.id.IPEditText);
-                ipString = ip.getText().toString();
-                EditText port = (EditText) rootView.findViewById(R.id.portEditText);
-                portString = port.getText().toString();
+                ipString = ipEditText.getText().toString();
+                portString = portEditText.getText().toString();
+                String formatString = formatSpinner.getSelectedItem().toString();
                 int portInt = Integer.parseInt(portString);
-                EditText content = (EditText) rootView.findViewById(R.id.contentEditText);
-                contentString = content.getText().toString();
-                String resultValue ="";
-                CcnLiteAndroid ccnLiteAndroid = new CcnLiteAndroid();
-                resultValue = ccnLiteAndroid.androidPeek(ipString, portInt, contentString);
-                TextView result = (TextView) rootView.findViewById(R.id.resultTextView);
-                result.setMovementMethod(new ScrollingMovementMethod());
-                result.setText(resultValue, TextView.BufferType.EDITABLE);
+                contentString = contentEditText.getText().toString();
+                new AndroidPeek().execute(ipString, Integer.toString(portInt), contentString, formatString);
             }
         });
 
@@ -143,5 +137,26 @@ public class HomeFragment extends Fragment {
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
+    }
+
+    private class AndroidPeek extends AsyncTask<String, Void, String> {
+        /** The system calls this to perform work in a worker thread and
+         * delivers it the parameters given to AsyncTask.execute() */
+        protected String doInBackground(String... params) {
+            String ipString = params[0];
+            int portInt = Integer.parseInt(params[1]);
+            String contentString = params[2];
+            String formatString = params[3];
+            return androidPeek(ipString, portInt, contentString, formatString);
+        }
+
+        public native String androidPeek(String ipString, int portString, String contentString, String formatString);
+
+        /** The system calls this to perform work in the UI thread and delivers
+         * the result from doInBackground() */
+        protected void onPostExecute(String result) {
+            resultTextView.setMovementMethod(new ScrollingMovementMethod());
+            resultTextView.append(result);
+        }
     }
 }

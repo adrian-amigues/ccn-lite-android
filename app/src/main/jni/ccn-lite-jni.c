@@ -53,13 +53,14 @@ Java_ch_unibas_ccn_1lite_1android_CcnLiteAndroid_relayInit(JNIEnv* env,
  */
 JNIEXPORT jstring JNICALL
 Java_ch_unibas_ccn_1lite_1android_CcnLiteAndroid_androidPeek(JNIEnv* env,
-                                                                jobject thiz, jstring ipString, jint portString, jstring contentString)
+                                                             jobject thiz, jstring ipString, jint portString,
+                                                             jstring contentString, jstring formatString)
 {
     char buf[128];
     const char *ip = (*env)->GetStringUTFChars(env, ipString, 0);
     int port = (int) portString;
     const char *content = (*env)->GetStringUTFChars(env, contentString, 0);
-    return (*env)->NewStringUTF(env, ccnl_android_peek("ccnx2015", ip, port, content));
+    return (*env)->NewStringUTF(env, ccnl_android_peek(formatString, ip, port, content));
 }
 
 /**
@@ -68,14 +69,15 @@ Java_ch_unibas_ccn_1lite_1android_CcnLiteAndroid_androidPeek(JNIEnv* env,
  * returns the string returned from that function
  */
 JNIEXPORT jstring JNICALL
-Java_ch_unibas_ccn_1lite_1android_RelayService_androidPeek(JNIEnv* env,
-                                                                jobject thiz, jstring ipString, jint portString, jstring contentString)
+Java_ch_unibas_ccn_1lite_1android_HomeFragment_androidPeek(JNIEnv* env,
+                                                           jobject thiz, jstring ipString, jint portString,
+                                                           jstring contentString, jstring formatString)
 {
     char buf[128];
     const char *ip = (*env)->GetStringUTFChars(env, ipString, 0);
     int port = (int) portString;
     const char *content = (*env)->GetStringUTFChars(env, contentString, 0);
-    return (*env)->NewStringUTF(env, ccnl_android_peek("ccnx2015", ip, port, content));
+    return (*env)->NewStringUTF(env, ccnl_android_peek(formatString, ip, port, content));
 }
 
 
