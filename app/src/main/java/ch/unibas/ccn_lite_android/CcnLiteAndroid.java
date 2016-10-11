@@ -111,11 +111,6 @@ public class CcnLiteAndroid extends AppCompatActivity //implements OnMenuItemCli
         mNavItems.add(new NavItem("History", "Previous sensor values", R.drawable.ic_history_black_24dp));
         mNavItems.add(new NavItem("Sensors", "See on GoogleMap", R.drawable.ic_place_black_24dp));
 
-        ipEditText = (EditText) findViewById(R.id.IPEditText);
-        portEditText = (EditText) findViewById(R.id.portEditText);
-        contentEditText = (EditText) findViewById(R.id.contentEditText);
-        resultTextView = (TextView) findViewById(R.id.resultTextView);
-
         // DrawerLayout
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
 
@@ -133,19 +128,6 @@ public class CcnLiteAndroid extends AppCompatActivity //implements OnMenuItemCli
             }
         });
 
-       /* String arraySpinner[] = new String[] {
-                "CCNx2015", "NDN2013", "CCNB", "IOT2014", "LOCALRPC", "LOCALRPC"
-        };
-
-        Spinner s = (Spinner) findViewById(R.id.formatSpinner);
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
-                android.R.layout.simple_spinner_item, arraySpinner);
-
-        s.setAdapter(adapter);
-*/
-
-
-//        hello = relayInit();
         if(mBound) {
             mService.startRely();
         }
@@ -236,30 +218,6 @@ public class CcnLiteAndroid extends AppCompatActivity //implements OnMenuItemCli
         bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
         Toast.makeText(this, "mBound = " + mBound, Toast.LENGTH_SHORT).show();
 
-        Button b = (Button) findViewById(R.id.sendButton);
-
-        b.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                ipEditText = (EditText) findViewById(R.id.IPEditText);
-                portEditText = (EditText) findViewById(R.id.portEditText);
-                contentEditText = (EditText) findViewById(R.id.contentEditText);
-                resultTextView = (TextView) findViewById(R.id.resultTextView);
-                ipString = ipEditText.getText().toString();
-                portString = portEditText.getText().toString();
-                int portInt = Integer.parseInt(portString);
-                contentString = contentEditText.getText().toString();
-                mHandler = new Handler();
-                new AndroidPeek().execute(ipString, Integer.toString(portInt), contentString);
-
-            }
-        });
-
-       /* ImageView imageViewMenu = (ImageView) findViewById(R.id.imageViewMenu);
-        imageViewMenu.setOnClickListener(new View.OnClickListener(){
-            public void onClick(View v){
-                showPopUp(v);
-            }
-        });*/
         mHandler = new Handler();
     }
 
@@ -273,59 +231,6 @@ public class CcnLiteAndroid extends AppCompatActivity //implements OnMenuItemCli
             mBound = false;
         }
     }
-
-    public boolean onMenuItemClick(MenuItem item) {
-        Intent intent;
-        switch (item.getItemId()) {
-            case R.id.menu_showSensors:
-                intent = new Intent(this, MapsActivity.class);
-                startActivity(intent);
-                return true;
-
-            case R.id.menu_add:
-                sensorDatabase.execSQL("INSERT INTO sensorTable VALUES('" + resultValue + "');");
-                return true;
-
-            case R.id.menu_history:
-                Cursor resultSet = sensorDatabase.rawQuery("Select * from sensorTable",null);
-                String sensorValue="";
-                int count = 0;
-                if(resultSet != null) {
-                    resultSet.moveToFirst();
-                    while (count < resultSet.getCount()) {
-                        count++;
-                        sensorValue += count + ": ";
-                        sensorValue += resultSet.getString(0) + "\n";
-                        resultSet.moveToNext();
-
-                    }
-                }
-
-                intent = new Intent(this, DisplayDatabaseHistory.class);
-                intent.putExtra("sensorHistory", sensorValue);
-                intent.putExtra("countOfItems", count);
-                startActivity(intent);
-
-                return true;
-
-            case R.id.menu_reset:
-                sensorDatabase.execSQL("DELETE FROM sensorTable;");
-
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
-
-    /*public void showPopUp(View v){
-        PopupMenu popup = new PopupMenu(CcnLiteAndroid.this, v);
-        popup.setOnMenuItemClickListener(CcnLiteAndroid.this);
-        MenuInflater inflater = popup.getMenuInflater();
-        inflater.inflate(R.menu.menu_items, popup.getMenu());
-        popup.show();
-    }*/
-
-
-
 
     public void appendToLog(String line) {
         while (adapter.getCount() > 500)

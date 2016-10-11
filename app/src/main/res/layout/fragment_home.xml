@@ -21,7 +21,7 @@
         android:layout_height="fill_parent"
         android:orientation="vertical"
         android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
-        android:background="#e9d5f4"
+        android:background="#f6f4f7"
         tools:context="ch.unibas.ccn_lite_android.CcnLiteAndroid">
 
         <EditText

@@ -10,8 +10,10 @@ import android.text.method.ScrollingMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import ch.unibas.ccn_lite_android.CcnLiteAndroid;
@@ -84,6 +86,15 @@ public class HomeFragment extends Fragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        String arraySpinner[] = new String[] {
+                "CCNx2015", "NDN2013", "CCNB", "IOT2014", "LOCALRPC", "LOCALRPC"
+        };
+        Spinner s = (Spinner) rootView.findViewById(R.id.formatSpinner);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),
+                android.R.layout.simple_spinner_item, arraySpinner);
+
+        s.setAdapter(adapter);
+
         Button b = (Button) rootView.findViewById(R.id.sendButton);
         b.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {

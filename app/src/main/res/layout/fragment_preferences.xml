@@ -13,7 +13,7 @@
         android:layout_height="fill_parent"
         android:orientation="vertical"
         android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
-        android:background="#e9d5f4"
+        android:background="#f9f6fa"
         tools:context="ch.unibas.ccn_lite_android.CcnLiteAndroid">
 
         <EditText
@@ -130,7 +130,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
-            android:background="#A949BA">
+            android:background="#f8f5f9">
 
             <ImageView android:layout_width="200sp"
                 android:layout_height="50sp"
