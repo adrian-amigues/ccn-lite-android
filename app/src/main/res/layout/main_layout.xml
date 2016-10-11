@@ -2,20 +2,135 @@
 <android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+
     android:id="@+id/drawerLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#FFFFFF">
+
+             <!-- android:id="@+id/myLayout"
+              android:layout_width="fill_parent"
+              android:layout_height="fill_parent"
+              android:orientation="vertical"
+              android:background="#e9d5f4"
+              tools:context="ch.unibas.ccn_lite_android.CcnLiteAndroid">
+
+   <EditText
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:inputType="textPersonName"
+       android:text="/android/test/mycontent"
+       android:ems="10"
+       android:id="@+id/contentEditText"
+       android:layout_alignBaseline="@+id/ContentTextView"
+       android:layout_alignBottom="@+id/ContentTextView"
+       android:layout_alignStart="@+id/portEditText"
+       android:textColor="@android:color/darker_gray"
+       android:layout_marginTop="30dp" />
+
+   <EditText
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:inputType="textPersonName"
+       android:text="130.238.15.221"
+       android:ems="10"
+       android:id="@+id/IPEditText"
+       android:textColor="@android:color/darker_gray"
+       android:layout_alignBaseline="@+id/IPTextView"
+       android:layout_alignBottom="@+id/IPTextView"
+       android:layout_alignParentEnd="true"
+       android:layout_marginEnd="38dp" />
+
+   <TextView
+       android:text="IP:"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:layout_marginTop="80dp"
+       android:id="@+id/IPTextView"
+       android:textStyle="normal|bold"
+       android:textColor="@android:color/background_dark"
+       android:layout_marginStart="49dp"
+       android:layout_alignParentTop="true"
+       android:layout_alignParentStart="true" />
+
+   <TextView
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:id="@+id/resultTextView"
+       android:textSize="18sp"
+       android:scrollbars = "vertical"
+       android:maxLines="7"
+       android:layout_below="@+id/sendButton"
+       android:layout_marginTop="52dp"
+       android:layout_alignEnd="@+id/contentEditText"
+       android:layout_alignStart="@+id/ContentTextView"
+       android:layout_weight="1.12"
+       android:background="#f2e6f9"
+       android:layout_marginBottom="30dp"
+       android:textColor="@android:color/black" />
+
+   <TextView
+       android:text="Result:"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:layout_below="@+id/sendButton"
+       android:layout_alignStart="@+id/ContentTextView"
+       android:layout_marginTop="16dp"
+       android:id="@+id/resultTitleTextView"
+       android:textColor="@android:color/black"
+       android:textSize="18sp" />
+
+   <EditText
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:inputType="textPersonName"
+       android:text="9999"
+       android:ems="10"
+       android:id="@+id/portEditText"
+       android:textColor="@android:color/darker_gray"
+       android:layout_alignBaseline="@+id/PortTextView"
+       android:layout_alignBottom="@+id/PortTextView"
+       android:layout_alignStart="@+id/IPEditText" />
+
+   <TextView
+       android:text="Content:"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:layout_marginTop="37dp"
+       android:id="@+id/ContentTextView"
+       android:textColor="@android:color/black"
+       android:textStyle="normal|bold"
+       android:layout_below="@+id/portEditText"
+       android:layout_alignStart="@+id/PortTextView" />
+
+   <TextView
+       android:text="Format:"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:layout_marginTop="34dp"
+       android:id="@+id/formatTextView"
+       android:textColor="@android:color/background_dark"
+       android:layout_below="@+id/contentEditText"
+       android:layout_alignStart="@+id/ContentTextView"
+       android:textStyle="normal|bold" />
+
+   <TextView
+       android:text="Port:"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:layout_marginTop="34dp"
+       android:id="@+id/PortTextView"
+       android:textStyle="normal|bold"
+       android:textColor="@android:color/background_dark"
+       android:layout_below="@+id/IPEditText"
+       android:layout_alignStart="@+id/IPTextView" />-->
+
 
    <!-- The main content view -->
    <RelativeLayout
        android:id="@+id/mainContent"
        android:layout_width="match_parent"
        android:layout_height="match_parent" >
-
-
-
-      
    </RelativeLayout>
 
 
