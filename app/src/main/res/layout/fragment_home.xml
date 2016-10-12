@@ -21,7 +21,7 @@
         android:layout_height="fill_parent"
         android:orientation="vertical"
         android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
-        android:background="#e9d5f4"
+        android:background="#efedf1"
         tools:context="ch.unibas.ccn_lite_android.CcnLiteAndroid">
 
         <EditText
@@ -35,7 +35,8 @@
             android:layout_alignBottom="@+id/ContentTextView"
             android:layout_alignStart="@+id/portEditText"
             android:textColor="@android:color/darker_gray"
-            android:layout_marginTop="30dp" />
+            android:layout_marginTop="30dp"
+            android:focusable="false" />
 
         <EditText
             android:layout_width="wrap_content"
@@ -48,7 +49,8 @@
             android:layout_alignBaseline="@+id/IPTextView"
             android:layout_alignBottom="@+id/IPTextView"
             android:layout_alignParentEnd="true"
-            android:layout_marginEnd="38dp" />
+            android:layout_marginEnd="38dp"
+            android:focusable="false" />
 
         <TextView
             android:text="IP:"
@@ -98,7 +100,8 @@
             android:textColor="@android:color/darker_gray"
             android:layout_alignBaseline="@+id/PortTextView"
             android:layout_alignBottom="@+id/PortTextView"
-            android:layout_alignStart="@+id/IPEditText" />
+            android:layout_alignStart="@+id/IPEditText"
+            android:focusable="false" />
 
         <TextView
             android:text="Content:"

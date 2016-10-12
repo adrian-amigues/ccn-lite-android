@@ -1,9 +1,7 @@
 package ch.unibas.ccn_lite_android;
 
 import java.util.ArrayList;
-import java.util.UUID;
 
-import android.app.Activity;
 import android.app.FragmentManager;
 import android.content.ComponentName;
 import android.content.Context;
@@ -11,7 +9,6 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Color;
 
 import android.app.Fragment;
 import android.support.v4.widget.DrawerLayout;
@@ -20,11 +17,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.method.ScrollingMovementMethod;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.os.AsyncTask;
 import android.os.IBinder;
-import android.text.method.ScrollingMovementMethod;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,27 +30,18 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.PopupMenu;
 import android.widget.RelativeLayout;
-import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.PopupMenu.OnMenuItemClickListener;
 
 
 import android.os.Bundle;
 import android.os.Handler;
 import android.widget.Toast;
-import com.google.android.gms.maps.MapFragment;
 
 import ch.unibas.ccn_lite_android.fragments.DeleteDatabaseFragment;
 import ch.unibas.ccn_lite_android.fragments.HistoryFragment;
 import ch.unibas.ccn_lite_android.fragments.HomeFragment;
-import ch.unibas.ccn_lite_android.fragments.PreferencesFragment;
 import ch.unibas.ccn_lite_android.fragments.addToDatabase;
-
-import static android.provider.AlarmClock.EXTRA_MESSAGE;
-import static android.R.attr.port;
-import static ch.unibas.ccn_lite_android.R.id.resultTextView;
 
 
 public class CcnLiteAndroid extends AppCompatActivity //implements OnMenuItemClickListener
@@ -274,7 +259,7 @@ public class CcnLiteAndroid extends AppCompatActivity //implements OnMenuItemCli
         }
     }
 
-    public boolean onMenuItemClick(MenuItem item) {
+    /*public boolean onMenuItemClick(MenuItem item) {
         Intent intent;
         switch (item.getItemId()) {
             case R.id.menu_showSensors:
@@ -314,7 +299,7 @@ public class CcnLiteAndroid extends AppCompatActivity //implements OnMenuItemCli
             default:
                 return super.onOptionsItemSelected(item);
         }
-    }
+    }*/
 
     /*public void showPopUp(View v){
         PopupMenu popup = new PopupMenu(CcnLiteAndroid.this, v);

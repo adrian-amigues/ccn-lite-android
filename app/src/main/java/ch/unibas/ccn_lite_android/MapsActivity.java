@@ -1,6 +1,7 @@
 package ch.unibas.ccn_lite_android;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.widget.Toast;
@@ -9,6 +10,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -46,8 +48,29 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
+        mMap.setMaxZoomPreference(14.0f);
 
-        // Add a marker in Stockholm and move the camera
+        LatLng uppsalaCenter = new LatLng(59.8586926, 17.6459759);
+        markers.add(0, mMap.addMarker(new MarkerOptions().position(uppsalaCenter).title("Sensor in Center")));
+        markers.get(0).setTag("UppsalaCenter");
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(uppsalaCenter, 14.0f));
+
+        mMap.addCircle(new CircleOptions().center(uppsalaCenter)
+                .radius(300)
+                .fillColor(0x90e74c3c)
+                .strokeColor(0x90e74c3c)
+                .strokeWidth(1));
+
+        LatLng uppsalaAngstrom = new LatLng(59.8400773, 17.6478329);
+        markers.add(1, mMap.addMarker(new MarkerOptions().position(uppsalaAngstrom).title("Sensor in Ångström")));
+        markers.get(1).setTag("uppsalaAngstrom");
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(uppsalaAngstrom, 14.0f));
+
+        LatLng uppsalaIkea = new LatLng(59.8471077, 17.69475);
+        markers.add(2, mMap.addMarker(new MarkerOptions().position(uppsalaIkea).title("Sensor in IKEA")));
+        markers.get(2).setTag("uppsalaIkea");
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(uppsalaIkea, 14.0f));
+        /*// Add a marker in Stockholm and move the camera
         LatLng stockholm = new LatLng(59.3293235, 18.0685808);
         markers.add(0, mMap.addMarker(new MarkerOptions().position(stockholm).title("Sensor in Stockholm")));
         markers.get(0).setTag("Stockholm");
@@ -82,7 +105,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         LatLng vasteras = new LatLng(59.6099005, 16.5448091);
         markers.add(6, mMap.addMarker(new MarkerOptions().position(vasteras).title("Sensor in Västerås")));
         markers.get(6).setTag("Västerås");
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(vasteras));
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(vasteras));*/
 
         mMap.setOnMarkerClickListener(this);
     }
