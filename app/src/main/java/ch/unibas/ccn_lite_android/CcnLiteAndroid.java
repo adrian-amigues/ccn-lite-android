@@ -73,18 +73,13 @@ public class CcnLiteAndroid extends AppCompatActivity //implements OnMenuItemCli
 
     private static String TAG = CcnLiteAndroid.class.getSimpleName();
     //    For service
-    RelayService mService;
-    boolean mBound = false;
-    EditText ipEditText;
-    TextView resultTextView;
-    EditText portEditText;
-    EditText contentEditText;
+   /* RelayService mService;
+    boolean mBound = false;*/
 
     ListView mDrawerList;
     RelativeLayout mDrawerPane;
     //private ActionBarDrawerToggle mDrawerToggle;
     private DrawerLayout mDrawerLayout;
-
     ArrayList<NavItem> mNavItems = new ArrayList<NavItem>();
 
     @Override
@@ -128,9 +123,9 @@ public class CcnLiteAndroid extends AppCompatActivity //implements OnMenuItemCli
             }
         });
 
-        if(mBound) {
+       /* if(mBound) {
             mService.startRely();
-        }
+        }*/
         ccnLiteContext = this;
     }
 
@@ -209,20 +204,20 @@ public class CcnLiteAndroid extends AppCompatActivity //implements OnMenuItemCli
     public void onStart() {
         super.onStart();
 
-        ListView lv;
+       ListView lv;
         sensorDatabase = openOrCreateDatabase("SENSORDATABASE",MODE_PRIVATE,null);
         sensorDatabase.execSQL("CREATE TABLE IF NOT EXISTS sensorTable(sensorValue VARCHAR);");
-
+/*
         // Bind to RelayService
         Intent intent = new Intent(this, RelayService.class);
         bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
-        Toast.makeText(this, "mBound = " + mBound, Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "mBound = " + mBound, Toast.LENGTH_SHORT).show();*/
 
         mHandler = new Handler();
     }
 
 
-    @Override
+   /* @Override
     protected void onStop() {
         super.onStop();
         // Unbind from the service
@@ -230,7 +225,7 @@ public class CcnLiteAndroid extends AppCompatActivity //implements OnMenuItemCli
             unbindService(mConnection);
             mBound = false;
         }
-    }
+    }*/
 
     public void appendToLog(String line) {
         while (adapter.getCount() > 500)
@@ -240,7 +235,7 @@ public class CcnLiteAndroid extends AppCompatActivity //implements OnMenuItemCli
     }
 
     /** Defines callbacks for service binding, passed to bindService() */
-    private ServiceConnection mConnection = new ServiceConnection() {
+   /* private ServiceConnection mConnection = new ServiceConnection() {
 
         @Override
         public void onServiceConnected(ComponentName className,
@@ -256,7 +251,7 @@ public class CcnLiteAndroid extends AppCompatActivity //implements OnMenuItemCli
             mBound = false;
         }
     };
-
+*/
     public native String relayInit();
 
     public native String androidPeek(String ipString, int portString, String contentString);
@@ -270,9 +265,9 @@ public class CcnLiteAndroid extends AppCompatActivity //implements OnMenuItemCli
         System.loadLibrary("ccn-lite-android");
     }
 
-    private class AndroidPeek extends AsyncTask<String, Void, String> {
-        /** The system calls this to perform work in a worker thread and
-         * delivers it the parameters given to AsyncTask.execute() */
+  /*  private class AndroidPeek extends AsyncTask<String, Void, String> {
+        *//** The system calls this to perform work in a worker thread and
+         * delivers it the parameters given to AsyncTask.execute() *//*
         protected String doInBackground(String... params) {
             String ipString = params[0];
             int portInt = Integer.parseInt(params[1]);
@@ -280,13 +275,13 @@ public class CcnLiteAndroid extends AppCompatActivity //implements OnMenuItemCli
             return mService.startAndroidPeek(ipString, portInt, contentString);
         }
 
-        /** The system calls this to perform work in the UI thread and delivers
-         * the result from doInBackground() */
+        *//** The system calls this to perform work in the UI thread and delivers
+         * the result from doInBackground() *//*
         protected void onPostExecute(String result) {
             resultTextView.setMovementMethod(new ScrollingMovementMethod());
             resultTextView.append(result);
         }
-    }
+    }*/
 }
 
 

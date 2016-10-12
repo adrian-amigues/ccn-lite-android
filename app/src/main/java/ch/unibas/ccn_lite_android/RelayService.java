@@ -22,7 +22,7 @@ public class RelayService extends Service{
      * runs in the same process as its clients, we don't need to deal with IPC.
      */
     public class LocalBinder extends Binder {
-        RelayService getService() {
+       public RelayService getService() {
             // Return this instance of RelayService so clients can call public methods
             return RelayService.this;
         }
