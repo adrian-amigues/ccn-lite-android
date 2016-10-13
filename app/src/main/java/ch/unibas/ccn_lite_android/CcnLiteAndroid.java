@@ -7,54 +7,27 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.IBinder;
 import android.text.method.ScrollingMovementMethod;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.view.View;
 import android.view.Window;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.ListView;
-import android.widget.PopupMenu;
-import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.PopupMenu.OnMenuItemClickListener;
-
-
 import android.os.Bundle;
 import android.os.Handler;
 import android.widget.Toast;
 
-import static android.R.attr.port;
-import static ch.unibas.ccn_lite_android.R.id.resultTextView;
-
-
-public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener
+public class CcnLiteAndroid extends Activity
 {
     ArrayAdapter adapter;
     Context ccnLiteContext;
-    SQLiteDatabase sensorDatabase;
-    String resultValue;
-
-    String ipString;
-    String portString;
-    String contentString;
     private Handler mHandler;
 
     //    For service
     RelayService mService;
     boolean mBound = false;
-    EditText ipEditText;
     TextView resultTextView;
-    EditText portEditText;
-    EditText contentEditText;
-
 
 
     @Override
@@ -62,26 +35,8 @@ public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.main_layout);
-        adapter = new ArrayAdapter(this, R.layout.logtextview, 0);
-        adapter.notifyDataSetChanged();
-
-        ipEditText = (EditText) findViewById(R.id.IPEditText);
-        portEditText = (EditText) findViewById(R.id.portEditText);
-        contentEditText = (EditText) findViewById(R.id.contentEditText);
-        resultTextView = (TextView) findViewById(R.id.resultTextView);
-
-        String arraySpinner[] = new String[] {
-                "CCNx2015", "NDN2013", "CCNB", "IOT2014", "LOCALRPC", "LOCALRPC"
-        };
-
-        Spinner s = (Spinner) findViewById(R.id.formatSpinner);
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
-                android.R.layout.simple_spinner_item, arraySpinner);
-
-        s.setAdapter(adapter);
-
-
-//        hello = relayInit();
+       // adapter = new ArrayAdapter(this, R.layout.logtextview, 0);
+       // adapter.notifyDataSetChanged();
         if(mBound) {
             mService.startRely();
         }
@@ -91,35 +46,11 @@ public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener
     @Override
     public void onStart() {
         super.onStart();
-
-        ListView lv;
-        sensorDatabase = openOrCreateDatabase("SENSORDATABASE",MODE_PRIVATE,null);
-        sensorDatabase.execSQL("CREATE TABLE IF NOT EXISTS sensorTable(sensorValue VARCHAR);");
-
         // Bind to RelayService
         Intent intent = new Intent(this, RelayService.class);
         bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
         Toast.makeText(this, "mBound = " + mBound, Toast.LENGTH_SHORT).show();
 
-        Button b = (Button) findViewById(R.id.sendButton);
-        b.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                ipString = ipEditText.getText().toString();
-                portString = portEditText.getText().toString();
-                int portInt = Integer.parseInt(portString);
-                contentString = contentEditText.getText().toString();
-                mHandler = new Handler();
-                new AndroidPeek().execute(ipString, Integer.toString(portInt), contentString);
-
-            }
-        });
-
-        ImageView imageViewMenu = (ImageView) findViewById(R.id.imageViewMenu);
-        imageViewMenu.setOnClickListener(new View.OnClickListener(){
-            public void onClick(View v){
-                showPopUp(v);
-            }
-        });
         mHandler = new Handler();
     }
 
@@ -131,50 +62,6 @@ public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener
             unbindService(mConnection);
             mBound = false;
         }
-    }
-
-    public boolean onMenuItemClick(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.menu_add:
-                sensorDatabase.execSQL("INSERT INTO sensorTable VALUES('" + resultValue + "');");
-                return true;
-
-            case R.id.menu_history:
-                Cursor resultSet = sensorDatabase.rawQuery("Select * from sensorTable",null);
-                String sensorValue="";
-                int count = 0;
-                if(resultSet != null) {
-                    resultSet.moveToFirst();
-                    while (count < resultSet.getCount()) {
-                        count++;
-                        sensorValue += count + ": ";
-                        sensorValue += resultSet.getString(0) + "\n";
-                        resultSet.moveToNext();
-
-                    }
-                }
-
-                Intent intent = new Intent(this, DisplayDatabaseHistory.class);
-                intent.putExtra("sensorHistory", sensorValue);
-                intent.putExtra("countOfItems", count);
-                startActivity(intent);
-
-                return true;
-
-            case R.id.menu_reset:
-                sensorDatabase.execSQL("DELETE FROM sensorTable;");
-
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
-
-    public void showPopUp(View v){
-        PopupMenu popup = new PopupMenu(CcnLiteAndroid.this, v);
-        popup.setOnMenuItemClickListener(CcnLiteAndroid.this);
-        MenuInflater inflater = popup.getMenuInflater();
-        inflater.inflate(R.menu.menu_items, popup.getMenu());
-        popup.show();
     }
 
     public void appendToLog(String line) {
