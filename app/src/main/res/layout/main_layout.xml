@@ -1,44 +1,85 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-              android:id="@+id/myLayout"
-              android:layout_width="fill_parent"
-              android:layout_height="fill_parent"
-              android:orientation="vertical"
-              android:background="#f9f6fa"
-              tools:context="ch.unibas.ccn_lite_android.CcnLiteAndroid">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
-
-   <RelativeLayout
+   <ImageView
+       android:id="@+id/imageView1"
        android:layout_width="match_parent"
+       android:layout_height="match_parent"
+       android:scaleType="centerCrop"
+       android:src="@drawable/pollacks" />
+
+   <LinearLayout
+       android:orientation="vertical"
+       android:layout_width="wrap_content"
        android:layout_height="wrap_content"
-       android:layout_alignParentTop="true"
-       android:layout_centerHorizontal="true"
-       android:background="#3b74f1">
+       android:layout_gravity="center">
 
-      <TextView
-          android:text="UNOISE"
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:layout_marginTop="34dp"
-          android:id="@+id/unoise" />
-
-     <!-- <ImageView android:layout_width="200sp"
-                 android:layout_height="50sp"
-                 android:layout_gravity="center"
-          android:paddingTop="15dp"
-                 android:src="ic_menu_refresh"
-          android:layout_marginLeft="5dp"
-          android:layout_marginRight="5dp"
-          android:layout_alignParentTop="true"
-          android:layout_alignParentEnd="true"
-          android:layout_marginEnd="14dp"
+      <LinearLayout
+          style="@style/SelectableItemBackground"
+          android:orientation="horizontal"
+          android:layout_width="@dimen/area_button_width"
+          android:layout_height="@dimen/area_button_height"
           android:clickable="true"
-          android:onClick="showPopUp"
-          android:id="@+id/imageViewMenu" />-->
-   </RelativeLayout>
+          android:onClick="onLinearLayoutClick"
+          android:gravity="center"
+          android:baselineAligned="false"
+          android:layout_marginBottom="@dimen/area_button_margin"
+          android:backgroundTint="@android:color/background_light">
 
+         <TextView
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             android:text="FooBar"
+             android:textSize="30sp"
+             android:textColor="@android:color/primary_text_light" />
 
-</RelativeLayout>
+         <TextView
+             android:id="@+id/area_value_1"
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             android:text="FooBar"
+             android:textSize="30sp"
+             android:textColor="@android:color/primary_text_light" />
+      </LinearLayout>
 
+      <LinearLayout
+          android:orientation="horizontal"
+          android:layout_width="@dimen/area_button_width"
+          android:layout_height="@dimen/area_button_height"
+          android:clickable="true"
+          android:gravity="center"
+          android:background="@color/area_button_background"
+          android:layout_marginBottom="@dimen/area_button_margin">
+
+         <TextView
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             android:text="FooBar"
+             android:textSize="30sp"
+             android:textColor="@android:color/primary_text_light" />
+      </LinearLayout>
+
+      <LinearLayout
+          android:orientation="horizontal"
+          android:layout_width="@dimen/area_button_width"
+          android:layout_height="@dimen/area_button_height"
+          android:clickable="true"
+          android:gravity="center"
+          android:background="@color/area_button_background">
+
+         <TextView
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             android:text="FooBar"
+             android:textSize="30sp"
+             android:textColor="@android:color/primary_text_light" />
+      </LinearLayout>
+   </LinearLayout>
+
+</FrameLayout>
 

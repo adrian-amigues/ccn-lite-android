@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--<style name="SelectableItemTheme">-->
+        <!--<item name="colorControlHighlight">@color/ripple_color</item>-->
+    <!--</style>-->
+    <style name="SelectableItemBackground" parent="@style/Widget.AppCompat.Button">
+        <item name="android:background">#CDFFFFFF</item>
+    </style>
+</resources>

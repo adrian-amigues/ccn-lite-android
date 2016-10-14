@@ -10,6 +10,7 @@ import android.content.ServiceConnection;
 import android.os.AsyncTask;
 import android.os.IBinder;
 import android.text.method.ScrollingMovementMethod;
+import android.view.View;
 import android.view.Window;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
@@ -33,7 +34,6 @@ public class CcnLiteAndroid extends Activity
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.main_layout);
        // adapter = new ArrayAdapter(this, R.layout.logtextview, 0);
        // adapter.notifyDataSetChanged();
@@ -46,6 +46,7 @@ public class CcnLiteAndroid extends Activity
     @Override
     public void onStart() {
         super.onStart();
+
         // Bind to RelayService
         Intent intent = new Intent(this, RelayService.class);
         bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
@@ -64,12 +65,16 @@ public class CcnLiteAndroid extends Activity
         }
     }
 
-    public void appendToLog(String line) {
-        while (adapter.getCount() > 500)
-            adapter.remove(adapter.getItem(0));
-        adapter.add(line);
-        adapter.notifyDataSetChanged();
+    public void onLinearLayoutClick(View v) {
+        Toast.makeText(this, "click!", Toast.LENGTH_SHORT).show();
     }
+
+//    public void appendToLog(String line) {
+//        while (adapter.getCount() > 500)
+//            adapter.remove(adapter.getItem(0));
+//        adapter.add(line);
+//        adapter.notifyDataSetChanged();
+//    }
 
     /** Defines callbacks for service binding, passed to bindService() */
     private ServiceConnection mConnection = new ServiceConnection() {

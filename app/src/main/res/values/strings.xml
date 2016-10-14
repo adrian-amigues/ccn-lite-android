@@ -1,8 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">ccn-lite-android</string>
+    <string name="app_name">uNoise</string>
 
     <string name="ble_not_supported">BLE not supported</string>
+
+    <!--<string-array-->
+        <!--name="pollacks_areas">-->
+        <!--<item>FooBar</item>-->
+        <!--<item>Möbius</item>-->
+        <!--<item>Ångström</item>-->
+    <!--</string-array>-->
 
 </resources>

@@ -2,8 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="ch.unibas.ccn_lite_android"
     android:versionCode="1"
-    android:versionName="1.0"
-    android:theme="@android:style/Theme.NoTitleBar.Fullscreen">
+    android:versionName="1.0">
 
     <uses-sdk
         android:maxSdkVersion="24"
@@ -14,23 +13,20 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <uses-feature
         android:name="android.hardware.bluetooth_le"
         android:required="false" />
 
-    <android:uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <android:uses-permission android:name="android.permission.READ_PHONE_STATE" />
-    <android:uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-
     <application
         android:debuggable="true"
-        android:icon="@drawable/icon"
         android:label="@string/app_name">
         <activity
             android:name=".CcnLiteAndroid"
-            android:configChanges="orientation|keyboardHidden"
-            android:label="@string/app_name">
+            android:configChanges="orientation|keyboardHidden">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -38,7 +34,5 @@
             </intent-filter>
         </activity>
         <service android:name=".RelayService" />
-        <activity android:name=".DisplayDatabaseHistory"></activity>
     </application>
-
 </manifest>
