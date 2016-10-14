@@ -95,6 +95,7 @@ unsigned char keyid[32];
 #include "ccnl-ext-crypto.c"
 
 #include "ccn-lite-android-peek.c"
+#include "ccn-lite-android-mkC.c"
 
 // ----------------------------------------------------------------------
 

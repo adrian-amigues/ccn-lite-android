@@ -33,15 +33,17 @@
 #define NEEDS_PACKET_CRAFTING
 
 //these will be in util
-#include "util/ccnl-common.c"
-#include "util/ccnl-crypto.c"
+//#include "util/ccnl-common.c"
+//#include "util/ccnl-crypto.c"
 
 //maybe don't need these 5 imports, probably needs socket
+
 #include <string.h>
 #include <time.h>
-#include "util/ccnl-common-for-android.c"
-#include "util/ccnl-socket.c"
-#include "util/ccn-lite-pktdump-android.c"
+//#include "util/ccnl-common-for-android.c"
+//#include "util/ccnl-socket.c"
+//#include "util/ccn-lite-pktdump-android.c"
+
 
 
 // ----------------------------------------------------------------------
@@ -51,12 +53,10 @@ char *witness; // used with w flag?
 
 // ----------------------------------------------------------------------
 
-char* ccn_lite_android_mkC(char* suiteStr, char* addr, int port, char* uri, char* body_param) {
+char* ccnl_android_mkC(char* suiteStr, char* addr, int port, char* uri, char* body_param) {
     unsigned char body[64 * 1024]; //body of content object
     unsigned char out[65 * 1024]; //this should be the result
     unsigned char *publisher = out;
-    pointer
-    to out
     char *outfname = 0;
     unsigned int chunknum = UINT_MAX, lastchunknum = UINT_MAX;
     int f, len, opt, plen, offs = 0;
@@ -110,7 +110,8 @@ char* ccn_lite_android_mkC(char* suiteStr, char* addr, int port, char* uri, char
         break;
         */
     //put content parameter to
-    body = body_param; //maybe unneccassary
+    //TODO: fix this
+    // body = body_param; //maybe unneccassary
 
     memset(out, 0, sizeof(out)); //writes zeros to out??
 

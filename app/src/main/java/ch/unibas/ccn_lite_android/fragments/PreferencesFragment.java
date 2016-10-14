@@ -19,7 +19,7 @@ import ch.unibas.ccn_lite_android.R;
  */
 
 public class PreferencesFragment extends Fragment {
-    String ipString;
+    String bodyString;
     String portString;
     String contentString;
     View rootView;
@@ -44,20 +44,23 @@ public class PreferencesFragment extends Fragment {
         Button b = (Button) rootView.findViewById(R.id.sendButton);
         b.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                EditText ip = (EditText) rootView.findViewById(R.id.IPEditText);
-                ipString = ip.getText().toString();
+                EditText body = (EditText) rootView.findViewById(R.id.IPEditText);
+                bodyString = body.getText().toString();
                 EditText port = (EditText) rootView.findViewById(R.id.portEditText);
                 portString = port.getText().toString();
                 int portInt = Integer.parseInt(portString);
                 EditText content = (EditText) rootView.findViewById(R.id.contentEditText);
                 contentString = content.getText().toString();
                 String resultValue ="";
-                CcnLiteAndroid ccnLiteAndroid = new CcnLiteAndroid();
-                resultValue = ccnLiteAndroid.androidPeek(ipString, portInt, contentString);
+                //TODO: change content to uri
+                androidMkc("ccnx2015", "127.0.0.1", 9999, contentString, bodyString);
+
                 TextView result = (TextView) rootView.findViewById(R.id.resultTextView);
                 result.setMovementMethod(new ScrollingMovementMethod());
                 result.setText(resultValue, TextView.BufferType.EDITABLE);
             }
         });
     }
+
+    public native String androidMkc(String suiteString, String ipString, int portInt, String uriString, String bodyString);
 }

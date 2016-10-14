@@ -42,7 +42,27 @@ Java_ch_unibas_ccn_1lite_1android_CcnLiteAndroid_relayInit(JNIEnv* env,
   * @return String - content Object
 */
 
+/**
+ * androidMkc
+ * calls the ccnl_android_mkc function from ccnl-lite-android-mkc.c
+ * returns the sucess or failure message string
+ */
 
+
+JNIEXPORT jstring JNICALL
+Java_ch_unibas_ccn_1lite_1android_PreferencesFragment_androidMkc(JNIEnv* env, jobject thiz, jstring suiteString,
+                                                                 jstring ipString, jint portInt,
+                                                                 jstring uriString, jstring bodyString)
+{
+
+    const char *suite = (*env)->GetStringUTFChars(env, suiteString, 0);
+    const char *addr = (*env)->GetStringUTFChars(env, ipString, 0);
+    int port = (int) portInt;
+    const char *uri = (*env)->GetStringUTFChars(env, uriString, 0);
+    const char *body = (*env)->GetStringUTFChars(env, bodyString, 0);
+
+    return (*env)->NewStringUTF(env, ccnl_android_mkC(suite, addr, port, uri, body));
+}
 
 
 
