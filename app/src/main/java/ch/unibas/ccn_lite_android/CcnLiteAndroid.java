@@ -66,7 +66,10 @@ public class CcnLiteAndroid extends Activity
     }
 
     public void onLinearLayoutClick(View v) {
-        Toast.makeText(this, "click!", Toast.LENGTH_SHORT).show();
+       // Toast.makeText(this, "click!", Toast.LENGTH_SHORT).show();
+        Intent intent = new Intent(this, chart.class);
+        startActivity(intent);
+
     }
 
 //    public void appendToLog(String line) {
