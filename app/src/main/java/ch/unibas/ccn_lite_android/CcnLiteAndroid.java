@@ -67,7 +67,7 @@ public class CcnLiteAndroid extends Activity
 
     public void onLinearLayoutClick(View v) {
        // Toast.makeText(this, "click!", Toast.LENGTH_SHORT).show();
-        Intent intent = new Intent(this, chart.class);
+        Intent intent = new Intent(this, ChartTabsActivity_main.class);
         startActivity(intent);
 
     }

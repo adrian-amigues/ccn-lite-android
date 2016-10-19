@@ -5,6 +5,9 @@
 
     <string name="ble_not_supported">BLE not supported</string>
 
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
     <!--<string-array-->
     <!--name="pollacks_areas">-->
     <!--<item>FooBar</item>-->

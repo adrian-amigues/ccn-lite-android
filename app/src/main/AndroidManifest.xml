@@ -23,6 +23,7 @@
 
     <application
         android:debuggable="true"
+        android:theme="@style/Theme.AppCompat.Light"
         android:label="@string/app_name">
         <activity
             android:name=".CcnLiteAndroid"
@@ -36,7 +37,7 @@
 
         <service android:name=".RelayService" />
 
-        <activity android:name=".chart"></activity>
+        <activity android:name=".ChartTabsActivity_main"></activity>
     </application>
 
 </manifest>
