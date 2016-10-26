@@ -1,6 +1,7 @@
 package ch.unibas.ccn_lite_android;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.transition.TransitionManager;
@@ -53,6 +54,8 @@ public class AreasAdapter extends RecyclerView.Adapter<AreasAdapter.AreaViewHold
         @Override
         public void onClick(View v) {
             Toast.makeText(context, "Go to graph", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(context, ChartTabsActivity_main.class);
+            context.startActivity(intent);
         }
     }
 

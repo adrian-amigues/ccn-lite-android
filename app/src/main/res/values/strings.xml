@@ -5,4 +5,7 @@
 
     <string name="area_photo_content_description">Area Photo</string>
 
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
 </resources>

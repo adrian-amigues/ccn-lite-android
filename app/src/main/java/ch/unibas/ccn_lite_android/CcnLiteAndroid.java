@@ -83,7 +83,7 @@ public class CcnLiteAndroid extends AppCompatActivity
         super.onStart();
     }
 
-    private void initializeData(){
+    private void initializeData() {
         areas.add(new Area("FooBar", "Eat in a basement - 35 Db", R.drawable.foobar));
         areas.add(new Area("Uthgård", "They have sofas - 28 Db", R.drawable.uthgard));
         areas.add(new Area("Uthgård2", "Not them again - 25 Db. " +
@@ -92,6 +92,12 @@ public class CcnLiteAndroid extends AppCompatActivity
                 "This is a longer text than the previous ones.", R.drawable.uthgard));
         adapter.notifyDataSetChanged();
     }
+
+//    public void onLinearLayoutClick(View v) {
+//       // Toast.makeText(this, "click!", Toast.LENGTH_SHORT).show();
+//        Intent intent = new Intent(this, ChartTabsActivity_main.class);
+//        startActivity(intent);
+//    }
 
 //    public void onLinearLayoutClick(View v) {
 //        Toast.makeText(this, "click!", Toast.LENGTH_SHORT).show();
