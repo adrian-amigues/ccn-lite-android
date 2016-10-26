@@ -1,5 +1,7 @@
 package ch.unibas.ccn_lite_android;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import android.app.Activity;
@@ -7,204 +9,104 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.IBinder;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.text.method.ScrollingMovementMethod;
-import android.view.MenuInflater;
-import android.view.MenuItem;
+import android.view.Menu;
 import android.view.View;
 import android.view.Window;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.ListView;
-import android.widget.PopupMenu;
-import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.PopupMenu.OnMenuItemClickListener;
-
-
 import android.os.Bundle;
 import android.os.Handler;
 import android.widget.Toast;
 
-import static android.R.attr.port;
-import static ch.unibas.ccn_lite_android.R.id.resultTextView;
-
-
-public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener
+public class CcnLiteAndroid extends AppCompatActivity
 {
-    ArrayAdapter adapter;
-    Context ccnLiteContext;
-    SQLiteDatabase sensorDatabase;
-    String resultValue;
-
-    String ipString;
-    String portString;
-    String contentString;
-    private Handler mHandler;
-
-    //    For service
-    RelayService mService;
-    boolean mBound = false;
-    EditText ipEditText;
-    TextView resultTextView;
-    EditText portEditText;
-    EditText contentEditText;
-
-
+    private List<Area> areas;
+    private AreasAdapter adapter;
+    private SwipeRefreshLayout swipeContainer;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
-        setContentView(R.layout.main_layout);
-        adapter = new ArrayAdapter(this, R.layout.logtextview, 0);
-        adapter.notifyDataSetChanged();
+        setContentView(R.layout.activity_main);
+        // Lookup the swipe container view
+        swipeContainer = (SwipeRefreshLayout) findViewById(R.id.swipeContainer);
+        // Setup refresh listener which triggers new data loading
+        swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                // Your code to refresh the list here.
+                // Make sure you call swipeContainer.setRefreshing(false)
+                // once the network request has completed successfully.
+//                fetchTimelineAsync(0);
+                Toast.makeText(CcnLiteAndroid.this, "Refresh values", Toast.LENGTH_SHORT).show();
+                swipeContainer.setRefreshing(false);
+            }
+        });
+        // Configure the refreshing colors
+        swipeContainer.setColorSchemeResources(android.R.color.holo_blue_bright,
+                android.R.color.holo_green_light,
+                android.R.color.holo_orange_light,
+                android.R.color.holo_red_light);
 
-        ipEditText = (EditText) findViewById(R.id.IPEditText);
-        portEditText = (EditText) findViewById(R.id.portEditText);
-        contentEditText = (EditText) findViewById(R.id.contentEditText);
-        resultTextView = (TextView) findViewById(R.id.resultTextView);
 
-        String arraySpinner[] = new String[] {
-                "CCNx2015", "NDN2013", "CCNB", "IOT2014", "LOCALRPC", "LOCALRPC"
-        };
+        Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
+        setSupportActionBar(myToolbar);
 
-        Spinner s = (Spinner) findViewById(R.id.formatSpinner);
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
-                android.R.layout.simple_spinner_item, arraySpinner);
+        RecyclerView rv = (RecyclerView) findViewById(R.id.rv);
+//        rv.setHasFixedSize(true);
+        areas = new ArrayList<>();
+        adapter = new AreasAdapter(areas, this);
+        LinearLayoutManager llm = new LinearLayoutManager(this);
+        rv.setLayoutManager(llm);
+        rv.setAdapter(adapter);
 
-        s.setAdapter(adapter);
+        initializeData();
+    }
 
-
-//        hello = relayInit();
-        if(mBound) {
-            mService.startRely();
-        }
-        ccnLiteContext = this;
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_layout, menu);
+        return true;
     }
 
     @Override
     public void onStart() {
         super.onStart();
-
-        ListView lv;
-        sensorDatabase = openOrCreateDatabase("SENSORDATABASE",MODE_PRIVATE,null);
-        sensorDatabase.execSQL("CREATE TABLE IF NOT EXISTS sensorTable(sensorValue VARCHAR);");
-
-        // Bind to RelayService
-        Intent intent = new Intent(this, RelayService.class);
-        bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
-        Toast.makeText(this, "mBound = " + mBound, Toast.LENGTH_SHORT).show();
-
-        Button b = (Button) findViewById(R.id.sendButton);
-        b.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                ipString = ipEditText.getText().toString();
-                portString = portEditText.getText().toString();
-                int portInt = Integer.parseInt(portString);
-                contentString = contentEditText.getText().toString();
-                mHandler = new Handler();
-                new AndroidPeek().execute(ipString, Integer.toString(portInt), contentString);
-
-            }
-        });
-
-        ImageView imageViewMenu = (ImageView) findViewById(R.id.imageViewMenu);
-        imageViewMenu.setOnClickListener(new View.OnClickListener(){
-            public void onClick(View v){
-                showPopUp(v);
-            }
-        });
-        mHandler = new Handler();
     }
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-        // Unbind from the service
-        if (mBound) {
-            unbindService(mConnection);
-            mBound = false;
-        }
-    }
-
-    public boolean onMenuItemClick(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.menu_add:
-                sensorDatabase.execSQL("INSERT INTO sensorTable VALUES('" + resultValue + "');");
-                return true;
-
-            case R.id.menu_history:
-                Cursor resultSet = sensorDatabase.rawQuery("Select * from sensorTable",null);
-                String sensorValue="";
-                int count = 0;
-                if(resultSet != null) {
-                    resultSet.moveToFirst();
-                    while (count < resultSet.getCount()) {
-                        count++;
-                        sensorValue += count + ": ";
-                        sensorValue += resultSet.getString(0) + "\n";
-                        resultSet.moveToNext();
-
-                    }
-                }
-
-                Intent intent = new Intent(this, DisplayDatabaseHistory.class);
-                intent.putExtra("sensorHistory", sensorValue);
-                intent.putExtra("countOfItems", count);
-                startActivity(intent);
-
-                return true;
-
-            case R.id.menu_reset:
-                sensorDatabase.execSQL("DELETE FROM sensorTable;");
-
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
-
-    public void showPopUp(View v){
-        PopupMenu popup = new PopupMenu(CcnLiteAndroid.this, v);
-        popup.setOnMenuItemClickListener(CcnLiteAndroid.this);
-        MenuInflater inflater = popup.getMenuInflater();
-        inflater.inflate(R.menu.menu_items, popup.getMenu());
-        popup.show();
-    }
-
-    public void appendToLog(String line) {
-        while (adapter.getCount() > 500)
-            adapter.remove(adapter.getItem(0));
-        adapter.add(line);
+    private void initializeData() {
+        areas.add(new Area("FooBar", "Eat in a basement - 35 Db", R.drawable.foobar));
+        areas.add(new Area("Uthgård", "They have sofas - 28 Db", R.drawable.uthgard));
+        areas.add(new Area("Uthgård2", "Not them again - 25 Db. " +
+                "This is a longer text than the previous ones.", R.drawable.uthgard));
+        areas.add(new Area("Uthgård3", "Not them again - 25 Db. " +
+                "This is a longer text than the previous ones.", R.drawable.uthgard));
         adapter.notifyDataSetChanged();
     }
 
-    /** Defines callbacks for service binding, passed to bindService() */
-    private ServiceConnection mConnection = new ServiceConnection() {
+//    public void onLinearLayoutClick(View v) {
+//       // Toast.makeText(this, "click!", Toast.LENGTH_SHORT).show();
+//        Intent intent = new Intent(this, ChartTabsActivity_main.class);
+//        startActivity(intent);
+//    }
 
-        @Override
-        public void onServiceConnected(ComponentName className,
-                                       IBinder service) {
-            // We've bound to RelayService, cast the IBinder and get RelayService instance
-            RelayService.LocalBinder binder = (RelayService.LocalBinder) service;
-            mService = binder.getService();
-            mBound = true;
-        }
+//    public void onLinearLayoutClick(View v) {
+//        Toast.makeText(this, "click!", Toast.LENGTH_SHORT).show();
+//    }
 
-        @Override
-        public void onServiceDisconnected(ComponentName arg0) {
-            mBound = false;
-        }
-    };
-
+//    Native functions declarations
     public native String relayInit();
-
     public native String androidPeek(String ipString, int portString, String contentString);
+
 
     /* this is used to load the 'ccn-lite-android' library on application
      * startup. The library has already been unpacked into
@@ -215,23 +117,23 @@ public class CcnLiteAndroid extends Activity implements OnMenuItemClickListener
         System.loadLibrary("ccn-lite-android");
     }
 
-    private class AndroidPeek extends AsyncTask<String, Void, String> {
-        /** The system calls this to perform work in a worker thread and
-         * delivers it the parameters given to AsyncTask.execute() */
-        protected String doInBackground(String... params) {
-            String ipString = params[0];
-            int portInt = Integer.parseInt(params[1]);
-            String contentString = params[2];
-            return mService.startAndroidPeek(ipString, portInt, contentString);
-        }
-
-        /** The system calls this to perform work in the UI thread and delivers
-         * the result from doInBackground() */
-        protected void onPostExecute(String result) {
-            resultTextView.setMovementMethod(new ScrollingMovementMethod());
-            resultTextView.append(result);
-        }
-    }
+//    private class AndroidPeek extends AsyncTask<String, Void, String> {
+//        /** The system calls this to perform work in a worker thread and
+//         * delivers it the parameters given to AsyncTask.execute() */
+//        protected String doInBackground(String... params) {
+//            String ipString = params[0];
+//            int portInt = Integer.parseInt(params[1]);
+//            String contentString = params[2];
+//            return mService.startAndroidPeek(ipString, portInt, contentString);
+//        }
+//
+//        /** The system calls this to perform work in the UI thread and delivers
+//         * the result from doInBackground() */
+//        protected void onPostExecute(String result) {
+//            resultTextView.setMovementMethod(new ScrollingMovementMethod());
+//            resultTextView.append(result);
+//        }
+//    }
 }
 
 
