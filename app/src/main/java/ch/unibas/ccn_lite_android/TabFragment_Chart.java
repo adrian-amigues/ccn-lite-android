@@ -17,6 +17,7 @@ import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.interfaces.datasets.IBarDataSet;
+import com.github.mikephil.charting.utils.ViewPortHandler;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,13 +49,14 @@ public class TabFragment_Chart extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_tab_fragment__chart, container, false);
         BarChart chartTest = (BarChart) view.findViewById(R.id.DayChart);
-
+        ViewPortHandler handler = chartTest.getViewPortHandler();
         BarData data = new BarData(getDataSet2());
         data.setBarWidth(0.9f);
         chartTest.setData(data);
         chartTest.setDescription("Noise/Time Chart");
+        
         chartTest.setFitBars(true);
-        //chartTest.setBackgroundColor(255);
+        chartTest.setVisibleXRangeMaximum(7);//It makes the chart scrollable
 
         XAxis xAxis = chartTest.getXAxis();
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
@@ -66,7 +68,7 @@ public class TabFragment_Chart extends Fragment {
         xAxis.setGranularity(1f);// minimum axis-step (interval) is 1
         xAxis.setAxisMinValue(0);
         // the labels that should be drawn on the XAxis
-        final String[] quarters = new String[] { "9.00", "10.00", "11.00", "12.00", "13.00", "14.00", "15.00", "16.00", "17.00" };
+        final String[] quarters = new String[] { "9.00", "10.00", "11.00", "12.00", "13.00", "14.00", "15.00", "16.00", "17.00", "18.00", "19.00", "20.00", "21.00", "22.00", "23.00", "00.00", "00.01" };
         xAxis.setValueFormatter(new AxisFormatter(quarters));
         xAxis.setLabelRotationAngle(90.0f);
 
@@ -100,6 +102,22 @@ public class TabFragment_Chart extends Fragment {
         valueSet1.add(v1e7);
         BarEntry v1e8 = new BarEntry(8.00f, 1);
         valueSet1.add(v1e8);
+        BarEntry v1e9 = new BarEntry(9.00f, 1);
+        valueSet1.add(v1e9);
+        BarEntry v1e10 = new BarEntry(10.00f, 1);
+        valueSet1.add(v1e10);
+        BarEntry v1e11 = new BarEntry(11.00f, 1);
+        valueSet1.add(v1e11);
+        BarEntry v1e12 = new BarEntry(12.00f, 1);
+        valueSet1.add(v1e12);
+        BarEntry v1e13 = new BarEntry(13.00f, 1);
+        valueSet1.add(v1e13);
+        BarEntry v1e14 = new BarEntry(14.00f, 1);
+        valueSet1.add(v1e14);
+        BarEntry v1e15 = new BarEntry(15.00f, 1);
+        valueSet1.add(v1e15);
+        BarEntry v1e16 = new BarEntry(16.00f, 1);
+        valueSet1.add(v1e16);
 
 
 
