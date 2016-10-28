@@ -10,6 +10,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.IBinder;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -32,6 +33,10 @@ public class CcnLiteAndroid extends AppCompatActivity
     private List<Area> areas;
     private AreasAdapter adapter;
     private SwipeRefreshLayout swipeContainer;
+    private String ipString = "127.0.0.1";
+    private String port = "9999";
+    private WorkCounter wk = null;
+    private boolean useParallelTaskExecution = false; // native function androidPeek can't handle parallel executions
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -43,12 +48,19 @@ public class CcnLiteAndroid extends AppCompatActivity
         swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                // Your code to refresh the list here.
-                // Make sure you call swipeContainer.setRefreshing(false)
-                // once the network request has completed successfully.
-//                fetchTimelineAsync(0);
                 Toast.makeText(CcnLiteAndroid.this, "Refresh values", Toast.LENGTH_SHORT).show();
-                swipeContainer.setRefreshing(false);
+                int areaCount = adapter.getItemCount();
+//                areaCount = 1; // temp
+                wk = new WorkCounter(areaCount);
+
+                for (int i = 0; i < areaCount; i++) {
+                    String requestedURI = adapter.getURI(i);
+                    if (useParallelTaskExecution && Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+                        new AndroidPeekTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, ipString, port, requestedURI, Integer.toString(i));
+                    } else {
+                        new AndroidPeekTask().execute(ipString, port, requestedURI, Integer.toString(i));
+                    }
+                }
             }
         });
         // Configure the refreshing colors
@@ -84,30 +96,67 @@ public class CcnLiteAndroid extends AppCompatActivity
     }
 
     private void initializeData() {
-        areas.add(new Area("FooBar", "Eat in a basement - 35 Db", R.drawable.foobar));
-        areas.add(new Area("Uthgård", "They have sofas - 28 Db", R.drawable.uthgard));
-        areas.add(new Area("Uthgård2", "Not them again - 25 Db. " +
-                "This is a longer text than the previous ones.", R.drawable.uthgard));
-        areas.add(new Area("Uthgård3", "Not them again - 25 Db. " +
-                "This is a longer text than the previous ones.", R.drawable.uthgard));
+        areas.add(new Area("FooBar", "Eat in a basement - 35 Db", R.drawable.foobar, "/unoise/foobar/"));
+        areas.add(new Area("Uthgård", "They have sofas - 28 Db", R.drawable.uthgard, "/unoise/utn/"));
+        areas.add(new Area("Rullan", "Expensive but nice - 32 Db", R.drawable.rullan, "/unoise/rullan/"));
+        areas.add(new Area("Uthgård", "Not them again - 25 Db. " +
+                "This is a longer text than the previous ones.", R.drawable.uthgard, "/unoise/utn/"));
         adapter.notifyDataSetChanged();
     }
 
-//    public void onLinearLayoutClick(View v) {
-//       // Toast.makeText(this, "click!", Toast.LENGTH_SHORT).show();
-//        Intent intent = new Intent(this, ChartTabsActivity_main.class);
-//        startActivity(intent);
-//    }
+    private class AndroidPeekTask extends AsyncTask<String, Void, String> {
+        private int areaPos;
+        /** The system calls this to perform work in a worker thread and
+         * delivers it the parameters given to AsyncTask.execute() */
+        protected String doInBackground(String... params) {
+            String ipString = params[0];
+            int portInt = Integer.parseInt(params[1]);
+            String contentString = params[2];
+            areaPos = Integer.parseInt(params[3]);
 
-//    public void onLinearLayoutClick(View v) {
-//        Toast.makeText(this, "click!", Toast.LENGTH_SHORT).show();
-//    }
+            return androidPeek(ipString, portInt, contentString);
+        }
 
-//    Native functions declarations
+        /** The system calls this to perform work in the UI thread and delivers
+         * the result from doInBackground() */
+        protected void onPostExecute(String result) {
+            if (result.equals("\n")) {
+                result = "No data available";
+            } else {
+                result = cleanResultString(result);
+            }
+            adapter.updateValue(areaPos, result);
+            wk.taskFinished();
+        }
+    }
+
+//    Used to count the finished tasks when all the cards are refreshed
+    public class WorkCounter {
+        private int runningTasks;
+
+        public WorkCounter(int numberOfTasks) {
+            this.runningTasks = numberOfTasks;
+        }
+        // Only call this in onPostExecute!
+        public void taskFinished() {
+            if (--runningTasks == 0) {
+                swipeContainer.setRefreshing(false);
+            }
+        }
+    }
+
+    public String cleanResultString(String str) {
+        if (str != null) {
+            while (str.length() > 0 && str.charAt(str.length()-1)=='\n') {
+                str = str.substring(0, str.length()-1);
+            }
+        }
+        return str;
+    }
+
+    //    Native functions declarations
     public native String relayInit();
     public native String androidPeek(String ipString, int portString, String contentString);
-
-
     /* this is used to load the 'ccn-lite-android' library on application
      * startup. The library has already been unpacked into
      * /data/data/ch.unibas.ccnliteandroid/lib/libccn-lite-android.so at
@@ -116,24 +165,6 @@ public class CcnLiteAndroid extends AppCompatActivity
     static {
         System.loadLibrary("ccn-lite-android");
     }
-
-//    private class AndroidPeek extends AsyncTask<String, Void, String> {
-//        /** The system calls this to perform work in a worker thread and
-//         * delivers it the parameters given to AsyncTask.execute() */
-//        protected String doInBackground(String... params) {
-//            String ipString = params[0];
-//            int portInt = Integer.parseInt(params[1]);
-//            String contentString = params[2];
-//            return mService.startAndroidPeek(ipString, portInt, contentString);
-//        }
-//
-//        /** The system calls this to perform work in the UI thread and delivers
-//         * the result from doInBackground() */
-//        protected void onPostExecute(String result) {
-//            resultTextView.setMovementMethod(new ScrollingMovementMethod());
-//            resultTextView.append(result);
-//        }
-//    }
 }
 
 

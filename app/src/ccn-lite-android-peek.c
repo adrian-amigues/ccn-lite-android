@@ -70,7 +70,7 @@ char* ccnl_android_peek(char* suiteStr, char* addr, int port, char* uri) {
     uint32_t nonce = (uint32_t) difftime(curtime, 0);
     char *path;
     struct sockaddr sa;
-    float wait = 3.0;
+    float wait = 2.0;
     clock_t begin = clock();
 
     time(&curtime);
@@ -240,7 +240,7 @@ char* ccnl_android_peek(char* suiteStr, char* addr, int port, char* uri) {
     // sprintf(response, "%s out = %s\n", response, pktdump_android(out, len, format, suite));
     sprintf(response, "%s [%f] - return response\n", response, timeDiff(begin));
     sprintf(response, "%s\n->%s\n", response, pktdump_android(out, len, format, suite));
-    sprintf(response, "->%s\n", pktdump_android(out, len, format, suite));
+    sprintf(response, "%s", pktdump_android(out, len, format, suite));
     return response;
 done:
     close(sock);

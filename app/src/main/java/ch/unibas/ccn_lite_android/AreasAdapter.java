@@ -2,6 +2,8 @@ package ch.unibas.ccn_lite_android;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
+import android.os.AsyncTask;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.transition.TransitionManager;
@@ -25,6 +27,12 @@ public class AreasAdapter extends RecyclerView.Adapter<AreasAdapter.AreaViewHold
     private int mExpandedPosition = -1;
     private Context context;
 
+    private final String lowerColor = "#18DB52";
+    private final String middleColor = "#EDD20B";
+    private final String higherColor = "#E21414";
+    private final int lowerBound = 15;
+    private final int upperBound = 25;
+
     AreasAdapter(List<Area> areas, Context context){
         this.areas = areas;
         this.context = context;
@@ -35,6 +43,7 @@ public class AreasAdapter extends RecyclerView.Adapter<AreasAdapter.AreaViewHold
         TextView areaName;
         TextView areaDescription;
         ImageView areaPhoto;
+        ImageView areaSmiley;
         TextView hidden;
         RecyclerView rv;
         Boolean isExpanded;
@@ -45,6 +54,7 @@ public class AreasAdapter extends RecyclerView.Adapter<AreasAdapter.AreaViewHold
             areaName = (TextView)itemView.findViewById(R.id.area_name);
             areaDescription = (TextView)itemView.findViewById(R.id.area_description);
             areaPhoto = (ImageView)itemView.findViewById(R.id.area_photo);
+            areaSmiley = (ImageView)itemView.findViewById(R.id.area_smiley);
             hidden = (TextView)itemView.findViewById(R.id.hidden);
             rv = (RecyclerView) itemView.findViewById(R.id.rv);
             isExpanded = false;
@@ -70,7 +80,9 @@ public class AreasAdapter extends RecyclerView.Adapter<AreasAdapter.AreaViewHold
         Area area = areas.get(position);
         holder.areaName.setText(area.getName());
         holder.areaDescription.setText(area.getDescription());
+        holder.areaDescription.setTextColor(getTextColor(area.getDescription()));
         holder.areaPhoto.setImageResource(area.getPhotoId());
+        holder.areaSmiley.setImageResource(area.getSmileyId());
 
 //        final boolean isExpanded = position==mExpandedPosition;
 //        holder.hidden.setVisibility(isExpanded?View.VISIBLE:View.GONE);
@@ -91,5 +103,36 @@ public class AreasAdapter extends RecyclerView.Adapter<AreasAdapter.AreaViewHold
     @Override
     public int getItemCount() {
         return areas.size();
+    }
+
+    public String getURI(int i) {
+        Area area = areas.get(i);
+        String uri = area.getUri();
+        area.increaseValueCounter();
+        return uri;
+    }
+
+    public void updateValue(int i, String newValue) {
+        Area area= areas.get(i);
+        area.setDescription(newValue);
+//       TODO: if too slow move line to taskFinished in WorkCounter
+        notifyDataSetChanged();
+    }
+
+    private int getTextColor(String desc) {
+        try {
+            String colorString;
+            int value = Integer.parseInt(desc);
+            if (value < lowerBound) {
+                colorString = lowerColor;
+            } else if (value > upperBound) {
+                colorString = higherColor;
+            } else {
+                colorString = middleColor;
+            }
+            return Color.parseColor(colorString);
+        } catch(Exception e) {
+            return Color.BLACK;
+        }
     }
 }
