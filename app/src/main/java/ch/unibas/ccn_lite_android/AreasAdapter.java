@@ -29,6 +29,7 @@ public class AreasAdapter extends RecyclerView.Adapter<AreasAdapter.AreaViewHold
     private List<Area> areas;
     private int mExpandedPosition = -1;
     private Context context;
+    private RecyclerView rv;
 
     private final String lowerColor = "#18DB52";
     private final String middleColor = "#EDD20B";
@@ -48,8 +49,9 @@ public class AreasAdapter extends RecyclerView.Adapter<AreasAdapter.AreaViewHold
         TextView areaDescription;
         ImageView areaPhoto;
         ImageView areaSmiley;
+        ImageView expandButton;
+        ImageView predictionGraph;
         TextView hidden;
-        RecyclerView rv;
         Boolean isExpanded;
 
         AreaViewHolder(View itemView) {
@@ -59,18 +61,26 @@ public class AreasAdapter extends RecyclerView.Adapter<AreasAdapter.AreaViewHold
             areaDescription = (TextView)itemView.findViewById(R.id.area_description);
             areaPhoto = (ImageView)itemView.findViewById(R.id.area_photo);
             areaSmiley = (ImageView)itemView.findViewById(R.id.area_smiley);
+            expandButton = (ImageView)itemView.findViewById(R.id.expand);
+            predictionGraph = (ImageView)itemView.findViewById(R.id.prediction_graph);
             hidden = (TextView)itemView.findViewById(R.id.hidden);
-            rv = (RecyclerView) itemView.findViewById(R.id.rv);
             isExpanded = false;
             itemView.setOnClickListener(this);
         }
 
         @Override
         public void onClick(View v) {
-            Toast.makeText(context, "Go to graph", Toast.LENGTH_SHORT).show();
+//            Toast.makeText(context, "Go to graph", Toast.LENGTH_SHORT).show();
             Intent intent = new Intent(context, ChartTabsActivity_main.class);
             context.startActivity(intent);
         }
+    }
+
+    @Override
+    public void onAttachedToRecyclerView(RecyclerView recyclerView) {
+        super.onAttachedToRecyclerView(recyclerView);
+
+        this.rv = recyclerView;
     }
 
     @Override
@@ -80,7 +90,7 @@ public class AreasAdapter extends RecyclerView.Adapter<AreasAdapter.AreaViewHold
     }
 
     @Override
-    public void onBindViewHolder(AreaViewHolder holder, int position) {
+    public void onBindViewHolder(final AreaViewHolder holder, int position) {
         Area area = areas.get(position);
         holder.areaName.setText(area.getName());
         holder.areaDescription.setText(area.getDescription());
@@ -88,20 +98,22 @@ public class AreasAdapter extends RecyclerView.Adapter<AreasAdapter.AreaViewHold
         holder.areaPhoto.setImageResource(area.getPhotoId());
         holder.areaSmiley.setImageResource(getSmiley(area.getDescription()));
 
-//        final boolean isExpanded = position==mExpandedPosition;
-//        holder.hidden.setVisibility(isExpanded?View.VISIBLE:View.GONE);
-//        holder.cv.setActivated(isExpanded);
-//        holder.cv.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                RecyclerView.ViewHolder holder = (RecyclerView.ViewHolder) v.getTag();
-////                RecyclerView rv = (RecyclerView) v.findViewById(R.id.rv);
-//                RecyclerView rv = (RecyclerView) v.findViewById(R.id.rv);
-//                mExpandedPosition = isExpanded ? -1:holder.getAdapterPosition();
-//                TransitionManager.beginDelayedTransition(rv);
-//                notifyDataSetChanged();
-//            }
-//        });
+        final boolean isExpanded = position == mExpandedPosition;
+        if (isExpanded) {
+            holder.predictionGraph.setVisibility(View.VISIBLE);
+            holder.expandButton.setImageResource(R.drawable.ic_expand_less_black_48dp);
+        } else {
+            holder.predictionGraph.setVisibility(View.GONE);
+            holder.expandButton.setImageResource(R.drawable.ic_expand_more_black_48dp);
+        }
+        holder.expandButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mExpandedPosition = isExpanded ? -1:holder.getAdapterPosition();
+                TransitionManager.beginDelayedTransition(rv);
+                notifyDataSetChanged();
+            }
+        });
     }
 
     @Override
@@ -159,5 +171,9 @@ public class AreasAdapter extends RecyclerView.Adapter<AreasAdapter.AreaViewHold
 
     public void sortAreas() {
         Collections.sort(areas, new AreaComparator());
+    }
+
+    public void resetExpandedPosition() {
+        mExpandedPosition = -1;
     }
 }

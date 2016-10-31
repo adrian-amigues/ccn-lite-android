@@ -154,6 +154,7 @@ public class CcnLiteAndroid extends AppCompatActivity
             if (--runningTasks == 0) {
                 swipeContainer.setRefreshing(false);
                 adapter.sortAreas();
+                adapter.resetExpandedPosition();
                 adapter.notifyDataSetChanged();
             }
         }
