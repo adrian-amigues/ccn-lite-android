@@ -14,6 +14,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -32,6 +35,7 @@ public class AreasAdapter extends RecyclerView.Adapter<AreasAdapter.AreaViewHold
     private final String higherColor = "#E21414";
     private final int lowerBound = 15;
     private final int upperBound = 25;
+    private final List<Integer> bounds = new ArrayList<>(Arrays.asList(15, 20, 25, 30));
 
     AreasAdapter(List<Area> areas, Context context){
         this.areas = areas;
@@ -82,7 +86,7 @@ public class AreasAdapter extends RecyclerView.Adapter<AreasAdapter.AreaViewHold
         holder.areaDescription.setText(area.getDescription());
         holder.areaDescription.setTextColor(getTextColor(area.getDescription()));
         holder.areaPhoto.setImageResource(area.getPhotoId());
-        holder.areaSmiley.setImageResource(area.getSmileyId());
+        holder.areaSmiley.setImageResource(getSmiley(area.getDescription()));
 
 //        final boolean isExpanded = position==mExpandedPosition;
 //        holder.hidden.setVisibility(isExpanded?View.VISIBLE:View.GONE);
@@ -115,8 +119,6 @@ public class AreasAdapter extends RecyclerView.Adapter<AreasAdapter.AreaViewHold
     public void updateValue(int i, String newValue) {
         Area area= areas.get(i);
         area.setDescription(newValue);
-//       TODO: if too slow move line to taskFinished in WorkCounter
-        notifyDataSetChanged();
     }
 
     private int getTextColor(String desc) {
@@ -134,5 +136,28 @@ public class AreasAdapter extends RecyclerView.Adapter<AreasAdapter.AreaViewHold
         } catch(Exception e) {
             return Color.BLACK;
         }
+    }
+
+    private int getSmiley(String desc) {
+        try {
+            int value = Integer.parseInt(desc);
+            if (value < bounds.get(0)) {
+                return R.drawable.face1;
+            } else if (value < bounds.get(1)) {
+                return R.drawable.face2;
+            } else if (value < bounds.get(2)) {
+                return R.drawable.face3;
+            } else if (value < bounds.get(3)) {
+                return R.drawable.face4;
+            } else {
+                return R.drawable.face5;
+            }
+        } catch(Exception e) {
+            return R.drawable.ic_sync_problem;
+        }
+    }
+
+    public void sortAreas() {
+        Collections.sort(areas, new AreaComparator());
     }
 }

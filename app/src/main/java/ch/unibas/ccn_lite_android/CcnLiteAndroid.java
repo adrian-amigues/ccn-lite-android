@@ -48,19 +48,7 @@ public class CcnLiteAndroid extends AppCompatActivity
         swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                Toast.makeText(CcnLiteAndroid.this, "Refresh values", Toast.LENGTH_SHORT).show();
-                int areaCount = adapter.getItemCount();
-//                areaCount = 1; // temp
-                wk = new WorkCounter(areaCount);
-
-                for (int i = 0; i < areaCount; i++) {
-                    String requestedURI = adapter.getURI(i);
-                    if (useParallelTaskExecution && Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-                        new AndroidPeekTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, ipString, port, requestedURI, Integer.toString(i));
-                    } else {
-                        new AndroidPeekTask().execute(ipString, port, requestedURI, Integer.toString(i));
-                    }
-                }
+                refresh();
             }
         });
         // Configure the refreshing colors
@@ -93,6 +81,7 @@ public class CcnLiteAndroid extends AppCompatActivity
     @Override
     public void onStart() {
         super.onStart();
+        refresh();
     }
 
     private void initializeData() {
@@ -102,6 +91,29 @@ public class CcnLiteAndroid extends AppCompatActivity
         areas.add(new Area("Uthgård", "Not them again - 25 Db. " +
                 "This is a longer text than the previous ones.", R.drawable.uthgard, "/unoise/utn/"));
         adapter.notifyDataSetChanged();
+    }
+
+    public String cleanResultString(String str) {
+        if (str != null) {
+            while (str.length() > 0 && str.charAt(str.length()-1)=='\n') {
+                str = str.substring(0, str.length()-1);
+            }
+        }
+        return str;
+    }
+
+    private void refresh() {
+        int areaCount = adapter.getItemCount();
+        wk = new WorkCounter(areaCount);
+
+        for (int i = 0; i < areaCount; i++) {
+            String requestedURI = adapter.getURI(i);
+            if (useParallelTaskExecution && Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+                new AndroidPeekTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, ipString, port, requestedURI, Integer.toString(i));
+            } else {
+                new AndroidPeekTask().execute(ipString, port, requestedURI, Integer.toString(i));
+            }
+        }
     }
 
     private class AndroidPeekTask extends AsyncTask<String, Void, String> {
@@ -141,17 +153,10 @@ public class CcnLiteAndroid extends AppCompatActivity
         public void taskFinished() {
             if (--runningTasks == 0) {
                 swipeContainer.setRefreshing(false);
+                adapter.sortAreas();
+                adapter.notifyDataSetChanged();
             }
         }
-    }
-
-    public String cleanResultString(String str) {
-        if (str != null) {
-            while (str.length() > 0 && str.charAt(str.length()-1)=='\n') {
-                str = str.substring(0, str.length()-1);
-            }
-        }
-        return str;
     }
 
     //    Native functions declarations

@@ -1,6 +1,10 @@
 package ch.unibas.ccn_lite_android;
 
+import java.util.Comparator;
+
 /**
+ * Represents an Area
+ *
  * Created by adrian on 2016-10-18.
  */
 
@@ -67,3 +71,5 @@ public class Area {
         valueCounter = (valueCounter % numberOfValues) + 1;
     }
 }
+
+
