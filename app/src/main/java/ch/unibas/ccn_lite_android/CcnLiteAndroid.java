@@ -115,9 +115,9 @@ public class CcnLiteAndroid extends AppCompatActivity
 
 
     private void initializeData() {
-        areas.add(new Area("FooBar", "Eat in a basement - 35 Db", R.drawable.foobar, "/demo/mote1/"));
-        areas.add(new Area("Uthgård", "They have sofas - 28 Db", R.drawable.uthgard, "/demo/mote2/"));
-        areas.add(new Area("Rullan", "Expensive but nice - 32 Db", R.drawable.rullan, "/demo/mote3/"));
+        areas.add(new Area("FooBar", "Mote 1", R.drawable.foobar, "/demo/mote1/"));
+        areas.add(new Area("Uthgård", "Mote 2", R.drawable.uthgard, "/demo/mote2/"));
+        areas.add(new Area("Rullan", "Mote 3", R.drawable.rullan, "/demo/mote3/"));
         adapter.notifyDataSetChanged();
     }
 
@@ -139,9 +139,9 @@ public class CcnLiteAndroid extends AppCompatActivity
         for (int i = 0; i < areaCount; i++) {
             String requestedURI = adapter.getURI(i);
             if (useParallelTaskExecution && Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-                new AndroidPeekTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, externalIp, port, requestedURI, Integer.toString(i));
+                new AndroidPeekTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, targetIp, port, requestedURI, Integer.toString(i));
             } else {
-                new AndroidPeekTask().execute(externalIp, port, requestedURI, Integer.toString(i));
+                new AndroidPeekTask().execute(targetIp, port, requestedURI, Integer.toString(i));
             }
         }
     }

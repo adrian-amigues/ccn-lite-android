@@ -106,7 +106,7 @@ char* ccnl_android_peek(char* suiteStr, char* addr, int port, char* uri) {
     }
     // sprintf(response, "%s prefix <%s> became %s\n", response, uri, ccnl_prefix_to_path(prefix));
 
-    LOGE("%s sent to %s with suite %s, nonce = %d", ccnl_prefix_to_path(prefix), addr, suiteStr, nonce);
+    LOGE("%s sent to %s with suite %s", ccnl_prefix_to_path(prefix), addr, suiteStr);
 
     // Make the interest
     len = mkInterest(prefix, &nonce, out, sizeof(out));

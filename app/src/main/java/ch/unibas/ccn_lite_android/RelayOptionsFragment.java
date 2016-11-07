@@ -43,6 +43,7 @@ public class RelayOptionsFragment extends DialogFragment {
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
+        //TODO: move settings to preferences
         int selectedRadio = 0;
         useServiceRelay = true;
         Bundle bundle = this.getArguments();
@@ -54,9 +55,11 @@ public class RelayOptionsFragment extends DialogFragment {
 
         LayoutInflater inflater = getActivity().getLayoutInflater();
         final View dialogView = inflater.inflate(R.layout.dialog_relay_options, null);
-        EditText ipField = (EditText) dialogView.findViewById(R.id.dialog_ip_address);
+        final EditText ipField = (EditText) dialogView.findViewById(R.id.dialog_ip_address);
         ipField.setText(externalIp);
-        //TODO: grey out ipField if useServiceRelay
+        if (useServiceRelay) {
+            ipField.setEnabled(false);
+        }
 
         // Use the Builder class for convenient dialog construction
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
@@ -65,9 +68,11 @@ public class RelayOptionsFragment extends DialogFragment {
                         switch (which) {
                             case 0:
                                 useServiceRelay = true;
+                                ipField.setEnabled(false);
                                 break;
                             case 1:
                                 useServiceRelay = false;
+                                ipField.setEnabled(true);
                                 break;
                         }
                     }
@@ -75,10 +80,7 @@ public class RelayOptionsFragment extends DialogFragment {
                 .setView(dialogView)
                 .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        EditText valueView = (EditText) dialogView.findViewById(R.id.dialog_ip_address); //here
-                        if(valueView != null) {
-                            externalIp = valueView.getText().toString();
-                        }
+                        externalIp = ipField.getText().toString();
                         mListener.onDialogPositiveClick(RelayOptionsFragment.this);
                     }
                 })
