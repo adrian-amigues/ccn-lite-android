@@ -2,41 +2,39 @@ package ch.unibas.ccn_lite_android;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
-import android.app.Activity;
-import android.content.ComponentName;
-import android.content.Context;
-import android.content.Intent;
-import android.content.ServiceConnection;
 import android.os.AsyncTask;
 import android.os.Build;
-import android.os.IBinder;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.text.method.ScrollingMovementMethod;
+import android.util.Log;
 import android.view.Menu;
-import android.view.View;
-import android.view.Window;
-import android.widget.ArrayAdapter;
-import android.widget.EditText;
-import android.widget.TextView;
+import android.view.MenuItem;
 import android.os.Bundle;
-import android.os.Handler;
 import android.widget.Toast;
 
 public class CcnLiteAndroid extends AppCompatActivity
+        implements RelayOptionsFragment.NoticeDialogListener
 {
+    private String TAG = "unoise";
+    private boolean useParallelTaskExecution = false; // native function androidPeek can't handle parallel executions
+
     private List<Area> areas;
+    private SensorReadingManager sensorReadingManager;
     private AreasAdapter adapter;
     private SwipeRefreshLayout swipeContainer;
-    private String ipString = "127.0.0.1";
-    private String port = "9999";
     private WorkCounter wk = null;
-    private boolean useParallelTaskExecution = false; // native function androidPeek can't handle parallel executions
+
+    private final String localIp = "127.0.0.1";
+    private final String port = "9695";
+    private Boolean useServiceRelay = true;
+    private String externalIp = "192.168.1.101";
+    private String ccnSuite = "ndn2013";
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -60,10 +58,36 @@ public class CcnLiteAndroid extends AppCompatActivity
 
         Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
         setSupportActionBar(myToolbar);
+        myToolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+//                Toast.makeText(CcnLiteAndroid.this, "Menu item click", Toast.LENGTH_SHORT).show();
+                if (item.isChecked()) item.setChecked(false);
+                else item.setChecked(true);
+                switch (item.getItemId()) {
+                    case R.id.radio_item_ccnx:
+                        ccnSuite = "ccnx2015";
+                        return true;
+                    case R.id.radio_item_ndn:
+                        ccnSuite = "ndn2013";
+                        return true;
+                    case R.id.item_relay_options:
+                        DialogFragment dialog = new RelayOptionsFragment();
+                        Bundle bundle = new Bundle();
+                        bundle.putString("externalIp", externalIp);
+                        bundle.putBoolean("useServiceRelay", useServiceRelay);
+                        dialog.setArguments(bundle);
+                        dialog.show(getSupportFragmentManager(), "dialog_relay_options");
+                        return true;
+                }
+                return false;
+            }
+        });
 
         RecyclerView rv = (RecyclerView) findViewById(R.id.rv);
 //        rv.setHasFixedSize(true);
         areas = new ArrayList<>();
+        sensorReadingManager = new SensorReadingManager();
         adapter = new AreasAdapter(areas, this);
         LinearLayoutManager llm = new LinearLayoutManager(this);
         rv.setLayoutManager(llm);
@@ -75,6 +99,11 @@ public class CcnLiteAndroid extends AppCompatActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_layout, menu);
+        if (ccnSuite.equals("ccnx2015")) {
+            menu.findItem(R.id.radio_item_ccnx).setChecked(true);
+        } else if (ccnSuite.equals("ndn2013")) {
+            menu.findItem(R.id.radio_item_ndn).setChecked(true);
+        }
         return true;
     }
 
@@ -84,12 +113,11 @@ public class CcnLiteAndroid extends AppCompatActivity
         refresh();
     }
 
+
     private void initializeData() {
-        areas.add(new Area("FooBar", "Eat in a basement - 35 Db", R.drawable.foobar, "/unoise/foobar/"));
-        areas.add(new Area("Uthgård", "They have sofas - 28 Db", R.drawable.uthgard, "/unoise/utn/"));
-        areas.add(new Area("Rullan", "Expensive but nice - 32 Db", R.drawable.rullan, "/unoise/rullan/"));
-        areas.add(new Area("Uthgård", "Not them again - 25 Db. " +
-                "This is a longer text than the previous ones.", R.drawable.uthgard, "/unoise/utn/"));
+        areas.add(new Area("FooBar", "Eat in a basement - 35 Db", R.drawable.foobar, "/demo/mote1/"));
+        areas.add(new Area("Uthgård", "They have sofas - 28 Db", R.drawable.uthgard, "/demo/mote2/"));
+        areas.add(new Area("Rullan", "Expensive but nice - 32 Db", R.drawable.rullan, "/demo/mote3/"));
         adapter.notifyDataSetChanged();
     }
 
@@ -103,16 +131,29 @@ public class CcnLiteAndroid extends AppCompatActivity
     }
 
     private void refresh() {
+        String targetIp = useServiceRelay ? localIp : externalIp;
         int areaCount = adapter.getItemCount();
+        areaCount = 3;
         wk = new WorkCounter(areaCount);
 
         for (int i = 0; i < areaCount; i++) {
             String requestedURI = adapter.getURI(i);
             if (useParallelTaskExecution && Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-                new AndroidPeekTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, ipString, port, requestedURI, Integer.toString(i));
+                new AndroidPeekTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, externalIp, port, requestedURI, Integer.toString(i));
             } else {
-                new AndroidPeekTask().execute(ipString, port, requestedURI, Integer.toString(i));
+                new AndroidPeekTask().execute(externalIp, port, requestedURI, Integer.toString(i));
             }
+        }
+    }
+
+    @Override
+    public void onDialogPositiveClick(RelayOptionsFragment dialog) {
+        useServiceRelay = dialog.getUseServiceRelay();
+        externalIp = dialog.getExternalIp();
+        if (useServiceRelay) {
+            Toast.makeText(CcnLiteAndroid.this, "Now using service", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(CcnLiteAndroid.this, "Now using "+externalIp, Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -126,18 +167,30 @@ public class CcnLiteAndroid extends AppCompatActivity
             String contentString = params[2];
             areaPos = Integer.parseInt(params[3]);
 
-            return androidPeek(ipString, portInt, contentString);
+            return androidPeek(ccnSuite, ipString, portInt, contentString);
         }
 
         /** The system calls this to perform work in the UI thread and delivers
          * the result from doInBackground() */
         protected void onPostExecute(String result) {
-            if (result.equals("\n")) {
-                result = "No data available";
+            Log.d(TAG, "onPostExecute "+wk.runningTasks+" result = " + result);
+            if (SensorReading.isSensorReading(result)) {
+                try {
+                    SensorReading sr = new SensorReading(result);
+                    sensorReadingManager.addSensorReading(sr);
+                    adapter.updateValue(areaPos, sr);
+                } catch(Exception e) {
+                    result = "Corrupted SensorReading";
+                    adapter.updateValue(areaPos, result);
+                }
             } else {
-                result = cleanResultString(result);
+                if (result.equals("\n")) {
+                    result = "No data available";
+                } else {
+                    result = cleanResultString(result);
+                }
+                adapter.updateValue(areaPos, result);
             }
-            adapter.updateValue(areaPos, result);
             wk.taskFinished();
         }
     }
@@ -162,7 +215,8 @@ public class CcnLiteAndroid extends AppCompatActivity
 
     //    Native functions declarations
     public native String relayInit();
-    public native String androidPeek(String ipString, int portString, String contentString);
+    public native String androidPeek(String suiteString, String ipString,
+                                     int portString, String contentString);
     /* this is used to load the 'ccn-lite-android' library on application
      * startup. The library has already been unpacked into
      * /data/data/ch.unibas.ccnliteandroid/lib/libccn-lite-android.so at

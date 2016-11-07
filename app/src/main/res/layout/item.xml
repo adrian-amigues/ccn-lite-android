@@ -94,6 +94,7 @@
                    android:clickable="true"
                    android:paddingTop="12dp"
                    android:paddingEnd="15dp"
+                   android:visibility="gone"
                    />
 
                <ImageView

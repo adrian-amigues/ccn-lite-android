@@ -29,6 +29,15 @@
 #include "util/ccn-lite-pktdump-android.c"
 
 #define USE_URI_TO_PREFIX
+#define USE_SUITE_CCNB
+#define USE_SUITE_CCNTLV
+#define USE_SUITE_CISTLV
+#define USE_SUITE_IOTTLV
+#define USE_SUITE_NDNTLV
+
+#define LOG_TAG "uNoise"
+#define  LOGD(...)  __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__)
+#define  LOGE(...)  __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
 
 // Function prototypes
 int frag_cb(struct ccnl_relay_s *relay, struct ccnl_face_s *from,
@@ -60,6 +69,7 @@ char* ccnl_android_peek(char* suiteStr, char* addr, int port, char* uri) {
     static char response[400];
     static ccnl_isContentFunc isContent;
     static ccnl_isFragmentFunc isFragment;
+    static ccnl_mkInterestFunc mkInterest;
     struct ccnl_prefix_s *prefix;
     struct ccnl_face_s dummyFace;
     unsigned int chunknum = UINT_MAX;
@@ -67,7 +77,7 @@ char* ccnl_android_peek(char* suiteStr, char* addr, int port, char* uri) {
     int sock = 0;
     int format = 2; // To print just the content of the returned content object, don't change to lower
     time_t curtime;
-    uint32_t nonce = (uint32_t) difftime(curtime, 0);
+    int nonce = random();
     char *path;
     struct sockaddr sa;
     float wait = 2.0;
@@ -80,7 +90,9 @@ char* ccnl_android_peek(char* suiteStr, char* addr, int port, char* uri) {
 
     // Getting the suite integer value
     suite = ccnl_str2suite(suiteStr);
+    mkInterest = ccnl_suite2mkInterestFunc(suite);
     isContent = ccnl_suite2isContentFunc(suite);
+    isFragment = ccnl_suite2isFragmentFunc(suite);
     if (!isContent) {
         return "Suite is not valid\n";
     }
@@ -94,9 +106,11 @@ char* ccnl_android_peek(char* suiteStr, char* addr, int port, char* uri) {
     }
     // sprintf(response, "%s prefix <%s> became %s\n", response, uri, ccnl_prefix_to_path(prefix));
 
+    LOGE("%s sent to %s with suite %s, nonce = %d", ccnl_prefix_to_path(prefix), addr, suiteStr, nonce);
 
     // Make the interest
-    len = ccntlv_mkInterest(prefix, &nonce, out, sizeof(out));
+    len = mkInterest(prefix, &nonce, out, sizeof(out));
+
     // sprintf(response, "%s interest has %d bytes\n", response, len);
 
     // Initialize network functionalities
@@ -238,9 +252,10 @@ char* ccnl_android_peek(char* suiteStr, char* addr, int port, char* uri) {
 
     // sprintf(response, "%s Returning response, len = %d, strlen(out) = %d\n", response, len, strlen(out));
     // sprintf(response, "%s out = %s\n", response, pktdump_android(out, len, format, suite));
-    sprintf(response, "%s [%f] - return response\n", response, timeDiff(begin));
-    sprintf(response, "%s\n->%s\n", response, pktdump_android(out, len, format, suite));
+    // sprintf(response, "%s [%f] - return response\n", response, timeDiff(begin));
+    // sprintf(response, "%s\n->%s\n", response, pktdump_android(out, len, format, suite));
     sprintf(response, "%s", pktdump_android(out, len, format, suite));
+    // sprintf(response, "%s", out);
     return response;
 done:
     close(sock);

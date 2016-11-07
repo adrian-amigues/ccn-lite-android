@@ -33,6 +33,10 @@
 
 #define NEEDS_PACKET_CRAFTING // for IOTTLV
 
+#define LOG_TAG "uNoise"
+#define  LOGD(...)  __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__)
+#define  LOGE(...)  __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
+
 #include "../ccnl-pkt-localrpc.h"
 
 // ----------------------------------------------------------------------
@@ -1570,8 +1574,6 @@ emit_content_only(unsigned char *start, int len, int suite, int format, char *pk
         return -1;
     }
     if (!pkt) {
-        DEBUGMSG(WARNING, "extract (%s): parsing error or no prefix\n",
-                 ccnl_suite2str(suite));
         return -1;
     }
 

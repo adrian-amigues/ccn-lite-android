@@ -65,7 +65,7 @@ public class AreasAdapter extends RecyclerView.Adapter<AreasAdapter.AreaViewHold
             predictionGraph = (ImageView)itemView.findViewById(R.id.prediction_graph);
             hidden = (TextView)itemView.findViewById(R.id.hidden);
             isExpanded = false;
-            itemView.setOnClickListener(this);
+            predictionGraph.setOnClickListener(this);
         }
 
         @Override
@@ -99,14 +99,15 @@ public class AreasAdapter extends RecyclerView.Adapter<AreasAdapter.AreaViewHold
         holder.areaSmiley.setImageResource(getSmiley(area.getDescription()));
 
         final boolean isExpanded = position == mExpandedPosition;
-        if (isExpanded) {
-            holder.predictionGraph.setVisibility(View.VISIBLE);
-            holder.expandButton.setImageResource(R.drawable.ic_expand_less_black_48dp);
-        } else {
-            holder.predictionGraph.setVisibility(View.GONE);
-            holder.expandButton.setImageResource(R.drawable.ic_expand_more_black_48dp);
-        }
-        holder.expandButton.setOnClickListener(new View.OnClickListener() {
+        holder.predictionGraph.setVisibility(isExpanded? View.VISIBLE:View.GONE);
+//        if (isExpanded) {
+//            holder.predictionGraph.setVisibility(View.VISIBLE);
+//            holder.expandButton.setImageResource(R.drawable.ic_expand_less_black_48dp);
+//        } else {
+//            holder.predictionGraph.setVisibility(View.GONE);
+//            holder.expandButton.setImageResource(R.drawable.ic_expand_more_black_48dp);
+//        }
+        holder.cv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mExpandedPosition = isExpanded ? -1:holder.getAdapterPosition();
@@ -124,13 +125,19 @@ public class AreasAdapter extends RecyclerView.Adapter<AreasAdapter.AreaViewHold
     public String getURI(int i) {
         Area area = areas.get(i);
         String uri = area.getUri();
-        area.increaseValueCounter();
+//        area.increaseValueCounter();
         return uri;
     }
 
     public void updateValue(int i, String newValue) {
         Area area= areas.get(i);
         area.setDescription(newValue);
+    }
+
+    public void updateValue(int i, SensorReading sr) {
+        Area area= areas.get(i);
+        int light = Integer.parseInt(sr.getLight()) / 4;
+        area.setDescription(Integer.toString(light));
     }
 
     private int getTextColor(String desc) {

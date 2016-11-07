@@ -16,7 +16,7 @@ public class Area {
     private String uriBase;
     private int valueCounter;
 
-    private final int numberOfValues = 4;
+    private final int numberOfValues = 1;
 
     public Area(String name, String description, int photoId, String uriBase) {
         this.name = name;
@@ -60,7 +60,8 @@ public class Area {
     }
 
     public String getUri() {
-        return uriBase + valueCounter;
+//        return uriBase + valueCounter;
+        return uriBase;
     }
 
     public int getValueCounter() {
