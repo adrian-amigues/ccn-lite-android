@@ -104,6 +104,7 @@ public class TabFragment_Chart_Week extends Fragment {
         YAxis rightAxis = chartTest.getAxisRight();
         rightAxis.setEnabled(false);
 
+        chartTest.setHighlightPerTapEnabled(false);
         chartTest.animateXY(2000, 2000);
         chartTest.invalidate();
         return view;

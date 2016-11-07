@@ -110,7 +110,7 @@ public class TabFragment_Chart_Month extends Fragment {
 
 
         chartTest.moveViewToX(xAxis.getAxisMaximum());
-
+        chartTest.setHighlightPerTapEnabled(false);
         chartTest.animateXY(2000, 2000);
         chartTest.invalidate();
         return view;

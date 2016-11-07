@@ -99,6 +99,7 @@ public class TabFragment_Chart extends Fragment {
         YAxis rightAxis = chartTest.getAxisRight();
         rightAxis.setEnabled(false);
 
+        chartTest.setHighlightPerTapEnabled(false);
         chartTest.moveViewToX(xAxis.getAxisMaximum());
         chartTest.animateXY(2000, 2000);
         chartTest.invalidate();
