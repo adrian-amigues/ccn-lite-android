@@ -62,6 +62,8 @@ public class TabFragment_Chart extends Fragment {
         chartTest.setDescriptionPosition(handler.contentLeft() + 2*handler.offsetLeft() + 2*description.length(), handler.contentTop());
         chartTest.setDescriptionTextSize(14f);
 
+
+
         chartTest.setFitBars(true);
         chartTest.setVisibleXRangeMaximum(7);//It makes the chart scrollable
 
@@ -93,9 +95,11 @@ public class TabFragment_Chart extends Fragment {
         LimitLine line = new LimitLine(800f);
         yAxis.addLimitLine(line);
 
+
         YAxis rightAxis = chartTest.getAxisRight();
         rightAxis.setEnabled(false);
 
+        chartTest.moveViewToX(xAxis.getAxisMaximum());
         chartTest.animateXY(2000, 2000);
         chartTest.invalidate();
         return view;
