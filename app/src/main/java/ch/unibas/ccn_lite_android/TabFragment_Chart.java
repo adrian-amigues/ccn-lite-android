@@ -63,13 +63,16 @@ public class TabFragment_Chart extends Fragment {
         chartTest.setDescriptionTextSize(14f);
 
 
+
         chartTest.setFitBars(true);
         chartTest.setVisibleXRangeMaximum(7);//It makes the chart scrollable
+
         Legend legend = chartTest.getLegend();
         legend.setPosition(Legend.LegendPosition.ABOVE_CHART_RIGHT);
         int[] legendColors = {Color.rgb(67, 189, 1), Color.rgb(254, 161, 2), Color.rgb(253, 1, 1)};
         String[] legendLabels = {"Low", "Medium", "High"};
         legend.setCustom(legendColors, legendLabels);
+
         XAxis xAxis = chartTest.getXAxis();
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
         xAxis.setTextSize(14f);
@@ -91,6 +94,7 @@ public class TabFragment_Chart extends Fragment {
         yAxis.setDrawGridLines(false);
         LimitLine line = new LimitLine(800f);
         yAxis.addLimitLine(line);
+
 
         YAxis rightAxis = chartTest.getAxisRight();
         rightAxis.setEnabled(false);

@@ -87,10 +87,12 @@ public class TabFragment_Chart_Month extends Fragment {
         xAxis.setGranularity(1f);// minimum axis-step (interval) is 1
         xAxis.setAxisMinValue(0);
         // the labels that should be drawn on the XAxis
+
         final String[] quarters = new String[] { "", "5 Oct.", "6 Oct.", "7 Oct.", "8 Oct.", "9 Oct.", "10 Oct.",
                 "11 Oct.", "12 Oct.", "13 Oct.", "14 Oct.", "15 Oct.", "16 Oct.", "17 Oct.", "18 Oct.", "19 Oct.",
                 "20 Oct.", "21 Oct.", "22 Oct.", "23 Oct.", "24 Oct.", "25 Oct.", "26 Oct.", "27 Oct.", "28 Oct.",
                 "29 Oct.", "30 Oct.", "31 Oct.", "1 Nov.", "2 Nov.", "3 Nov.", "4 nov."};
+
         xAxis.setValueFormatter(new AxisFormatter(quarters));
         xAxis.setLabelRotationAngle(90.0f);
 
@@ -106,7 +108,9 @@ public class TabFragment_Chart_Month extends Fragment {
         YAxis rightAxis = chartTest.getAxisRight();
         rightAxis.setEnabled(false);
 
+
         chartTest.moveViewToX(xAxis.getAxisMaximum());
+
         chartTest.animateXY(2000, 2000);
         chartTest.invalidate();
         return view;
