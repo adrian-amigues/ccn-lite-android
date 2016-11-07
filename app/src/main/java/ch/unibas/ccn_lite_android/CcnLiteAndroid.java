@@ -115,9 +115,9 @@ public class CcnLiteAndroid extends AppCompatActivity
 
 
     private void initializeData() {
-        areas.add(new Area("FooBar", "Mote 1", R.drawable.foobar, "/demo/mote1/"));
-        areas.add(new Area("Uthgård", "Mote 2", R.drawable.uthgard, "/demo/mote2/"));
-        areas.add(new Area("Rullan", "Mote 3", R.drawable.rullan, "/demo/mote3/"));
+        areas.add(new Area("Mote 1", "Mote 1", R.drawable.foobar, "/demo/mote1/"));
+        areas.add(new Area("Mote 2", "Mote 2", R.drawable.uthgard, "/demo/mote2/"));
+        areas.add(new Area("Mote 3", "Mote 3", R.drawable.rullan, "/demo/mote3/"));
         adapter.notifyDataSetChanged();
     }
 
