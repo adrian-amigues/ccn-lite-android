@@ -2,6 +2,9 @@ package ch.unibas.ccn_lite_android;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -19,6 +22,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.os.Bundle;
 import android.widget.Toast;
+
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 public class CcnLiteAndroid extends AppCompatActivity
         implements RelayOptionsFragment.NoticeDialogListener
@@ -122,7 +127,14 @@ public class CcnLiteAndroid extends AppCompatActivity
     @Override
     public void onStart() {
         super.onStart();
-        refresh();
+//        refresh();
+
+        ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+        scheduler.scheduleAtFixedRate(new Runnable() {
+                    public void run() {
+                        refresh();
+                    }
+                }, 0, 10, SECONDS);
     }
     @Override
     public void onPause() {
@@ -179,6 +191,7 @@ public class CcnLiteAndroid extends AppCompatActivity
         externalIp = dialog.getExternalIp();
         prefEditor.putBoolean(getString(R.string.pref_key_use_service_relay), useServiceRelay);
         prefEditor.putString(getString(R.string.pref_key_external_ip), externalIp);
+        prefEditor.commit(); //TODO: only commit in onPause
         if (useServiceRelay) {
             Toast.makeText(CcnLiteAndroid.this, "Now using service", Toast.LENGTH_SHORT).show();
         } else {
