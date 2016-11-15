@@ -109,6 +109,7 @@ public class TabFragment_Chart_Week extends Fragment {
         chartTest.invalidate();
         return view;
     }
+
     private List<IBarDataSet> getDataSet2() {
         List<IBarDataSet> dataSets = null;
 

@@ -96,7 +96,6 @@ public class TabFragment_Chart_Month extends Fragment {
         xAxis.setValueFormatter(new AxisFormatter(quarters));
         xAxis.setLabelRotationAngle(90.0f);
 
-
         YAxis yAxis = chartTest.getAxisLeft();
         yAxis.setTextSize(14f); // set the text size
         yAxis.setTextColor(Color.BLACK);
@@ -108,13 +107,13 @@ public class TabFragment_Chart_Month extends Fragment {
         YAxis rightAxis = chartTest.getAxisRight();
         rightAxis.setEnabled(false);
 
-
         chartTest.moveViewToX(xAxis.getAxisMaximum());
         chartTest.setHighlightPerTapEnabled(false);
         chartTest.animateXY(2000, 2000);
         chartTest.invalidate();
         return view;
     }
+
     private List<IBarDataSet> getDataSet2() {
         List<IBarDataSet> dataSets = null;
 
