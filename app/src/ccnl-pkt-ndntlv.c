@@ -23,6 +23,10 @@
 
 #include "ccnl-pkt-ndntlv.h"
 
+#define LOG_TAG "uNoise"
+#define  LOGD(...)  __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__)
+#define  LOGE(...)  __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
+
 #ifdef USE_SUITE_NDNTLV
 
 // ----------------------------------------------------------------------
@@ -405,7 +409,7 @@ ccnl_ndntlv_prependIncludedNonNegInt(int type, unsigned int val,
 
 
 int
-ccnl_ndntlv_prependBlob(int type, unsigned char *blob, int len,
+ccnl_ndntlv_prependBlob(int type, unsigned char *blob, int len, // blob = nonce
                         int *offset, unsigned char *buf)
 {
     int oldoffset = *offset;
@@ -461,6 +465,8 @@ ccnl_ndntlv_prependInterest(struct ccnl_prefix_s *name, int scope, int *nonce,
     int oldoffset = *offset;
     unsigned char lifetime[2] = { 0x0f, 0xa0 };
     //unsigned char mustbefresh[2] = { NDN_TLV_MustBeFresh, 0x00 };
+
+    // LOGD("nonce = %d, casted nonce = %d", *nonce, *((unsigned char*) nonce));
 
     if (scope >= 0) {
         if (scope > 2)
