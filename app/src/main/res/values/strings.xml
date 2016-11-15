@@ -4,6 +4,17 @@
     <string name="app_name">uNoise</string>
 
     <string name="area_photo_content_description">Area Photo</string>
+    <string name="area_smiley_description">Area Smiley</string>
+    <string name="menu_item_ccn_suite">CCN suite</string>
+    <string name="dialog_relay_options">Relay options</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+    <string name="dialog_default_ip">192.168.1.101</string>
+
+    <string-array name="dialog_relay_options_radios">
+        <item>Service relay</item>
+        <item>IP address</item>
+    </string-array>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
