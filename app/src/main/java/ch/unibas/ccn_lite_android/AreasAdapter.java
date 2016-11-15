@@ -36,7 +36,7 @@ public class AreasAdapter extends RecyclerView.Adapter<AreasAdapter.AreaViewHold
     private final String higherColor = "#E21414";
     private final int lowerBound = 15;
     private final int upperBound = 25;
-    private final List<Integer> bounds = new ArrayList<>(Arrays.asList(15, 20, 25, 30));
+    private final List<Integer> bounds = new ArrayList<>(Arrays.asList(10, 50, 500, 2000));
 
     AreasAdapter(List<Area> areas, Context context){
         this.areas = areas;
@@ -136,7 +136,7 @@ public class AreasAdapter extends RecyclerView.Adapter<AreasAdapter.AreaViewHold
 
     public void updateValue(int i, SensorReading sr) {
         Area area= areas.get(i);
-        int light = Integer.parseInt(sr.getLight()) / 4;
+        int light = Integer.parseInt(sr.getLight());
         area.setDescription(Integer.toString(light));
     }
 
