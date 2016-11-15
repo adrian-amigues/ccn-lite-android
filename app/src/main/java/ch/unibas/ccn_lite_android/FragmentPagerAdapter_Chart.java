@@ -26,7 +26,12 @@ public class FragmentPagerAdapter_Chart extends FragmentPagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
-        return TabFragment_Chart.newInstance(position);
+        if(position == 0)
+            return TabFragment_Chart.newInstance(position);
+        else if(position == 1)
+            return TabFragment_Chart_Week.newInstance(position);
+        else
+            return TabFragment_Chart_Month.newInstance(position);
     }
 
     @Override
