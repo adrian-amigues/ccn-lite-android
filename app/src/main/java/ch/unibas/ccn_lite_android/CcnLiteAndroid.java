@@ -3,6 +3,9 @@ package ch.unibas.ccn_lite_android;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.support.v4.app.DialogFragment;
@@ -28,18 +31,25 @@ public class CcnLiteAndroid extends AppCompatActivity
     private AreasAdapter adapter;
     private SwipeRefreshLayout swipeContainer;
     private WorkCounter wk = null;
+    private SharedPreferences sharedPref;
+    private SharedPreferences.Editor prefEditor;
 
     private final String localIp = "127.0.0.1";
     private final String port = "9695";
-    private Boolean useServiceRelay = true;
-    private String externalIp = "192.168.1.101";
-    private String ccnSuite = "ndn2013";
+    private Boolean useServiceRelay;
+    private String externalIp;
+    private String ccnSuite;
 
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        sharedPref = getPreferences(Context.MODE_PRIVATE);
+        prefEditor = sharedPref.edit();
+        loadPreferences(sharedPref);
+
         // Lookup the swipe container view
         swipeContainer = (SwipeRefreshLayout) findViewById(R.id.swipeContainer);
         // Setup refresh listener which triggers new data loading
@@ -67,9 +77,11 @@ public class CcnLiteAndroid extends AppCompatActivity
                 switch (item.getItemId()) {
                     case R.id.radio_item_ccnx:
                         ccnSuite = "ccnx2015";
+                        prefEditor.putString(getString(R.string.pref_key_ccn_suite), ccnSuite);
                         return true;
                     case R.id.radio_item_ndn:
                         ccnSuite = "ndn2013";
+                        prefEditor.putString(getString(R.string.pref_key_ccn_suite), ccnSuite);
                         return true;
                     case R.id.item_relay_options:
                         DialogFragment dialog = new RelayOptionsFragment();
@@ -112,6 +124,21 @@ public class CcnLiteAndroid extends AppCompatActivity
         super.onStart();
         refresh();
     }
+    @Override
+    public void onPause() {
+        super.onPause();
+        prefEditor.commit();
+    }
+
+    private void loadPreferences(SharedPreferences sharedPref) {
+        Resources res = getResources();
+        ccnSuite = sharedPref.getString(res.getString(R.string.pref_key_ccn_suite),
+                res.getString(R.string.default_ccn_suite));
+        externalIp = sharedPref.getString(res.getString(R.string.pref_key_external_ip),
+                res.getString(R.string.default_external_ip));
+        useServiceRelay = sharedPref.getBoolean(res.getString(R.string.pref_key_use_service_relay),
+                res.getBoolean(R.bool.default_use_service_relay));
+    }
 
 
     private void initializeData() {
@@ -150,6 +177,8 @@ public class CcnLiteAndroid extends AppCompatActivity
     public void onDialogPositiveClick(RelayOptionsFragment dialog) {
         useServiceRelay = dialog.getUseServiceRelay();
         externalIp = dialog.getExternalIp();
+        prefEditor.putBoolean(getString(R.string.pref_key_use_service_relay), useServiceRelay);
+        prefEditor.putString(getString(R.string.pref_key_external_ip), externalIp);
         if (useServiceRelay) {
             Toast.makeText(CcnLiteAndroid.this, "Now using service", Toast.LENGTH_SHORT).show();
         } else {
