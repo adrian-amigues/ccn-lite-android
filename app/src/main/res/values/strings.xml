@@ -15,6 +15,8 @@
     <string name="menu_radio_item_ccnx_title">CCNX2015</string>
     <string name="menu_radio_item_ndn_title">NDN2013</string>
     <string name="menu_item_network_settings_title">Network settings</string>
+    <string name="menu_item_auto_refresh_checkbox_title">Auto refresh</string>
+    <string name="menu_item_sync_sds">Sync SDS</string>
 
     <!-- Network settings dialog -->
     <string-array name="network_settings_dialog_radios">

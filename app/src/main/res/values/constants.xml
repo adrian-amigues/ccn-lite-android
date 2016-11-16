@@ -2,4 +2,6 @@
 <resources>
     <string name="localIp">127.0.0.1</string>
     <string name="port">9695</string>
+    <string name="sds_uri">sds/sensors</string>
+    <string name="sds_port">9999</string>
 </resources>

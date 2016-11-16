@@ -12,6 +12,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -21,6 +22,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.os.Bundle;
 import android.widget.Toast;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import ch.unibas.ccn_lite_android.models.Area;
 import ch.unibas.ccn_lite_android.adapters.AreasAdapter;
@@ -64,9 +68,9 @@ public class CcnLiteAndroid extends AppCompatActivity
         // Initialize the top bar
         Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
         setSupportActionBar(myToolbar);
-        if(myToolbar != null) {
-            myToolbar.setOnMenuItemClickListener(new ToolbarMenuItemClickListener());
-        }
+//        if(myToolbar != null) {
+//            myToolbar.setOnMenuItemClickListener(new ToolbarMenuItemClickListener());
+//        }
 
         areas = new ArrayList<>();
         sensorReadingManager = new SensorReadingManager();
@@ -88,16 +92,17 @@ public class CcnLiteAndroid extends AppCompatActivity
         super.onStart();
 //        refresh();
 
-        ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
-        scheduler.scheduleAtFixedRate(new Runnable() {
-            public void run() {
-                refresh();
-            }
-        }, 0, 10, SECONDS);
+//        ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+//        scheduler.scheduleAtFixedRate(new Runnable() {
+//            public void run() {
+//                refresh(false);
+//            }
+//        }, 0, 10, SECONDS);
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        Toast.makeText(CcnLiteAndroid.this, "Creating menu", Toast.LENGTH_SHORT).show();
         getMenuInflater().inflate(R.menu.menu_layout, menu);
         if (ccnSuite.equals("ccnx2015")) {
             menu.findItem(R.id.menu_radio_item_ccnx).setChecked(true);
@@ -105,6 +110,48 @@ public class CcnLiteAndroid extends AppCompatActivity
             menu.findItem(R.id.menu_radio_item_ndn).setChecked(true);
         }
         return true;
+    }
+
+    @Override
+    public void onOptionsMenuClosed(Menu menu) {
+        Toast.makeText(CcnLiteAndroid.this, "Closing menu", Toast.LENGTH_SHORT).show();
+//        openOptionsMenu();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        SharedPreferences.Editor prefEditor = sharedPref.edit();
+        if (item.isChecked()) item.setChecked(false);
+        else item.setChecked(true);
+
+        switch (item.getItemId()) {
+            case R.id.menu_item_sync_sds:
+                refresh(true);
+                break;
+            case R.id.menu_item_network_settings:
+                DialogFragment dialog = new RelayOptionsFragment();
+                Bundle bundle = new Bundle();
+                bundle.putString("externalIp", externalIp);
+                bundle.putBoolean("useServiceRelay", useServiceRelay);
+                dialog.setArguments(bundle);
+                dialog.show(getSupportFragmentManager(), "dialog_network_settings");
+                break;
+            case R.id.menu_item_auto_refresh_checkbox:
+                break;
+            case R.id.menu_radio_item_ccnx:
+                ccnSuite = "ccnx2015";
+                prefEditor.putString(getString(R.string.pref_key_ccn_suite), ccnSuite);
+                prefEditor.apply();
+                break;
+            case R.id.menu_radio_item_ndn:
+                ccnSuite = "ndn2013";
+                prefEditor.putString(getString(R.string.pref_key_ccn_suite), ccnSuite);
+                prefEditor.apply();
+                break;
+            default:
+                break;
+        }
+        return false;
     }
 
     /**
@@ -139,7 +186,7 @@ public class CcnLiteAndroid extends AppCompatActivity
         swipe.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                refresh();
+                refresh(false);
             }
         });
         swipe.setColorSchemeResources(android.R.color.holo_blue_bright,
@@ -152,9 +199,24 @@ public class CcnLiteAndroid extends AppCompatActivity
      * The main way of getting data from the network.
      * refresh creates AndroidPeekTask for each area.
      */
-    private void refresh() {
+    private void refresh(Boolean refreshSds) {
         String port = getString(R.string.port);
         String targetIp = useServiceRelay ? getString(R.string.localIp) : externalIp;
+
+        if (refreshSds) {
+            String ret;
+            int sdsPort = Integer.parseInt(getString(R.string.sds_port));
+            ret = androidPeek(ccnSuite, targetIp, sdsPort, getString(R.string.sds_uri));
+            Log.d(TAG, "SDS returned: "+ret);
+            try {
+                JSONArray jsonArray = new JSONArray(ret);
+                String prefix = jsonArray.getJSONObject(0).getString("prefix");
+                Log.d(TAG, "SDS prefix: "+prefix);
+            } catch(org.json.JSONException e) {
+                Log.e(TAG, "Unvalid Json: "+e);
+            }
+        }
+
         int areaCount = adapter.getItemCount();
         areaCount = 3;
         taskCounter = new AndroidPeekTaskCounter(areaCount);
@@ -181,39 +243,6 @@ public class CcnLiteAndroid extends AppCompatActivity
             }
         }
         return str;
-    }
-
-    /**
-     * Listener class for the toolbar menu item clicks
-     */
-    private class ToolbarMenuItemClickListener implements Toolbar.OnMenuItemClickListener {
-        @Override
-        public boolean onMenuItemClick(MenuItem item) {
-            SharedPreferences.Editor prefEditor = sharedPref.edit();
-            if (item.isChecked()) item.setChecked(false);
-            else item.setChecked(true);
-            switch (item.getItemId()) {
-                case R.id.menu_radio_item_ccnx:
-                    ccnSuite = "ccnx2015";
-                    prefEditor.putString(getString(R.string.pref_key_ccn_suite), ccnSuite);
-                    prefEditor.apply();
-                    return true;
-                case R.id.menu_radio_item_ndn:
-                    ccnSuite = "ndn2013";
-                    prefEditor.putString(getString(R.string.pref_key_ccn_suite), ccnSuite);
-                    prefEditor.apply();
-                    return true;
-                case R.id.menu_item_network_settings:
-                    DialogFragment dialog = new RelayOptionsFragment();
-                    Bundle bundle = new Bundle();
-                    bundle.putString("externalIp", externalIp);
-                    bundle.putBoolean("useServiceRelay", useServiceRelay);
-                    dialog.setArguments(bundle);
-                    dialog.show(getSupportFragmentManager(), "dialog_network_settings");
-                    return true;
-            }
-            return false;
-        }
     }
 
     /**

@@ -1,6 +1,6 @@
 -- Merging decision tree log ---
 manifest
-ADDED from /home/adrian/android-ndk/android4-ccnlite/app/src/main/AndroidManifest.xml:2:1-44:12
+ADDED from /home/adrian/android-ndk/android4-ccnlite/app/src/main/AndroidManifest.xml:2:1-42:12
 	package
 		ADDED from /home/adrian/android-ndk/android4-ccnlite/app/src/main/AndroidManifest.xml:3:5-41
 		INJECTED from /home/adrian/android-ndk/android4-ccnlite/app/src/main/AndroidManifest.xml
@@ -72,7 +72,7 @@ ADDED from /home/adrian/android-ndk/android4-ccnlite/app/src/main/AndroidManifes
 	android:name
 		ADDED from /home/adrian/android-ndk/android4-ccnlite/app/src/main/AndroidManifest.xml:21:9-53
 application
-ADDED from /home/adrian/android-ndk/android4-ccnlite/app/src/main/AndroidManifest.xml:24:5-42:19
+ADDED from /home/adrian/android-ndk/android4-ccnlite/app/src/main/AndroidManifest.xml:26:5-40:19
 MERGED from [com.android.support:design:23.4.0] /home/adrian/android-ndk/android4-ccnlite/app/build/intermediates/exploded-aar/com.android.support/design/23.4.0/AndroidManifest.xml:22:5-20
 MERGED from [com.android.support:support-v4:23.4.0] /home/adrian/android-ndk/android4-ccnlite/app/build/intermediates/exploded-aar/com.android.support/support-v4/23.4.0/AndroidManifest.xml:22:5-20
 MERGED from [com.android.support:appcompat-v7:23.4.0] /home/adrian/android-ndk/android4-ccnlite/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.4.0/AndroidManifest.xml:25:5-20
@@ -81,21 +81,17 @@ MERGED from [com.android.support:support-vector-drawable:23.4.0] /home/adrian/an
 MERGED from [com.android.support:cardview-v7:23.4.0] /home/adrian/android-ndk/android4-ccnlite/app/build/intermediates/exploded-aar/com.android.support/cardview-v7/23.4.0/AndroidManifest.xml:22:5-20
 MERGED from [com.bignerdranch.android:expandablerecyclerview:1.0.3] /home/adrian/android-ndk/android4-ccnlite/app/build/intermediates/exploded-aar/com.bignerdranch.android/expandablerecyclerview/1.0.3/AndroidManifest.xml:11:5-14:19
 	android:label
-		ADDED from /home/adrian/android-ndk/android4-ccnlite/app/src/main/AndroidManifest.xml:27:9-41
-	android:debuggable
-		ADDED from /home/adrian/android-ndk/android4-ccnlite/app/src/main/AndroidManifest.xml:25:9-34
+		ADDED from /home/adrian/android-ndk/android4-ccnlite/app/src/main/AndroidManifest.xml:28:9-41
 	android:allowBackup
 		ADDED from [com.bignerdranch.android:expandablerecyclerview:1.0.3] /home/adrian/android-ndk/android4-ccnlite/app/build/intermediates/exploded-aar/com.bignerdranch.android/expandablerecyclerview/1.0.3/AndroidManifest.xml:12:9-35
 	android:theme
-		ADDED from /home/adrian/android-ndk/android4-ccnlite/app/src/main/AndroidManifest.xml:26:9-53
+		ADDED from /home/adrian/android-ndk/android4-ccnlite/app/src/main/AndroidManifest.xml:27:9-65
 activity#ch.unibas.ccn_lite_android.activities.CcnLiteAndroid
-ADDED from /home/adrian/android-ndk/android4-ccnlite/app/src/main/AndroidManifest.xml:28:9-37:20
+ADDED from /home/adrian/android-ndk/android4-ccnlite/app/src/main/AndroidManifest.xml:29:9-37:20
 	android:configChanges
 		ADDED from /home/adrian/android-ndk/android4-ccnlite/app/src/main/AndroidManifest.xml:31:13-63
-	android:theme
-		ADDED from /home/adrian/android-ndk/android4-ccnlite/app/src/main/AndroidManifest.xml:30:13-69
 	android:name
-		ADDED from /home/adrian/android-ndk/android4-ccnlite/app/src/main/AndroidManifest.xml:29:13-54
+		ADDED from /home/adrian/android-ndk/android4-ccnlite/app/src/main/AndroidManifest.xml:30:13-54
 intent-filter#android.intent.action.MAIN+android.intent.category.LAUNCHER
 ADDED from /home/adrian/android-ndk/android4-ccnlite/app/src/main/AndroidManifest.xml:32:13-36:29
 action#android.intent.action.MAIN
@@ -106,11 +102,7 @@ category#android.intent.category.LAUNCHER
 ADDED from /home/adrian/android-ndk/android4-ccnlite/app/src/main/AndroidManifest.xml:35:17-77
 	android:name
 		ADDED from /home/adrian/android-ndk/android4-ccnlite/app/src/main/AndroidManifest.xml:35:27-74
-service#ch.unibas.ccn_lite_android.RelayService
-ADDED from /home/adrian/android-ndk/android4-ccnlite/app/src/main/AndroidManifest.xml:39:9-49
-	android:name
-		ADDED from /home/adrian/android-ndk/android4-ccnlite/app/src/main/AndroidManifest.xml:39:18-46
 activity#ch.unibas.ccn_lite_android.activities.ChartTabsActivity_main
-ADDED from /home/adrian/android-ndk/android4-ccnlite/app/src/main/AndroidManifest.xml:41:9-80
+ADDED from /home/adrian/android-ndk/android4-ccnlite/app/src/main/AndroidManifest.xml:39:9-80
 	android:name
-		ADDED from /home/adrian/android-ndk/android4-ccnlite/app/src/main/AndroidManifest.xml:41:19-68
+		ADDED from /home/adrian/android-ndk/android4-ccnlite/app/src/main/AndroidManifest.xml:39:19-68
