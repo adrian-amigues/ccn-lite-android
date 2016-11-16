@@ -5,11 +5,11 @@
         <!--android:title="@string/menu_item_ccn_suite"-->
         <!--app:showAsAction="never"/>-->
     <group android:checkableBehavior="single">
-        <item android:id="@+id/radio_item_ccnx"
-            android:title="CCNX2015" />
-        <item android:id="@+id/radio_item_ndn"
-            android:title="NDN2013" />
+        <item android:id="@+id/menu_radio_item_ccnx"
+            android:title="@string/menu_radio_item_ccnx_title" />
+        <item android:id="@+id/menu_radio_item_ndn"
+            android:title="@string/menu_radio_item_ndn_title" />
     </group>
-    <item android:id="@+id/item_relay_options"
-        android:title="Relay options" />
+    <item android:id="@+id/menu_item_network_settings"
+        android:title="@string/menu_item_network_settings_title" />
 </menu>

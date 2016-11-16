@@ -22,8 +22,8 @@ public class RelayOptionsFragment extends DialogFragment {
     private String externalIp;
 
     public interface NoticeDialogListener {
-        public void onDialogPositiveClick(RelayOptionsFragment dialog);
-//        public void onDialogNegativeClick(DialogFragment dialog);
+        void onNetworkSettingsDialogPositiveClick(RelayOptionsFragment dialog);
+//        void onDialogNegativeClick(DialogFragment dialog);
     }
 
     NoticeDialogListener mListener;
@@ -56,7 +56,7 @@ public class RelayOptionsFragment extends DialogFragment {
         }
 
         LayoutInflater inflater = getActivity().getLayoutInflater();
-        final View dialogView = inflater.inflate(R.layout.dialog_relay_options, null);
+        final View dialogView = inflater.inflate(R.layout.dialog_network_settings, null);
         final EditText ipField = (EditText) dialogView.findViewById(R.id.dialog_ip_address);
         ipField.setText(externalIp);
         if (useServiceRelay) {
@@ -65,7 +65,7 @@ public class RelayOptionsFragment extends DialogFragment {
 
         // Use the Builder class for convenient dialog construction
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setSingleChoiceItems(R.array.dialog_relay_options_radios, selectedRadio, new DialogInterface.OnClickListener() {
+        builder.setSingleChoiceItems(R.array.network_settings_dialog_radios, selectedRadio, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         switch (which) {
                             case 0:
@@ -83,7 +83,7 @@ public class RelayOptionsFragment extends DialogFragment {
                 .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         externalIp = ipField.getText().toString();
-                        mListener.onDialogPositiveClick(RelayOptionsFragment.this);
+                        mListener.onNetworkSettingsDialogPositiveClick(RelayOptionsFragment.this);
                     }
                 })
                 .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {

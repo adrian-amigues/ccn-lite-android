@@ -12,32 +12,6 @@ static JavaVM *jvm;
 static jclass ccnLiteClass;
 static jobject ccnLiteObject;
 
-/*Init Relay*/
-
-//JNIEXPORT jstring JNICALL
-//Java_ch_unibas_ccn_1lite_1android_CcnLiteAndroid_relayInit(JNIEnv* env,
-//                                                            jobject thiz)
-//{
-//    char *hello;
-//
-//    (*env)->GetJavaVM(env, &jvm);
-//
-//    if (ccnLiteClass == NULL) {
-//        jclass localRefCls = (*env)->FindClass(env,
-//                             "ch/unibas/ccn_lite_android/CcnLiteAndroid");
-//        if (localRefCls != NULL)
-//            ccnLiteClass = (*env)->NewGlobalRef(env, localRefCls);
-//        (*env)->DeleteLocalRef(env, localRefCls);
-//    }
-//    if (ccnLiteObject == NULL)
-//        ccnLiteObject = (*env)->NewGlobalRef(env, thiz);
-//
-//    hello = ccnl_android_init();
-//    return (*env)->NewStringUTF(env, hello);
-//}
-
-
-
 /**
  * androidPeek
  * calls the ccnl_android_peek function from ccnl-lite-android-peek.c
@@ -54,8 +28,6 @@ Java_ch_unibas_ccn_1lite_1android_activities_CcnLiteAndroid_androidPeek(JNIEnv* 
     const char *content = (*env)->GetStringUTFChars(env, contentString, 0);
     return (*env)->NewStringUTF(env, ccnl_android_peek(suite, ip, port, content));
 }
-
-
 
 
 void jni_append_to_log(char *line)

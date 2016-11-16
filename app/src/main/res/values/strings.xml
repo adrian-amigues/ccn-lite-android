@@ -11,7 +11,13 @@
     <string name="cancel">Cancel</string>
     <string name="dialog_default_ip">192.168.1.101</string>
 
-    <string-array name="dialog_relay_options_radios">
+    <!-- Menu items -->
+    <string name="menu_radio_item_ccnx_title">CCNX2015</string>
+    <string name="menu_radio_item_ndn_title">NDN2013</string>
+    <string name="menu_item_network_settings_title">Network settings</string>
+
+    <!-- Network settings dialog -->
+    <string-array name="network_settings_dialog_radios">
         <item>Service relay</item>
         <item>IP address</item>
     </string-array>
