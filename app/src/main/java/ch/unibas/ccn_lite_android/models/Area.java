@@ -1,6 +1,8 @@
 package ch.unibas.ccn_lite_android.models;
 
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 
 import ch.unibas.ccn_lite_android.R;
 
@@ -12,9 +14,11 @@ import ch.unibas.ccn_lite_android.R;
 
 public class Area {
     private String name;
+    private List<Sensor> sensors;
+    private String currentValue;
+
     private String description;
     private int photoId;
-    private int smileyId;
     private String uriBase;
     private int valueCounter;
 
@@ -22,11 +26,18 @@ public class Area {
 
     public Area(String name, String description, int photoId, String uriBase) {
         this.name = name;
+        this.sensors = new ArrayList<>();
+
         this.description = description;
+        this.currentValue = description;
         this.photoId = photoId;
         this.uriBase = uriBase;
         this.valueCounter = 1;
-        this.smileyId = R.drawable.face3;
+    }
+    public Area(String name) {
+        this.name = name;
+        this.sensors = new ArrayList<>();
+        this.currentValue = "";
     }
 
     public String getName() {
@@ -53,12 +64,12 @@ public class Area {
         this.photoId = photoId;
     }
 
-    public int getSmileyId() {
-        return smileyId;
+    public String getCurrentValue() {
+        return currentValue;
     }
 
-    public void setSmileyId(int smileyId) {
-        this.smileyId = smileyId;
+    public void setCurrentValue(String currentValue) {
+        this.currentValue = currentValue;
     }
 
     public String getUri() {
@@ -72,6 +83,26 @@ public class Area {
 
     public void increaseValueCounter() {
         valueCounter = (valueCounter % numberOfValues) + 1;
+    }
+
+    public List<Sensor> getSensors() {
+        return sensors;
+    }
+
+    public void setSensors(List<Sensor> sensors) {
+        this.sensors = sensors;
+    }
+
+    public Sensor getSensor(int i) {
+        return sensors.get(i);
+    }
+
+    public void emptySensors() {
+        sensors = new ArrayList<>();
+    }
+
+    public void addSensor(Sensor s) {
+        sensors.add(s);
     }
 }
 

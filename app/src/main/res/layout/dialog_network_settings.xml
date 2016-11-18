@@ -4,6 +4,58 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <RadioGroup
+        android:id="@+id/dialog_suite_radio_group"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        >
+        <RadioButton android:id="@+id/dialog_suite_radio_ccnx"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="ccnx2015"
+            />
+        <RadioButton android:id="@+id/dialog_suite_radio_ndn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="ndn2013"
+            />
+    </RadioGroup>
+
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="2dp"
+        android:background="#c0c0c0"/>
+
+    <CheckBox android:id="@+id/dialog_suite_checkbox_auto_refresh"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Auto refresh"
+        />
+
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="2dp"
+        android:background="#c0c0c0"/>
+
+    <RadioGroup
+        android:id="@+id/dialog_relay_radio_group"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        >
+        <RadioButton android:id="@+id/dialog_relay_radio_service_relay"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Service relay"
+            />
+        <RadioButton android:id="@+id/dialog_relay_radio_ip_address"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Ip address"
+            />
+    </RadioGroup>
+
     <EditText
         android:id="@+id/dialog_ip_address"
         android:inputType="phone"
@@ -14,5 +66,4 @@
         android:layout_marginRight="4dp"
         android:layout_marginBottom="4dp"
         />
-
 </LinearLayout>
