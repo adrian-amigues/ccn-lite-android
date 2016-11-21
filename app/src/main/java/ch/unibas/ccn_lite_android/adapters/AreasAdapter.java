@@ -71,9 +71,9 @@ public class AreasAdapter extends RecyclerView.Adapter<AreasAdapter.AreaViewHold
 //            areaDescription = (TextView)itemView.findViewById(R.id.area_description);
             areaPhoto = (ImageView)itemView.findViewById(R.id.area_photo);
             areaSmiley = (ImageView)itemView.findViewById(R.id.area_smiley);
-            expandButton = (ImageView)itemView.findViewById(R.id.expand);
+//            expandButton = (ImageView)itemView.findViewById(R.id.expand);
             predictionGraph = (ImageView)itemView.findViewById(R.id.prediction_graph);
-            hidden = (TextView)itemView.findViewById(R.id.hidden);
+//            hidden = (TextView)itemView.findViewById(R.id.hidden);
             isExpanded = false;
             predictionGraph.setOnClickListener(this);
         }
