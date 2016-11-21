@@ -212,21 +212,31 @@ public class CcnLiteAndroid extends AppCompatActivity
         prefEditor.apply();
     }
 
+    /**
+     * Starts the automatic refreshing at a fixed rate
+     */
     private void startAutoRefresh() {
         ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+        int delay = getResources().getInteger(R.integer.auto_refresh_delay_seconds);
         scheduledFuture = scheduler.scheduleAtFixedRate(new Runnable() {
             public void run() {
                 refresh();
             }
-        }, 10, 10, SECONDS);
+        }, delay, delay, SECONDS);
     }
 
+    /**
+     * Stops the automatic refreshing
+     */
     private void stopAutoRefresh() {
         if (scheduledFuture != null) {
             scheduledFuture.cancel(true);
         }
     }
 
+    /**
+     * Retreives SDS data, creates a peekTask with a specific uri aiming at the SDS
+     */
     private void refreshSds() {
         stopAutoRefresh();
         String port = getString(R.string.sds_port);
@@ -239,6 +249,7 @@ public class CcnLiteAndroid extends AppCompatActivity
             peekTaskCounter = new AndroidPeekTaskCounter(1, true);
         }
         Log.d(TAG, "refreshSds called");
+        swipeContainer.setRefreshing(true);
         if (useParallelTaskExecution && Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
             new AndroidPeekTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, targetIp, port, uri, null);
         } else {
@@ -247,8 +258,7 @@ public class CcnLiteAndroid extends AppCompatActivity
     }
 
     /**
-     * The main way of getting data from the network.
-     * refresh creates AndroidPeekTask for each area.
+     * Retreives data from the known sensors by creating multiple peekTasks
      */
     private void refresh() {
         String port = getString(R.string.port);
@@ -262,6 +272,7 @@ public class CcnLiteAndroid extends AppCompatActivity
             peekTaskCounter = new AndroidPeekTaskCounter(cardCount, false);
         }
         Log.d(TAG, "refresh called with "+cardCount+" URIs");
+        swipeContainer.setRefreshing(true);
         for (int i = 0; i < cardCount; i++) {
             String requestedURI = adapter.getURI(i);
             if (useParallelTaskExecution && Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
@@ -349,7 +360,6 @@ public class CcnLiteAndroid extends AppCompatActivity
 
         void taskFinished(Boolean validResult) {
             if (--runningTasks == 0) {
-                swipeContainer.setRefreshing(false);
                 if (isSdsTask) {
                     if (!validResult) {
                         Toast.makeText(CcnLiteAndroid.this, "SDS not found. Using old sensor info", Toast.LENGTH_LONG).show();
@@ -362,6 +372,7 @@ public class CcnLiteAndroid extends AppCompatActivity
                     adapter.sortAreas();
                     adapter.resetExpandedPosition();
                     adapter.notifyDataSetChanged();
+                    swipeContainer.setRefreshing(false);
                 }
             }
         }
@@ -381,6 +392,11 @@ public class CcnLiteAndroid extends AppCompatActivity
     public native String androidPeek(String suiteString, String ipString,
                                       int portString, String contentString);
 
+    /**
+     * Returns true if the passed string is a valid JSON
+     * @param test the string to test
+     * @return true if the json string test is valid
+     */
     public boolean isJSONValid(String test) {
         try {
             new JSONObject(test);

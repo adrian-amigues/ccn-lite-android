@@ -9,6 +9,8 @@
     <string name="bundle_name_ccnSuite">ccnSuite</string>
     <string name="bundle_name_useServiceRelay">useServiceRelay</string>
     <string name="bundle_name_useAutoRefresh">useAutoRefresh</string>
+    
+    <integer name="auto_refresh_delay_seconds">10</integer>
 
     <string-array name="ccn_suites">
         <item>ndn2013</item>
