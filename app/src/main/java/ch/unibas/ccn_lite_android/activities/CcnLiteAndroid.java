@@ -31,6 +31,7 @@ import ch.unibas.ccn_lite_android.fragments.NetworkSettingsFragment;
 import ch.unibas.ccn_lite_android.models.Area;
 import ch.unibas.ccn_lite_android.adapters.AreasAdapter;
 import ch.unibas.ccn_lite_android.R;
+import ch.unibas.ccn_lite_android.models.Sensor;
 import ch.unibas.ccn_lite_android.models.SensorReading;
 import ch.unibas.ccn_lite_android.models.AreaManager;
 
@@ -148,8 +149,15 @@ public class CcnLiteAndroid extends AppCompatActivity
      * Initializes the areas array with data
      */
     private void initializeData() {
+        Area a = new Area("FooBar Origins");
+        Sensor s = new Sensor("/foobar/origins");
+        s.setLight("260");
+        s.setTemperature("19.6");
+        a.addSensor(s);
+        a.setPhotoId(R.drawable.foobar);
+        areaManager.addArea(a);
+
         areaManager.addArea(new Area("FooBar", "Mote 1", R.drawable.foobar, "/demo/mote1/"));
-//        areaManager.addArea(new Area("FooBar", "Mote 1", R.drawable.foobar, "/test"));
         areaManager.addArea(new Area("Uthgård", "Mote 2", R.drawable.uthgard, "/demo/mote2/"));
         areaManager.addArea(new Area("Rullan", "Mote 3", R.drawable.rullan, "/demo/mote3/"));
         adapter.notifyDataSetChanged();
@@ -263,17 +271,17 @@ public class CcnLiteAndroid extends AppCompatActivity
     private void refresh() {
         String port = getString(R.string.port);
         String targetIp = useServiceRelay ? getString(R.string.localIp) : externalIp;
-        int cardCount = adapter.getItemCount();
-//        cardCount = 3;
+        int areaCount = adapter.getItemCount();
+//        areaCount = 3;
 
         if (peekTaskCounter != null && peekTaskCounter.getRunningTasks() > 0) {
-            peekTaskCounter.setRunningTasks(cardCount + peekTaskCounter.getRunningTasks());
+            peekTaskCounter.setRunningTasks(areaCount + peekTaskCounter.getRunningTasks());
         } else {
-            peekTaskCounter = new AndroidPeekTaskCounter(cardCount, false);
+            peekTaskCounter = new AndroidPeekTaskCounter(areaCount, false);
         }
-        Log.d(TAG, "refresh called with "+cardCount+" URIs");
+        Log.d(TAG, "refresh called with "+areaCount+" URIs");
         swipeContainer.setRefreshing(true);
-        for (int i = 0; i < cardCount; i++) {
+        for (int i = 0; i < areaCount; i++) {
             String requestedURI = adapter.getURI(i);
             if (useParallelTaskExecution && Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
                 new AndroidPeekTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, targetIp, port, requestedURI, Integer.toString(i));
@@ -322,7 +330,6 @@ public class CcnLiteAndroid extends AppCompatActivity
                 } else {
                     try {
                         SensorReading sr = new SensorReading(result);
-                        //                    areaManager.addSensorReading(sr);
                         adapter.updateValue(areaPos, sr);
                     } catch (Exception e) {
                         result = "Corrupted SensorReading";
@@ -369,7 +376,7 @@ public class CcnLiteAndroid extends AppCompatActivity
                         startAutoRefresh();
                     }
                 } else {
-                    adapter.sortAreas();
+                    areaManager.sortAreas();
                     adapter.resetExpandedPosition();
                     adapter.notifyDataSetChanged();
                     swipeContainer.setRefreshing(false);

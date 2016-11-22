@@ -6,8 +6,11 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
+import ch.unibas.ccn_lite_android.adapters.AreasAdapter;
 import ch.unibas.ccn_lite_android.models.SensorReading;
 
 /**
@@ -60,5 +63,26 @@ public class AreaManager {
 
     public void emptyAreas() {
         areas = new ArrayList<>();
+    }
+
+    public int getNumberAreas() {
+        return areas.size();
+    }
+
+    public void sortAreas() {
+        Collections.sort(areas, new AreaComparator());
+    }
+
+    private class AreaComparator implements Comparator<Area> {
+        @Override
+        public int compare(Area a1, Area a2) {
+            try {
+                int value1 = Integer.parseInt(a1.getCurrentValue());
+                int value2 = Integer.parseInt(a2.getCurrentValue());
+                return value1 - value2;
+            } catch (Exception e) {
+                return a1.getCurrentValue().compareTo(a2.getCurrentValue());
+            }
+        }
     }
 }

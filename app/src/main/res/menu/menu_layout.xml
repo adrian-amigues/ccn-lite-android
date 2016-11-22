@@ -9,7 +9,7 @@
         android:icon="@drawable/ic_sync_black_48dp"
         app:showAsAction="ifRoom"/>
 
-    <!--<item android:id="@+id/menu_item_settings"-->
+    <!--<card_item android:id="@+id/menu_item_settings"-->
         <!--android:title="@string/menu_item_settings"-->
         <!--android:icon="@drawable/ic_settings_black_48dp"-->
         <!--app:showAsAction="ifRoom"/>-->
@@ -20,15 +20,15 @@
 
     <!--<group android:checkableBehavior="all"-->
         <!--app:showAsAction="never">-->
-        <!--<item android:id="@+id/menu_item_auto_refresh_checkbox"-->
+        <!--<card_item android:id="@+id/menu_item_auto_refresh_checkbox"-->
             <!--android:title="@string/menu_item_auto_refresh_checkbox_title" />-->
     <!--</group>-->
 
     <!--<group android:checkableBehavior="single"-->
         <!--app:showAsAction="never">-->
-        <!--<item android:id="@+id/menu_radio_item_ccnx"-->
+        <!--<card_item android:id="@+id/menu_radio_item_ccnx"-->
             <!--android:title="@string/menu_radio_item_ccnx_title" />-->
-        <!--<item android:id="@+id/menu_radio_item_ndn"-->
+        <!--<card_item android:id="@+id/menu_radio_item_ndn"-->
             <!--android:title="@string/menu_radio_item_ndn_title" />-->
     <!--</group>-->
 
