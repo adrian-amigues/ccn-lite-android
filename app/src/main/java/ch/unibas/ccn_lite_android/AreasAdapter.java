@@ -1,9 +1,19 @@
 package ch.unibas.ccn_lite_android;
 
+import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.transition.TransitionManager;
@@ -14,23 +24,25 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+
+import static android.app.Activity.RESULT_OK;
 
 /**
  *
  * Created by adrian on 2016-10-18.
  */
 
-public class AreasAdapter extends RecyclerView.Adapter<AreasAdapter.AreaViewHolder>{
+public class AreasAdapter extends RecyclerView.Adapter<AreasAdapter.AreaViewHolder> {
 
     private List<Area> areas;
     private int mExpandedPosition = -1;
     private Context context;
     private RecyclerView rv;
-
     private final String lowerColor = "#18DB52";
     private final String middleColor = "#EDD20B";
     private final String higherColor = "#E21414";
@@ -42,6 +54,18 @@ public class AreasAdapter extends RecyclerView.Adapter<AreasAdapter.AreaViewHold
         this.areas = areas;
         this.context = context;
     }
+
+    private OnItemClickListener listener;
+    // Define the listener interface
+    public interface OnItemClickListener {
+        void onItemClick(int position);
+    }
+    // Define the method that allows the parent activity or fragment to define the listener
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        this.listener = listener;
+    }
+
+
 
     public class AreaViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         CardView cv;
@@ -66,14 +90,67 @@ public class AreasAdapter extends RecyclerView.Adapter<AreasAdapter.AreaViewHold
             hidden = (TextView)itemView.findViewById(R.id.hidden);
             isExpanded = false;
             predictionGraph.setOnClickListener(this);
+
+            areaPhoto.setOnClickListener(new View.OnClickListener(){
+                public void onClick(View v) {
+                    int position = getAdapterPosition();
+                    // Triggers click upwards to the adapter on click
+                    if (listener != null) {
+                        if (position != RecyclerView.NO_POSITION) {
+                            listener.onItemClick(position);
+                        }
+                    }
+                    startActivityForResultFunction(position);
+                }
+            });
         }
+
+
+
 
         @Override
         public void onClick(View v) {
+
 //            Toast.makeText(context, "Go to graph", Toast.LENGTH_SHORT).show();
             Intent intent = new Intent(context, ChartTabsActivity_main.class);
             context.startActivity(intent);
         }
+    }
+
+    private void selectImage(final int position) {
+        final CharSequence[] items = { "Take Photo", "Choose from Gallery",
+                "Delete photo" };
+        String userChoosenTask;
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle("Add or Delete a Photo!");
+        builder.setItems(items, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int item) {
+                if (items[item].equals("Take Photo")) {
+                    cameraIntent();
+                } else if (items[item].equals("Choose from Gallery")) {
+                    galleryIntent();
+                }else if (items[item].equals("Delete photo")) {
+                    Bitmap icon = BitmapFactory.decodeResource(context.getResources(),
+                            R.drawable.ic_add_a_photo_black_48dp);
+                    updateImage(position, icon);
+                    notifyItemChanged(position);
+                }
+            }
+        });
+        builder.show();
+    }
+
+    public void cameraIntent(){
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        ((Activity) context).startActivityForResult(intent, 1);
+    }
+
+    public void galleryIntent(){
+        Intent intent = new Intent();
+        intent.setType("image/*");
+        intent.setAction(Intent.ACTION_GET_CONTENT);//
+        ((Activity) context).startActivityForResult(Intent.createChooser(intent, "Select File"),2);
     }
 
     @Override
@@ -95,7 +172,7 @@ public class AreasAdapter extends RecyclerView.Adapter<AreasAdapter.AreaViewHold
         holder.areaName.setText(area.getName());
         holder.areaDescription.setText(area.getDescription());
         holder.areaDescription.setTextColor(getTextColor(area.getDescription()));
-        holder.areaPhoto.setImageResource(area.getPhotoId());
+        holder.areaPhoto.setImageBitmap(area.getBitmap());
         holder.areaSmiley.setImageResource(getSmiley(area.getDescription()));
 
         final boolean isExpanded = position == mExpandedPosition;
@@ -117,6 +194,11 @@ public class AreasAdapter extends RecyclerView.Adapter<AreasAdapter.AreaViewHold
         });
     }
 
+    public void startActivityForResultFunction(int position){
+        selectImage(position);
+    }
+
+
     @Override
     public int getItemCount() {
         return areas.size();
@@ -127,6 +209,11 @@ public class AreasAdapter extends RecyclerView.Adapter<AreasAdapter.AreaViewHold
         String uri = area.getUri();
 //        area.increaseValueCounter();
         return uri;
+    }
+
+    public void updateImage(int i, Bitmap newImage) {
+        Area area= areas.get(i);
+        area.setBitmap(newImage);
     }
 
     public void updateValue(int i, String newValue) {
