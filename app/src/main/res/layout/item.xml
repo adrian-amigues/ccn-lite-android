@@ -97,6 +97,19 @@
                    android:visibility="gone"
                    />
 
+               <com.github.mikephil.charting.charts.LineChart
+                   android:id="@+id/predictionChart"
+                   android:layout_width="match_parent"
+                   android:layout_height="250dp"
+                   android:layout_alignParentBottom="true"
+                   android:layout_below="@id/area_photo"
+                   android:scaleType="fitXY"
+                   android:background="@android:color/background_light"
+                   android:paddingStart="16dp"
+                   android:paddingEnd="16dp"
+                   android:paddingBottom="16dp"
+                   android:visibility="gone"/>
+
                <ImageView
                    android:id="@+id/prediction_graph"
                    android:layout_width="match_parent"

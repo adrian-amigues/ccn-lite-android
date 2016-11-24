@@ -24,6 +24,22 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.github.mikephil.charting.charts.BarChart;
+import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.Legend;
+import com.github.mikephil.charting.components.LimitLine;
+import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.components.YAxis;
+import com.github.mikephil.charting.data.BarData;
+import com.github.mikephil.charting.data.BarDataSet;
+import com.github.mikephil.charting.data.BarEntry;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.LineData;
+import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.interfaces.datasets.IBarDataSet;
+import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
+import com.github.mikephil.charting.utils.ViewPortHandler;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -50,6 +66,7 @@ public class AreasAdapter extends RecyclerView.Adapter<AreasAdapter.AreaViewHold
     private final int upperBound = 25;
     private final List<Integer> bounds = new ArrayList<>(Arrays.asList(15, 20, 25, 30));
 
+
     AreasAdapter(List<Area> areas, Context context){
         this.areas = areas;
         this.context = context;
@@ -74,9 +91,13 @@ public class AreasAdapter extends RecyclerView.Adapter<AreasAdapter.AreaViewHold
         ImageView areaPhoto;
         ImageView areaSmiley;
         ImageView expandButton;
-        ImageView predictionGraph;
+        //ImageView predictionGraph;
         TextView hidden;
         Boolean isExpanded;
+        LineChart predictionChart;
+
+
+
 
         AreaViewHolder(View itemView) {
             super(itemView);
@@ -86,11 +107,14 @@ public class AreasAdapter extends RecyclerView.Adapter<AreasAdapter.AreaViewHold
             areaPhoto = (ImageView)itemView.findViewById(R.id.area_photo);
             areaSmiley = (ImageView)itemView.findViewById(R.id.area_smiley);
             expandButton = (ImageView)itemView.findViewById(R.id.expand);
-            predictionGraph = (ImageView)itemView.findViewById(R.id.prediction_graph);
+            //predictionGraph = (ImageView)itemView.findViewById(R.id.prediction_graph);
             hidden = (TextView)itemView.findViewById(R.id.hidden);
             isExpanded = false;
-            predictionGraph.setOnClickListener(this);
-
+            predictionChart = (LineChart) itemView.findViewById(R.id.predictionChart);
+            //predictionGraph.setOnClickListener(this);
+           // bch.setOnClickListener(this);
+            Prediction prediction = new Prediction();
+            prediction.makepredictionGraph(predictionChart);
             areaPhoto.setOnClickListener(new View.OnClickListener(){
                 public void onClick(View v) {
                     int position = getAdapterPosition();
@@ -176,7 +200,8 @@ public class AreasAdapter extends RecyclerView.Adapter<AreasAdapter.AreaViewHold
         holder.areaSmiley.setImageResource(getSmiley(area.getDescription()));
 
         final boolean isExpanded = position == mExpandedPosition;
-        holder.predictionGraph.setVisibility(isExpanded? View.VISIBLE:View.GONE);
+        //holder.predictionGraph.setVisibility(isExpanded? View.VISIBLE:View.GONE);
+        holder.predictionChart.setVisibility(isExpanded? View.VISIBLE:View.GONE);
 //        if (isExpanded) {
 //            holder.predictionGraph.setVisibility(View.VISIBLE);
 //            holder.expandButton.setImageResource(R.drawable.ic_expand_less_black_48dp);
