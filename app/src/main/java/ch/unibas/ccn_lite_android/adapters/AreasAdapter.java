@@ -33,24 +33,14 @@ import ch.unibas.ccn_lite_android.activities.ChartTabsActivity_main;
 public class AreasAdapter extends RecyclerView.Adapter<AreasAdapter.AreaViewHolder>{
 
     private AreaManager areaManager;
-    private List<Area> areas;
     private int mExpandedPosition = -1;
     private Context context;
     private RecyclerView rv;
 
-
-//    private final String lowerColor = "#18DB52";
-//    private final String middleColor = "#EDD20B";
-//    private final String higherColor = "#E21414";
     private final List<Integer> bounds = new ArrayList<>(Arrays.asList(15, 20, 25, 30));
 
-    public AreasAdapter(List<Area> areas, Context context){
-        this.areas = areas;
-        this.context = context;
-    }
     public AreasAdapter(AreaManager areaManager, Context context){
         this.areaManager = areaManager;
-        this.areas = areaManager.getAreas();
         this.context = context;
     }
 
@@ -60,7 +50,6 @@ public class AreasAdapter extends RecyclerView.Adapter<AreasAdapter.AreaViewHold
         ImageView areaPhoto;
         ImageView areaSmiley;
         ImageView predictionGraph;
-        TextView hidden;
         Boolean isExpanded;
         LinearLayout expandedPart;
         LinearLayout sensorList;
@@ -72,7 +61,6 @@ public class AreasAdapter extends RecyclerView.Adapter<AreasAdapter.AreaViewHold
             areaPhoto = (ImageView)itemView.findViewById(R.id.area_photo);
             areaSmiley = (ImageView)itemView.findViewById(R.id.area_smiley);
             predictionGraph = (ImageView)itemView.findViewById(R.id.prediction_graph);
-//            hidden = (TextView)itemView.findViewById(R.id.hidden);
             expandedPart = (LinearLayout)itemView.findViewById(R.id.expanded_part);
             sensorList = (LinearLayout)itemView.findViewById(R.id.sensor_list);
             isExpanded = false;
@@ -89,7 +77,6 @@ public class AreasAdapter extends RecyclerView.Adapter<AreasAdapter.AreaViewHold
     @Override
     public void onAttachedToRecyclerView(RecyclerView recyclerView) {
         super.onAttachedToRecyclerView(recyclerView);
-
         this.rv = recyclerView;
     }
 
@@ -146,26 +133,29 @@ public class AreasAdapter extends RecyclerView.Adapter<AreasAdapter.AreaViewHold
         return areaManager.getAreas().size();
     }
 
-    public String getURI(int i) {
-        Area area = areaManager.getAreas().get(i);
-        if (area.isDeprecatedArea()) {
-            return area.getUri();
-        } else {
-            return area.getSensor(0).getUri(); //TODO: update to not only get the first URI
-        }
+//    public String getURI(int i) {
+//        Area area = areaManager.getAreas().get(i);
+//        if (area.isDeprecatedArea()) {
+//            return area.getUri();
+//        } else {
+//            return area.getSensor(0).getUri(); //TODO: update to not only get the first URI
+//        }
+//    }
+
+    public void updateValue(int areaPos, int sensorPos, String newValue) {
+        Area area= areaManager.getAreas().get(areaPos);
+//        area.setDescription(newValue);
+        area.setCurrentValue(newValue);
     }
 
-    public void updateValue(int i, String newValue) {
-        Area area= areaManager.getAreas().get(i);
-        area.setDescription(newValue);
-    }
-
-    public void updateValue(int i, SensorReading sr) {
-        Area area= areaManager.getAreas().get(i);
-        int light = Integer.parseInt(sr.getLight()) / 4;
-        area.setDescription(Integer.toString(light)); //TODO: Deprecated
-        area.setCurrentValue(Integer.toString(light));
-        area.updateSensors(sr);
+    public void updateValue(int areaPos, int sensorPos, SensorReading sr) {
+        Area area = areaManager.getAreas().get(areaPos);
+        Sensor sensor = area.getSensor(sensorPos);
+        sensor.updateValues(sr);
+        float smileyValue = Float.parseFloat(sr.getLight()) / 4;
+//        area.setDescription(Float.toString(smileyValue)); //TODO: Deprecated
+        area.setCurrentValue(Float.toString(smileyValue));
+        sr.updateSensorValues();
     }
 
     private int getSmiley(String valueStr) {

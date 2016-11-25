@@ -6,11 +6,15 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 
+import ch.unibas.ccn_lite_android.R;
 import ch.unibas.ccn_lite_android.adapters.AreasAdapter;
+import ch.unibas.ccn_lite_android.helpers.Helper;
 import ch.unibas.ccn_lite_android.models.SensorReading;
 
 /**
@@ -32,20 +36,22 @@ public class AreaManager {
             JSONArray jsonArray = new JSONArray(jsonStr);
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject areaObject = jsonArray.getJSONObject(i);
-                String areaName = areaObject.getString("name");
-                JSONArray sensorUris = areaObject.getJSONArray("uris");
+                String areaName = areaObject.getString("location");
                 Area area = new Area(areaName);
-                for (int j = 0; j < sensorUris.length(); j++) {
-                    String uri = sensorUris.getString(j);
-                    Sensor sensor = new Sensor(uri);
-                    area.addSensor(sensor);
-                }
+                String uri = areaObject.getString("prefix");
+                String sensorMac = areaObject.getString("sensor_mac");
+                Calendar sensorInitialDate = Helper.stringToDate(areaObject.getString("time"));
+                int initialSeqno = Integer.parseInt(areaObject.getString("sqn"));
+                int looptime = Integer.parseInt(areaObject.getString("looptime"));
+                Sensor sensor = new Sensor(sensorMac, uri, sensorInitialDate, initialSeqno, looptime);
+                area.addSensor(sensor);
+                area.setPhotoId(R.drawable.foobar);
                 areas.add(area);
             }
-            String prefix = jsonArray.getJSONObject(0).getString("prefix");
-            Log.d(TAG, "SDS prefix: "+prefix);
         } catch(org.json.JSONException e) {
             Log.e(TAG, "Unvalid Json: "+e);
+        } catch (Exception e) {
+            Log.e(TAG, "Error when handling Json: "+e);
         }
     }
 
@@ -84,5 +90,14 @@ public class AreaManager {
                 return a1.getCurrentValue().compareTo(a2.getCurrentValue());
             }
         }
+    }
+
+    public int getTotalUris() {
+        int count = 0;
+        for (int i = 0; i < areas.size(); i++) {
+            Area a = areas.get(i);
+            count += a.getSensors().size();
+        }
+        return count;
     }
 }

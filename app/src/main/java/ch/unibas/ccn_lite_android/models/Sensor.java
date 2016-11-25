@@ -1,5 +1,7 @@
 package ch.unibas.ccn_lite_android.models;
 
+import java.util.Calendar;
+
 /**
  * Created by adrian on 2016-11-16.
  */
@@ -7,11 +9,18 @@ package ch.unibas.ccn_lite_android.models;
 public class Sensor {
     private String id;
     private String uri;
+    private Calendar initialDate;
+    private int initialSeqno;
+    private int looptime;
     private String light;
     private String temperature;
 
-    public Sensor(String uri) {
+    public Sensor(String id, String uri, Calendar initialDate, int seqno, int looptime) {
+        this.id = id;
         this.uri = uri;
+        this.initialDate = initialDate;
+        this.initialSeqno = seqno;
+        this.looptime = looptime;
         this.light = "0";
         this.temperature = "0";
     }
@@ -51,5 +60,14 @@ public class Sensor {
     public void updateValues(SensorReading sr) {
         this.light = sr.getLight();
         this.temperature = sr.getTemperature();
+    }
+
+    public int getCurrentSeqno() {
+        Calendar dateNow = Calendar.getInstance();
+        long nowTimeMillis = dateNow.getTimeInMillis();
+        long initialTimeMillis = initialDate.getTimeInMillis();
+        long diffTimeMillis = nowTimeMillis - initialTimeMillis;
+        Double diffSeqno = Math.floor(diffTimeMillis / (looptime * 1000));
+        return initialSeqno + diffSeqno.intValue();
     }
 }

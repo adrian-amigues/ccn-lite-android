@@ -1,7 +1,5 @@
 package ch.unibas.ccn_lite_android.activities;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -28,6 +26,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import ch.unibas.ccn_lite_android.fragments.NetworkSettingsFragment;
+import ch.unibas.ccn_lite_android.helpers.Helper;
 import ch.unibas.ccn_lite_android.models.Area;
 import ch.unibas.ccn_lite_android.adapters.AreasAdapter;
 import ch.unibas.ccn_lite_android.R;
@@ -150,16 +149,16 @@ public class CcnLiteAndroid extends AppCompatActivity
      */
     private void initializeData() {
         Area a = new Area("FooBar Origins");
-        Sensor s = new Sensor("/foobar/origins");
-        s.setLight("260");
-        s.setTemperature("19.6");
+        Sensor s = new Sensor("0", "/p/4b4b6683/foobar/opt");
+//        s.setLight("260");
+//        s.setTemperature("19.6");
         a.addSensor(s);
         a.setPhotoId(R.drawable.foobar);
         areaManager.addArea(a);
 
-        areaManager.addArea(new Area("FooBar", "Mote 1", R.drawable.foobar, "/demo/mote1/"));
-        areaManager.addArea(new Area("Uthgård", "Mote 2", R.drawable.uthgard, "/demo/mote2/"));
-        areaManager.addArea(new Area("Rullan", "Mote 3", R.drawable.rullan, "/demo/mote3/"));
+//        areaManager.addArea(new Area("FooBar", "Mote 1", R.drawable.foobar, "/demo/mote1/"));
+//        areaManager.addArea(new Area("Uthgård", "Mote 2", R.drawable.uthgard, "/demo/mote2/"));
+//        areaManager.addArea(new Area("Rullan", "Mote 3", R.drawable.rullan, "/p/4b4b6683/foobar/opt"));
         adapter.notifyDataSetChanged();
     }
 
@@ -180,19 +179,19 @@ public class CcnLiteAndroid extends AppCompatActivity
                 android.R.color.holo_red_light);
     }
 
-    /**
-     * Cleans and returns the passed string by stripping it of all '\n' at its end
-     * @param str the string to clean
-     * @return the cleaned string
-     */
-    public String cleanResultString(String str) {
-        if (str != null) {
-            while (str.length() > 0 && str.charAt(str.length()-1)=='\n') {
-                str = str.substring(0, str.length()-1);
-            }
-        }
-        return str;
-    }
+//    /**
+//     * Cleans and returns the passed string by stripping it of all '\n' at its end
+//     * @param str the string to clean
+//     * @return the cleaned string
+//     */
+//    public String cleanResultString(String str) {
+//        if (str != null) {
+//            while (str.length() > 0 && str.charAt(str.length()-1)=='\n') {
+//                str = str.substring(0, str.length()-1);
+//            }
+//        }
+//        return str;
+//    }
 
     /**
      * Callback for the positive button click on the RelayOptions dialog
@@ -271,22 +270,30 @@ public class CcnLiteAndroid extends AppCompatActivity
     private void refresh() {
         String port = getString(R.string.port);
         String targetIp = useServiceRelay ? getString(R.string.localIp) : externalIp;
-        int areaCount = adapter.getItemCount();
-//        areaCount = 3;
+        String requestedURI;
+        int totalUris = areaManager.getTotalUris();
+        int areaCount = areaManager.getAreas().size();
 
         if (peekTaskCounter != null && peekTaskCounter.getRunningTasks() > 0) {
-            peekTaskCounter.setRunningTasks(areaCount + peekTaskCounter.getRunningTasks());
+            peekTaskCounter.setRunningTasks(totalUris + peekTaskCounter.getRunningTasks());
         } else {
-            peekTaskCounter = new AndroidPeekTaskCounter(areaCount, false);
+            peekTaskCounter = new AndroidPeekTaskCounter(totalUris, false);
         }
-        Log.d(TAG, "refresh called with "+areaCount+" URIs");
+        Log.d(TAG, "refresh called with "+totalUris+" URIs");
         swipeContainer.setRefreshing(true);
+
         for (int i = 0; i < areaCount; i++) {
-            String requestedURI = adapter.getURI(i);
-            if (useParallelTaskExecution && Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-                new AndroidPeekTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, targetIp, port, requestedURI, Integer.toString(i));
-            } else {
-                new AndroidPeekTask().execute(targetIp, port, requestedURI, Integer.toString(i));
+            Area a = areaManager.getAreas().get(i);
+            for (int j = 0; j < a.getSensors().size(); j++) {
+
+                requestedURI = a.getSensor(j).getUri();
+                if (useParallelTaskExecution && Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+                    new AndroidPeekTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, targetIp,
+                            port, requestedURI, Integer.toString(i), Integer.toString(j));
+                } else {
+                    new AndroidPeekTask().execute(targetIp, port, requestedURI,
+                            Integer.toString(i), Integer.toString(j));
+                }
             }
         }
     }
@@ -298,6 +305,7 @@ public class CcnLiteAndroid extends AppCompatActivity
     private class AndroidPeekTask extends AsyncTask<String, Void, String> {
         // position of the area in areas which will recieve the results
         private int areaPos = -1;
+        private int sensorPos = -1;
 
         /**
          * calls androidPeek jni function with the received parameters
@@ -308,8 +316,9 @@ public class CcnLiteAndroid extends AppCompatActivity
             String ipString = params[0];
             int portInt = Integer.parseInt(params[1]);
             String contentString = params[2];
-            if (params[3] != null) {
+            if (params[3] != null && params[4] != null) {
                 areaPos = Integer.parseInt(params[3]);
+                sensorPos = Integer.parseInt(params[4]);
             }
             Log.i(TAG, contentString+" ("+ccnSuite+") sent to "+ipString+" on port "+portInt);
             return androidPeek(ccnSuite, ipString, portInt, contentString);
@@ -320,34 +329,44 @@ public class CcnLiteAndroid extends AppCompatActivity
          * @param result the returned string from androidPeek
          */
         protected void onPostExecute(String result) {
-            if (isJSONValid(result)) {
+            if (peekTaskCounter.isSdsTask()) {
                 Log.i(TAG, "onPostExecute SDS result = " + result);
-                areaManager.updateFromSds(result);
-            } else if (SensorReading.isSensorReading(result)) {
-                Log.i(TAG, "onPostExecute "+peekTaskCounter.runningTasks+" sensor reading result = " + result);
-                if (areaPos == -1) {
-                    Log.e(TAG, "Sensor reading received but has no link to an area");
+                if (isJSONValid(result)) {
+                    areaManager.updateFromSds(result);
+                    peekTaskCounter.taskFinished(AndroidPeekTaskCounter.VALID_SDS);
                 } else {
-                    try {
-                        SensorReading sr = new SensorReading(result);
-                        adapter.updateValue(areaPos, sr);
-                    } catch (Exception e) {
-                        result = "Corrupted SensorReading";
-                        adapter.updateValue(areaPos, result);
-                        peekTaskCounter.taskFinished(true);
-                    }
+                    peekTaskCounter.taskFinished(AndroidPeekTaskCounter.UNVALID_SDS);
                 }
-            } else {
+            }
+            else if (areaPos == -1 || sensorPos == -1) {
+                Log.e(TAG, "Sensor reading received but has no link to an area or a sensor");
+                peekTaskCounter.taskFinished(AndroidPeekTaskCounter.UNLINKED_RESULT);
+            }
+            else if (SensorReading.isSensorReading(result)) {
+                Log.i(TAG, "onPostExecute "+peekTaskCounter.runningTasks+" sensor reading result = " + result);
+                try {
+                    Sensor s = areaManager.getAreas().get(areaPos).getSensor(sensorPos);
+                    SensorReading sr = new SensorReading(result, s);
+                    adapter.updateValue(areaPos, sensorPos, sr);
+                    peekTaskCounter.taskFinished(AndroidPeekTaskCounter.VALID_READING);
+                } catch (Exception e) {
+                    Log.e(TAG, "Unvalid SensorReading: "+e);
+                    result = "Unvalid SensorReading";
+                    adapter.updateValue(areaPos, sensorPos, result);
+                    peekTaskCounter.taskFinished(AndroidPeekTaskCounter.UNVALID_READING);
+                }
+            }
+            else {
                 Log.i(TAG, "onPostExecute "+peekTaskCounter.runningTasks+" unknown result = " + result);
                 if (result.equals("\n")) {
                     result = "No data available";
                 } else {
-                    result = cleanResultString(result);
+                    result = Helper.cleanResultString(result);
                 }
-                if (areaPos >= 0) {
-                    adapter.updateValue(areaPos, result);
+                if (areaPos >= 0 && sensorPos >= 0) {
+                    adapter.updateValue(areaPos, sensorPos, result);
                 }
-                peekTaskCounter.taskFinished(false);
+                peekTaskCounter.taskFinished(AndroidPeekTaskCounter.UNKNOWN_RESULT);
             }
         }
     }
@@ -360,15 +379,23 @@ public class CcnLiteAndroid extends AppCompatActivity
         private int runningTasks;
         private boolean isSdsTask;
 
+        static final int VALID_SDS = 1;
+        static final int UNVALID_SDS = 2;
+        static final int VALID_READING = 3;
+        static final int UNVALID_READING = 4;
+        static final int UNLINKED_RESULT = 5;
+        static final int UNKNOWN_RESULT = 6;
+
         AndroidPeekTaskCounter(int numberOfTasks, boolean isSdsTask) {
             this.runningTasks = numberOfTasks;
             this.isSdsTask = isSdsTask;
         }
 
-        void taskFinished(Boolean validResult) {
+        void taskFinished(int flag) {
+            Log.v(TAG, "Task finished with falg = "+flag);
             if (--runningTasks == 0) {
                 if (isSdsTask) {
-                    if (!validResult) {
+                    if (flag == UNVALID_SDS) {
                         Toast.makeText(CcnLiteAndroid.this, "SDS not found. Using old sensor info", Toast.LENGTH_LONG).show();
                     }
                     refresh();
@@ -383,12 +410,16 @@ public class CcnLiteAndroid extends AppCompatActivity
                 }
             }
         }
-        public int getRunningTasks() {
+        int getRunningTasks() {
             return runningTasks;
         }
 
-        public void setRunningTasks(int runningTasks) {
+        void setRunningTasks(int runningTasks) {
             this.runningTasks = runningTasks;
+        }
+
+        public boolean isSdsTask() {
+            return isSdsTask;
         }
     }
 

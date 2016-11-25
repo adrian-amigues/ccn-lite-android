@@ -466,7 +466,7 @@ ccnl_ndntlv_prependInterest(struct ccnl_prefix_s *name, int scope, int *nonce,
     unsigned char lifetime[2] = { 0x0f, 0xa0 };
     //unsigned char mustbefresh[2] = { NDN_TLV_MustBeFresh, 0x00 };
 
-    // LOGD("nonce = %d, casted nonce = %d", *nonce, *((unsigned char*) nonce));
+    // LOGD("ndntlv_prependInterest: nonce = %d, casted nonce = %d", *nonce, *((unsigned char*) nonce));
 
     if (scope >= 0) {
         if (scope > 2)
