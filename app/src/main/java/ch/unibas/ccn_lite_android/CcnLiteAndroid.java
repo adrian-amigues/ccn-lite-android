@@ -40,8 +40,7 @@ public class CcnLiteAndroid extends AppCompatActivity
         implements RelayOptionsFragment.NoticeDialogListener
 {
     SQLiteDatabase myDB= null;
-    String TableName = "PicAddressTable";
-
+    DatabaseTable dbTable;
     private String TAG = "unoise";
     private boolean useParallelTaskExecution = false; // native function androidPeek can't handle parallel executions
 
@@ -65,9 +64,8 @@ public class CcnLiteAndroid extends AppCompatActivity
         super.onCreate(savedInstanceState);
 
         myDB = this.openOrCreateDatabase("uNoiseDatabase", MODE_PRIVATE, null);
-        myDB.execSQL("CREATE TABLE IF NOT EXISTS "
-                + TableName
-                + " (Name VARCHAR, PictureAddress VARCHAR);");
+        dbTable = new DatabaseTable(myDB);
+        dbTable.createTable();
 
         setContentView(R.layout.activity_main);
         // Lookup the swipe container view
@@ -160,7 +158,7 @@ public class CcnLiteAndroid extends AppCompatActivity
         Bitmap icon = BitmapFactory.decodeResource(getResources(),
                 R.drawable.ic_add_a_photo_black_48dp);
 
-        Cursor c = myDB.rawQuery("SELECT * FROM " + TableName , null);
+        Cursor c = dbTable.selectData();
         int count = c.getCount();
         int Column1 = c.getColumnIndex("Name");
         int Column2 = c.getColumnIndex("PictureAddress");
@@ -170,7 +168,6 @@ public class CcnLiteAndroid extends AppCompatActivity
             areas.add(new Area(s, "Mote 1", R.drawable.foobar, "/demo/mote1/", icon));
 
             String Name = "";
-            String path = "";
             if (c != null) {
                 c.moveToFirst();
                 int index = 0;
@@ -180,9 +177,7 @@ public class CcnLiteAndroid extends AppCompatActivity
                     if (Name.equals(s)) {
                         String fileName = c.getString(Column2);
                         Bitmap bitmap = null;
-                        File imageFile = new File(fileName);
                         try {
-                            Uri uri = Uri.fromFile(imageFile);
                             bitmap = BitmapFactory.decodeStream(getContentResolver().openInputStream(Uri.parse(fileName)));
                         } catch (FileNotFoundException e) {
                             e.printStackTrace();
@@ -238,31 +233,25 @@ public class CcnLiteAndroid extends AppCompatActivity
                 File imageFile = new File(address);
                 Uri uri = Uri.fromFile(imageFile);
 
-                Cursor c = myDB.rawQuery("SELECT * FROM " + TableName , null);
+                Cursor c = dbTable.selectData();
                 if(c != null){
                     int count = c.getCount();
                     int index = 0;
                     c.moveToFirst();
-                    int Column1 = c.getColumnIndex("Name");
-                    int Column2 = c.getColumnIndex("PictureAddress");
+                    int Column1 = c.getColumnIndex(dbTable.firstColumnName);
+                    int Column2 = c.getColumnIndex(dbTable.secondColumnName);
                     while(index < count){
                         String nameOfPicture = c.getString(Column1);
                         String j = c.getString(Column2);
                         if(nameOfPicture.equals(areaName)){
-                            myDB.execSQL("UPDATE "
-                                    + TableName
-                                    + " SET PictureAddress='" + uri + "'"
-                                    + " WHERE Name = '" + areaName + "'");
+                            dbTable.updateTable(uri, areaName);
                             break;
                         }
                         c.moveToNext();
                         index++;
                     }
                     if(index == count)
-                         myDB.execSQL("INSERT INTO "
-                        + TableName
-                        + " (Name, PictureAddress)"
-                        + " VALUES ('" + areaName + "','" + uri + "');");
+                        dbTable.insertToTable(uri, areaName);
                 }
 
                 adapter.updateImage(ppp, newProfilePic);
@@ -283,30 +272,24 @@ public class CcnLiteAndroid extends AppCompatActivity
                 e.printStackTrace();
             }
             String areaName = areas.get(ppp).getName();
-            Cursor c = myDB.rawQuery("SELECT * FROM " + TableName , null);
+            Cursor c = dbTable.selectData();
             if(c != null){
                 int count = c.getCount();
                 int index = 0;
                 c.moveToFirst();
-                int Column1 = c.getColumnIndex("Name");
-                int Column2 = c.getColumnIndex("PictureAddress");
+                int Column1 = c.getColumnIndex(dbTable.firstColumnName);
+                int Column2 = c.getColumnIndex(dbTable.secondColumnName);
                 while(index < count){
                     String nameOfPicture = c.getString(Column1);
                     if(nameOfPicture.equals(areaName)){
-                        myDB.execSQL("UPDATE "
-                                + TableName
-                                + " SET PictureAddress='" + selectedImageUri + "'"
-                                + " WHERE Name = '" + areaName + "'");
+                        dbTable.updateTable(selectedImageUri, areaName);
                         break;
                     }
                     c.moveToNext();
                     index++;
                 }
                 if(index == count)
-                    myDB.execSQL("INSERT INTO "
-                            + TableName
-                            + " (Name, PictureAddress)"
-                            + " VALUES ('" + areaName + "','" + selectedImageUri + "');");
+                    dbTable.insertToTable(selectedImageUri, areaName);
             }
             adapter.updateImage(ppp, b);
             adapter.notifyItemChanged(ppp);

@@ -129,9 +129,6 @@ public class AreasAdapter extends RecyclerView.Adapter<AreasAdapter.AreaViewHold
             });
         }
 
-
-
-
         @Override
         public void onClick(View v) {
 
