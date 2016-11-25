@@ -40,7 +40,7 @@ public class CcnLiteAndroid extends AppCompatActivity
         implements RelayOptionsFragment.NoticeDialogListener
 {
     SQLiteDatabase myDB= null;
-    String TableName = "PictureAddressesTable22";
+    String TableName = "PicAddressTable";
 
     private String TAG = "unoise";
     private boolean useParallelTaskExecution = false; // native function androidPeek can't handle parallel executions
@@ -183,7 +183,7 @@ public class CcnLiteAndroid extends AppCompatActivity
                         File imageFile = new File(fileName);
                         try {
                             Uri uri = Uri.fromFile(imageFile);
-                            bitmap = BitmapFactory.decodeStream(getContentResolver().openInputStream(uri));
+                            bitmap = BitmapFactory.decodeStream(getContentResolver().openInputStream(Uri.parse(fileName)));
                         } catch (FileNotFoundException e) {
                             e.printStackTrace();
                         }
@@ -232,7 +232,12 @@ public class CcnLiteAndroid extends AppCompatActivity
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
+
+
                 String address = root + "/" + areaName + n;
+                File imageFile = new File(address);
+                Uri uri = Uri.fromFile(imageFile);
+
                 Cursor c = myDB.rawQuery("SELECT * FROM " + TableName , null);
                 if(c != null){
                     int count = c.getCount();
@@ -246,7 +251,7 @@ public class CcnLiteAndroid extends AppCompatActivity
                         if(nameOfPicture.equals(areaName)){
                             myDB.execSQL("UPDATE "
                                     + TableName
-                                    + " SET PictureAddress='" + address + "'"
+                                    + " SET PictureAddress='" + uri + "'"
                                     + " WHERE Name = '" + areaName + "'");
                             break;
                         }
@@ -257,12 +262,8 @@ public class CcnLiteAndroid extends AppCompatActivity
                          myDB.execSQL("INSERT INTO "
                         + TableName
                         + " (Name, PictureAddress)"
-                        + " VALUES ('" + areaName + "','" + address + "');");
+                        + " VALUES ('" + areaName + "','" + uri + "');");
                 }
-
-
-
-
 
                 adapter.updateImage(ppp, newProfilePic);
                 adapter.notifyItemChanged(ppp);
@@ -270,6 +271,11 @@ public class CcnLiteAndroid extends AppCompatActivity
         }else{
             Uri selectedImageUri = data.getData();
             String selectedImagePath = selectedImageUri.getPath();
+            File file = new File(selectedImagePath);
+            Uri test = Uri.fromFile(file);
+            String testString = test.getPath();
+            if(test.equals(selectedImageUri))
+                System.out.print("hi");
             Bitmap b = null;
             try {
                 b = BitmapFactory.decodeStream(getContentResolver().openInputStream(selectedImageUri));
@@ -289,7 +295,7 @@ public class CcnLiteAndroid extends AppCompatActivity
                     if(nameOfPicture.equals(areaName)){
                         myDB.execSQL("UPDATE "
                                 + TableName
-                                + " SET PictureAddress='" + selectedImagePath + "'"
+                                + " SET PictureAddress='" + selectedImageUri + "'"
                                 + " WHERE Name = '" + areaName + "'");
                         break;
                     }
@@ -300,7 +306,7 @@ public class CcnLiteAndroid extends AppCompatActivity
                     myDB.execSQL("INSERT INTO "
                             + TableName
                             + " (Name, PictureAddress)"
-                            + " VALUES ('" + areaName + "','" + selectedImagePath + "');");
+                            + " VALUES ('" + areaName + "','" + selectedImageUri + "');");
             }
             adapter.updateImage(ppp, b);
             adapter.notifyItemChanged(ppp);
