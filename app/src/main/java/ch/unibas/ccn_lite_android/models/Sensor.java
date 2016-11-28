@@ -33,8 +33,12 @@ public class Sensor {
         this.id = id;
     }
 
-    public String getUri() {
+    public String getBaseUri() {
         return uri;
+    }
+
+    public String getUri() {
+        return uri + "/" + getCurrentSeqno();
     }
 
     public void setUri(String uri) {

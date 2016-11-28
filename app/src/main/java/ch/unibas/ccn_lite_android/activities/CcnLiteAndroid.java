@@ -1,5 +1,6 @@
 package ch.unibas.ccn_lite_android.activities;
 
+import java.util.Calendar;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -149,7 +150,7 @@ public class CcnLiteAndroid extends AppCompatActivity
      */
     private void initializeData() {
         Area a = new Area("FooBar Origins");
-        Sensor s = new Sensor("0", "/p/4b4b6683/foobar/opt");
+        Sensor s = new Sensor("0", "/p/4b4b6683/foobar/opt", Calendar.getInstance(), 1, 5);
 //        s.setLight("260");
 //        s.setTemperature("19.6");
         a.addSensor(s);
