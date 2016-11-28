@@ -91,13 +91,11 @@ public class AreasAdapter extends RecyclerView.Adapter<AreasAdapter.AreaViewHold
         ImageView areaPhoto;
         ImageView areaSmiley;
         ImageView expandButton;
-        //ImageView predictionGraph;
+        TextView pastChart;
         TextView hidden;
         Boolean isExpanded;
         LineChart predictionChart;
-
-
-
+        
 
         AreaViewHolder(View itemView) {
             super(itemView);
@@ -107,11 +105,11 @@ public class AreasAdapter extends RecyclerView.Adapter<AreasAdapter.AreaViewHold
             areaPhoto = (ImageView)itemView.findViewById(R.id.area_photo);
             areaSmiley = (ImageView)itemView.findViewById(R.id.area_smiley);
             expandButton = (ImageView)itemView.findViewById(R.id.expand);
-            //predictionGraph = (ImageView)itemView.findViewById(R.id.prediction_graph);
+            pastChart = (TextView)itemView.findViewById(R.id.past_chart);
             hidden = (TextView)itemView.findViewById(R.id.hidden);
             isExpanded = false;
             predictionChart = (LineChart) itemView.findViewById(R.id.predictionChart);
-            //predictionGraph.setOnClickListener(this);
+            pastChart.setOnClickListener(this);
            // bch.setOnClickListener(this);
             Prediction prediction = new Prediction();
             prediction.makepredictionGraph(predictionChart);
@@ -197,7 +195,7 @@ public class AreasAdapter extends RecyclerView.Adapter<AreasAdapter.AreaViewHold
         holder.areaSmiley.setImageResource(getSmiley(area.getDescription()));
 
         final boolean isExpanded = position == mExpandedPosition;
-        //holder.predictionGraph.setVisibility(isExpanded? View.VISIBLE:View.GONE);
+        holder.pastChart.setVisibility(isExpanded? View.VISIBLE:View.GONE);
         holder.predictionChart.setVisibility(isExpanded? View.VISIBLE:View.GONE);
 //        if (isExpanded) {
 //            holder.predictionGraph.setVisibility(View.VISIBLE);
