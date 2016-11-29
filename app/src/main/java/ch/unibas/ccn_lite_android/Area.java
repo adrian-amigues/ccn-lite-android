@@ -1,5 +1,8 @@
 package ch.unibas.ccn_lite_android;
 
+import android.graphics.Bitmap;
+import android.widget.ImageView;
+
 import java.util.Comparator;
 
 /**
@@ -12,19 +15,30 @@ public class Area {
     private String name;
     private String description;
     private int photoId;
+    private Bitmap bitmap;
     private int smileyId;
     private String uriBase;
     private int valueCounter;
-
+    private boolean selectedPhoto;
     private final int numberOfValues = 1;
 
-    public Area(String name, String description, int photoId, String uriBase) {
+    public void setSelectedPhoto(boolean selectedPhoto) {
+        this.selectedPhoto = selectedPhoto;
+    }
+
+    public boolean isSelectedPhoto() {
+        return selectedPhoto;
+    }
+
+    public Area(String name, String description, int photoId, String uriBase, Bitmap image) {
         this.name = name;
         this.description = description;
         this.photoId = photoId;
         this.uriBase = uriBase;
         this.valueCounter = 1;
         this.smileyId = R.drawable.face3;
+        this.selectedPhoto = false;
+        this.bitmap = image;
     }
 
     public String getName() {
@@ -50,6 +64,12 @@ public class Area {
     public void setPhotoId(int photoId) {
         this.photoId = photoId;
     }
+
+    public void setBitmap(Bitmap bitmap) {
+        this.bitmap = bitmap;
+    }
+
+    public Bitmap getBitmap(){ return bitmap;}
 
     public int getSmileyId() {
         return smileyId;

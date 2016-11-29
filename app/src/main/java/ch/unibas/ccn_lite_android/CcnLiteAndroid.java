@@ -1,10 +1,27 @@
 package ch.unibas.ccn_lite_android;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
+import android.app.Activity;
+import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -15,11 +32,15 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 public class CcnLiteAndroid extends AppCompatActivity
         implements RelayOptionsFragment.NoticeDialogListener
 {
+    SQLiteDatabase myDB= null;
+    DatabaseTable dbTable;
     private String TAG = "unoise";
     private boolean useParallelTaskExecution = false; // native function androidPeek can't handle parallel executions
 
@@ -35,10 +56,17 @@ public class CcnLiteAndroid extends AppCompatActivity
     private String externalIp = "192.168.1.101";
     private String ccnSuite = "ndn2013";
 
+    int ppp;
+    static ImageView selectedImage;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        myDB = this.openOrCreateDatabase("uNoiseDatabase", MODE_PRIVATE, null);
+        dbTable = new DatabaseTable(myDB);
+        dbTable.createTable();
+
         setContentView(R.layout.activity_main);
         // Lookup the swipe container view
         swipeContainer = (SwipeRefreshLayout) findViewById(R.id.swipeContainer);
@@ -93,6 +121,12 @@ public class CcnLiteAndroid extends AppCompatActivity
         rv.setLayoutManager(llm);
         rv.setAdapter(adapter);
 
+        adapter.setOnItemClickListener(new AreasAdapter.OnItemClickListener() {
+
+            public void onItemClick(int position) {
+              ppp=position;
+            }
+        });
         initializeData();
     }
 
@@ -115,11 +149,154 @@ public class CcnLiteAndroid extends AppCompatActivity
 
 
     private void initializeData() {
-        areas.add(new Area("FooBar", "Mote 1", R.drawable.foobar, "/demo/mote1/"));
-        areas.add(new Area("Uthgård", "Mote 2", R.drawable.uthgard, "/demo/mote2/"));
-        areas.add(new Area("Rullan", "Mote 3", R.drawable.rullan, "/demo/mote3/"));
+
+        ArrayList<String> areasNames = new ArrayList<String>();
+        areasNames.add("FooBar");
+        areasNames.add("Uthgård");
+        areasNames.add("Rullan");
+
+        Bitmap icon = BitmapFactory.decodeResource(getResources(),
+                R.drawable.ic_add_a_photo_black_48dp);
+
+        Cursor c = dbTable.selectData();
+        int count = c.getCount();
+        int Column1 = c.getColumnIndex("Name");
+        int Column2 = c.getColumnIndex("PictureAddress");
+
+        for(String s : areasNames) {
+
+            areas.add(new Area(s, "Mote 1", R.drawable.foobar, "/demo/mote1/", icon));
+
+            String Name = "";
+            if (c != null) {
+                c.moveToFirst();
+                int index = 0;
+                // Loop through all Results
+                while (index < count) {
+                    Name = c.getString(Column1);
+                    if (Name.equals(s)) {
+                        String fileName = c.getString(Column2);
+                        Bitmap bitmap = null;
+                        try {
+                            bitmap = BitmapFactory.decodeStream(getContentResolver().openInputStream(Uri.parse(fileName)));
+                        } catch (FileNotFoundException e) {
+                            e.printStackTrace();
+                        }
+                        if (bitmap != null) {
+                            areas.set(areas.size()-1, new Area(s, "Mote 1", R.drawable.foobar, "/demo/mote1/", bitmap));
+                        }
+                        break;
+                    }
+                    c.moveToNext();
+                    index++;
+                }
+            }
+
+        }
         adapter.notifyDataSetChanged();
     }
+
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode != RESULT_OK) {
+            return;
+        }
+        if (requestCode == 1) {
+            final Bundle extras = data.getExtras();
+            if (extras != null) {
+
+                Bitmap newProfilePic = extras.getParcelable("data");
+                String root = Environment.getExternalStorageDirectory().toString();
+                File myDir = new File(root);
+                myDir.mkdirs();
+
+                Random generator = new Random();
+                int n = 10000;
+                n = generator.nextInt(n);
+                String areaName = areas.get(ppp).getName();
+                String fname = areaName + n;
+
+                File file = new File (myDir, fname);
+
+                if (file.exists ()) file.delete ();
+                try {
+                    FileOutputStream out = new FileOutputStream(file);
+                    boolean b = newProfilePic.compress(Bitmap.CompressFormat.JPEG, 90, out);
+                    out.flush();
+                    out.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+
+                String address = root + "/" + areaName + n;
+                File imageFile = new File(address);
+                Uri uri = Uri.fromFile(imageFile);
+
+                Cursor c = dbTable.selectData();
+                if(c != null){
+                    int count = c.getCount();
+                    int index = 0;
+                    c.moveToFirst();
+                    int Column1 = c.getColumnIndex(dbTable.firstColumnName);
+                    int Column2 = c.getColumnIndex(dbTable.secondColumnName);
+                    while(index < count){
+                        String nameOfPicture = c.getString(Column1);
+                        String j = c.getString(Column2);
+                        if(nameOfPicture.equals(areaName)){
+                            dbTable.updateTable(uri, areaName);
+                            break;
+                        }
+                        c.moveToNext();
+                        index++;
+                    }
+                    if(index == count)
+                        dbTable.insertToTable(uri, areaName);
+                }
+
+                adapter.updateImage(ppp, newProfilePic);
+                adapter.notifyItemChanged(ppp);
+            }
+        }else{
+            Uri selectedImageUri = data.getData();
+            String selectedImagePath = selectedImageUri.getPath();
+            File file = new File(selectedImagePath);
+            Uri test = Uri.fromFile(file);
+            String testString = test.getPath();
+            if(test.equals(selectedImageUri))
+                System.out.print("hi");
+            Bitmap b = null;
+            try {
+                b = BitmapFactory.decodeStream(getContentResolver().openInputStream(selectedImageUri));
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+            String areaName = areas.get(ppp).getName();
+            Cursor c = dbTable.selectData();
+            if(c != null){
+                int count = c.getCount();
+                int index = 0;
+                c.moveToFirst();
+                int Column1 = c.getColumnIndex(dbTable.firstColumnName);
+                int Column2 = c.getColumnIndex(dbTable.secondColumnName);
+                while(index < count){
+                    String nameOfPicture = c.getString(Column1);
+                    if(nameOfPicture.equals(areaName)){
+                        dbTable.updateTable(selectedImageUri, areaName);
+                        break;
+                    }
+                    c.moveToNext();
+                    index++;
+                }
+                if(index == count)
+                    dbTable.insertToTable(selectedImageUri, areaName);
+            }
+            adapter.updateImage(ppp, b);
+            adapter.notifyItemChanged(ppp);
+        }
+
+    }
+
 
     public String cleanResultString(String str) {
         if (str != null) {
