@@ -72,6 +72,7 @@ public class Sensor {
         long initialTimeMillis = initialDate.getTimeInMillis();
         long diffTimeMillis = nowTimeMillis - initialTimeMillis;
         Double diffSeqno = Math.floor(diffTimeMillis / (looptime * 1000));
+        int test = dateNow.get(Calendar.MONTH);
         return initialSeqno + diffSeqno.intValue();
     }
 }

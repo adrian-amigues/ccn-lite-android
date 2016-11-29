@@ -28,7 +28,7 @@ public class Helper {
         try {
             String[] parts = dateString.split("-");
             int year = Integer.parseInt(parts[0]);
-            int month = Integer.parseInt(parts[1]);
+            int month = Integer.parseInt(parts[1]) - 1;
             int day = Integer.parseInt(parts[2]);
             int hour = Integer.parseInt(parts[3]);
             int minute = Integer.parseInt(parts[4]);
