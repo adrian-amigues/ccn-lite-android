@@ -1,21 +1,24 @@
 package ch.unibas.ccn_lite_android.models;
 
+import android.content.Context;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.List;
 
 import ch.unibas.ccn_lite_android.R;
-import ch.unibas.ccn_lite_android.adapters.AreasAdapter;
 import ch.unibas.ccn_lite_android.helpers.Helper;
-import ch.unibas.ccn_lite_android.models.SensorReading;
 
 /**
  *
@@ -25,9 +28,11 @@ import ch.unibas.ccn_lite_android.models.SensorReading;
 public class AreaManager {
     private List<Area> areas;
     private String TAG = "unoise";
+    private Context context;
 
-    public AreaManager() {
+    public AreaManager(Context context) {
         areas = new ArrayList<>();
+        this.context = context;
     }
 
     public void updateFromSds(String jsonStr) {
@@ -99,5 +104,48 @@ public class AreaManager {
             count += a.getSensors().size();
         }
         return count;
+    }
+
+    public void setAreaImages(DatabaseTable dbTable) {
+        Bitmap icon = BitmapFactory.decodeResource(context.getResources(),
+                R.drawable.ic_add_a_photo_black_48dp);
+
+        Cursor c = dbTable.selectData();
+        int count = c.getCount();
+        int Column1 = c.getColumnIndex("Name");
+        int Column2 = c.getColumnIndex("PictureAddress");
+
+        for(Area a : getAreas()) {
+            String s = a.getName();
+            a.setBitmap(icon);
+
+//            areas.add(new Area(s, "Mote 1", R.drawable.foobar, "/demo/mote1/", icon));
+
+            String Name = "";
+            if (c != null) {
+                c.moveToFirst();
+                int index = 0;
+                // Loop through all Results
+                while (index < count) {
+                    Name = c.getString(Column1);
+                    if (Name.equals(s)) {
+                        String fileName = c.getString(Column2);
+                        Bitmap bitmap = null;
+                        try {
+                            bitmap = BitmapFactory.decodeStream(context.getContentResolver().openInputStream(Uri.parse(fileName)));
+                        } catch (FileNotFoundException e) {
+                            e.printStackTrace();
+                        }
+                        if (bitmap != null) {
+                            a.setBitmap(bitmap);
+//                            areas.set(areas.size()-1, new Area(s, "Mote 1", R.drawable.foobar, "/demo/mote1/", bitmap));
+                        }
+                        break;
+                    }
+                    c.moveToNext();
+                    index++;
+                }
+            }
+        }
     }
 }

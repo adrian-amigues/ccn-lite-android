@@ -1,5 +1,9 @@
 package ch.unibas.ccn_lite_android.models;
 
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -18,6 +22,8 @@ public class Area {
     private String currentValue;
 
     private int photoId;
+    private Bitmap bitmap;
+    private boolean selectedPhoto;
 //    private String description;
 //    private String uriBase;
 //    private int valueCounter;
@@ -74,7 +80,15 @@ public class Area {
         this.currentValue = currentValue;
     }
 
-//    public String getUri() {
+    public Bitmap getBitmap() {
+        return bitmap;
+    }
+
+    public void setBitmap(Bitmap bitmap) {
+        this.bitmap = bitmap;
+    }
+
+    //    public String getUri() {
 //        return uriBase;
 //    }
 

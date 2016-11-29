@@ -21,7 +21,7 @@ import com.github.mikephil.charting.utils.ViewPortHandler;
 import java.util.ArrayList;
 import java.util.List;
 
-import ch.unibas.ccn_lite_android.AxisFormatter;
+import ch.unibas.ccn_lite_android.models.AxisFormatter;
 import ch.unibas.ccn_lite_android.R;
 
 

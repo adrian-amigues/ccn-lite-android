@@ -1,7 +1,13 @@
 package ch.unibas.ccn_lite_android.adapters;
 
+import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.provider.MediaStore;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.transition.TransitionManager;
@@ -12,12 +18,13 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import org.w3c.dom.Text;
+import com.github.mikephil.charting.charts.LineChart;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import ch.unibas.ccn_lite_android.models.Prediction;
 import ch.unibas.ccn_lite_android.models.Area;
 import ch.unibas.ccn_lite_android.R;
 import ch.unibas.ccn_lite_android.models.AreaManager;
@@ -36,12 +43,22 @@ public class AreasAdapter extends RecyclerView.Adapter<AreasAdapter.AreaViewHold
     private int mExpandedPosition = -1;
     private Context context;
     private RecyclerView rv;
+    private OnItemClickListener listener;
 
     private final List<Integer> bounds = new ArrayList<>(Arrays.asList(15, 20, 25, 30));
 
     public AreasAdapter(AreaManager areaManager, Context context){
         this.areaManager = areaManager;
         this.context = context;
+    }
+
+    // Define the listener interface
+    public interface OnItemClickListener {
+        void onItemClick(int position);
+    }
+    // Define the method that allows the parent activity or fragment to define the listener
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        this.listener = listener;
     }
 
     class AreaViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
@@ -53,6 +70,8 @@ public class AreasAdapter extends RecyclerView.Adapter<AreasAdapter.AreaViewHold
         Boolean isExpanded;
         LinearLayout expandedPart;
         LinearLayout sensorList;
+        TextView pastChart;
+        LineChart predictionChart;
 
         AreaViewHolder(View itemView) {
             super(itemView);
@@ -60,11 +79,27 @@ public class AreasAdapter extends RecyclerView.Adapter<AreasAdapter.AreaViewHold
             areaName = (TextView)itemView.findViewById(R.id.area_name);
             areaPhoto = (ImageView)itemView.findViewById(R.id.area_photo);
             areaSmiley = (ImageView)itemView.findViewById(R.id.area_smiley);
-            predictionGraph = (ImageView)itemView.findViewById(R.id.prediction_graph);
+//            predictionGraph = (ImageView)itemView.findViewById(R.id.prediction_graph);
             expandedPart = (LinearLayout)itemView.findViewById(R.id.expanded_part);
             sensorList = (LinearLayout)itemView.findViewById(R.id.sensor_list);
+            pastChart = (TextView)itemView.findViewById(R.id.past_chart_link);
             isExpanded = false;
-            predictionGraph.setOnClickListener(this);
+            predictionChart = (LineChart) itemView.findViewById(R.id.predictionChart);
+            pastChart.setOnClickListener(this);
+            Prediction prediction = new Prediction();
+            prediction.makepredictionGraph(predictionChart);
+            areaPhoto.setOnClickListener(new View.OnClickListener(){
+                public void onClick(View v) {
+                    int position = getAdapterPosition();
+                    // Triggers click upwards to the adapter on click
+                    if (listener != null) {
+                        if (position != RecyclerView.NO_POSITION) {
+                            listener.onItemClick(position);
+                        }
+                    }
+                    startActivityForResultFunction(position);
+                }
+            });
         }
 
         @Override
@@ -91,6 +126,7 @@ public class AreasAdapter extends RecyclerView.Adapter<AreasAdapter.AreaViewHold
         Area area = areaManager.getAreas().get(position);
         holder.areaName.setText(area.getName());
         holder.areaPhoto.setImageResource(area.getPhotoId());
+        holder.areaPhoto.setImageBitmap(area.getBitmap());
         holder.areaSmiley.setImageResource(getSmiley(area.getCurrentValue()));
 
         final boolean isExpanded = position == mExpandedPosition;
@@ -158,6 +194,11 @@ public class AreasAdapter extends RecyclerView.Adapter<AreasAdapter.AreaViewHold
         sr.updateSensorValues();
     }
 
+    public void updateImage(int i, Bitmap newImage) {
+        Area area= areaManager.getAreas().get(i);
+        area.setBitmap(newImage);
+    }
+
     private int getSmiley(String valueStr) {
         try {
             int v = Integer.parseInt(valueStr);
@@ -179,5 +220,45 @@ public class AreasAdapter extends RecyclerView.Adapter<AreasAdapter.AreaViewHold
 
     public void resetExpandedPosition() {
         mExpandedPosition = -1;
+    }
+
+    private void selectImage(final int position) {
+        final CharSequence[] items = { "Take Photo", "Choose from Gallery",
+                "Delete photo" };
+        String userChoosenTask;
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle("Add or Delete a Photo!");
+        builder.setItems(items, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int item) {
+                if (items[item].equals("Take Photo")) {
+                    cameraIntent();
+                } else if (items[item].equals("Choose from Gallery")) {
+                    galleryIntent();
+                }else if (items[item].equals("Delete photo")) {
+                    Bitmap icon = BitmapFactory.decodeResource(context.getResources(),
+                            R.drawable.ic_add_a_photo_black_48dp);
+                    updateImage(position, icon);
+                    notifyItemChanged(position);
+                }
+            }
+        });
+        builder.show();
+    }
+
+    public void cameraIntent(){
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        ((Activity) context).startActivityForResult(intent, 1);
+    }
+
+    public void galleryIntent(){
+        Intent intent = new Intent();
+        intent.setType("image/*");
+        intent.setAction(Intent.ACTION_GET_CONTENT);//
+        ((Activity) context).startActivityForResult(Intent.createChooser(intent, "Select File"),2);
+    }
+
+    public void startActivityForResultFunction(int position){
+        selectImage(position);
     }
 }

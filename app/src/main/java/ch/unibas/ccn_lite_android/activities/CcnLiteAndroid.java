@@ -1,15 +1,25 @@
 package ch.unibas.ccn_lite_android.activities;
 
-import java.util.Calendar;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.util.Random;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.os.Environment;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -20,12 +30,14 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.os.Bundle;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import ch.unibas.ccn_lite_android.models.DatabaseTable;
 import ch.unibas.ccn_lite_android.fragments.NetworkSettingsFragment;
 import ch.unibas.ccn_lite_android.helpers.Helper;
 import ch.unibas.ccn_lite_android.models.Area;
@@ -56,10 +68,19 @@ public class CcnLiteAndroid extends AppCompatActivity
     private String externalIp;
     private String ccnSuite;
 
+    SQLiteDatabase myDB= null;
+    DatabaseTable dbTable;
+    int ppp;
+    static ImageView selectedImage;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        myDB = this.openOrCreateDatabase("uNoiseDatabase", MODE_PRIVATE, null);
+        dbTable = new DatabaseTable(myDB);
+        dbTable.createTable();
 
         // Initialize preferences
         sharedPref = getPreferences(Context.MODE_PRIVATE);
@@ -74,7 +95,7 @@ public class CcnLiteAndroid extends AppCompatActivity
         setSupportActionBar(myToolbar);
 
 //        areas = new ArrayList<>();
-        areaManager = new AreaManager();
+        areaManager = new AreaManager(this);
         adapter = new AreasAdapter(areaManager, this);
 
         // Initialize the RecyclerView
@@ -84,6 +105,11 @@ public class CcnLiteAndroid extends AppCompatActivity
             rv.setLayoutManager(llm);
             rv.setAdapter(adapter);
         }
+        adapter.setOnItemClickListener(new AreasAdapter.OnItemClickListener() {
+            public void onItemClick(int position) {
+                ppp=position;
+            }
+        });
 
         initializeData();
     }
@@ -163,6 +189,8 @@ public class CcnLiteAndroid extends AppCompatActivity
 //        areaManager.addArea(new Area("FooBar", "Mote 1", R.drawable.foobar, "/demo/mote1/"));
 //        areaManager.addArea(new Area("Uthgård", "Mote 2", R.drawable.uthgard, "/demo/mote2/"));
 //        areaManager.addArea(new Area("Rullan", "Mote 3", R.drawable.rullan, "/p/4b4b6683/foobar/opt"));
+
+//        areaManager.setAreaImages(dbTable);
         adapter.notifyDataSetChanged();
     }
 
@@ -432,6 +460,7 @@ public class CcnLiteAndroid extends AppCompatActivity
                         if (flag == UNVALID_SDS) {
                             Toast.makeText(CcnLiteAndroid.this, "SDS not found. Using old sensor info", Toast.LENGTH_LONG).show();
                         }
+//                        areaManager.setAreaImages(dbTable);
                         refresh();
                         if (useAutoRefresh) {
                             startAutoRefresh();
@@ -439,6 +468,7 @@ public class CcnLiteAndroid extends AppCompatActivity
                         break;
                     case PREDICTION_TASK:
                         // TODO: handle prediction
+                        swipeContainer.setRefreshing(false);
                         break;
                     case REFRESH_TASK:
                         areaManager.sortAreas();
@@ -485,6 +515,107 @@ public class CcnLiteAndroid extends AppCompatActivity
             }
         }
         return true;
+    }
+
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode != RESULT_OK) {
+            return;
+        }
+        if (requestCode == 1) {
+            final Bundle extras = data.getExtras();
+            if (extras != null) {
+
+                Bitmap newProfilePic = extras.getParcelable("data");
+                String root = Environment.getExternalStorageDirectory().toString();
+                File myDir = new File(root);
+                myDir.mkdirs();
+
+                Random generator = new Random();
+                int n = 10000;
+                n = generator.nextInt(n);
+                String areaName = areaManager.getAreas().get(ppp).getName();
+                String fname = areaName + n;
+
+                File file = new File (myDir, fname);
+
+                if (file.exists ()) file.delete ();
+                try {
+                    FileOutputStream out = new FileOutputStream(file);
+                    boolean b = newProfilePic.compress(Bitmap.CompressFormat.JPEG, 90, out);
+                    out.flush();
+                    out.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+
+                String address = root + "/" + areaName + n;
+                File imageFile = new File(address);
+                Uri uri = Uri.fromFile(imageFile);
+
+                Cursor c = dbTable.selectData();
+                if(c != null){
+                    int count = c.getCount();
+                    int index = 0;
+                    c.moveToFirst();
+                    int Column1 = c.getColumnIndex(dbTable.firstColumnName);
+                    int Column2 = c.getColumnIndex(dbTable.secondColumnName);
+                    while(index < count){
+                        String nameOfPicture = c.getString(Column1);
+                        String j = c.getString(Column2);
+                        if(nameOfPicture.equals(areaName)){
+                            dbTable.updateTable(uri, areaName);
+                            break;
+                        }
+                        c.moveToNext();
+                        index++;
+                    }
+                    if(index == count)
+                        dbTable.insertToTable(uri, areaName);
+                }
+
+                adapter.updateImage(ppp, newProfilePic);
+                adapter.notifyItemChanged(ppp);
+            }
+        }else{
+            Uri selectedImageUri = data.getData();
+            String selectedImagePath = selectedImageUri.getPath();
+            File file = new File(selectedImagePath);
+            Uri test = Uri.fromFile(file);
+            String testString = test.getPath();
+            if(test.equals(selectedImageUri))
+                System.out.print("hi");
+            Bitmap b = null;
+            try {
+                b = BitmapFactory.decodeStream(getContentResolver().openInputStream(selectedImageUri));
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+            String areaName = areaManager.getAreas().get(ppp).getName();
+            Cursor c = dbTable.selectData();
+            if(c != null){
+                int count = c.getCount();
+                int index = 0;
+                c.moveToFirst();
+                int Column1 = c.getColumnIndex(dbTable.firstColumnName);
+                int Column2 = c.getColumnIndex(dbTable.secondColumnName);
+                while(index < count){
+                    String nameOfPicture = c.getString(Column1);
+                    if(nameOfPicture.equals(areaName)){
+                        dbTable.updateTable(selectedImageUri, areaName);
+                        break;
+                    }
+                    c.moveToNext();
+                    index++;
+                }
+                if(index == count)
+                    dbTable.insertToTable(selectedImageUri, areaName);
+            }
+            adapter.updateImage(ppp, b);
+            adapter.notifyItemChanged(ppp);
+        }
+
     }
 }
 

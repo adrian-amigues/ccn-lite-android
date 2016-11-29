@@ -66,7 +66,7 @@ int outlen;
  */
 char* ccnl_android_peek(char* suiteStr, char* addr, int port, char* uri) {
     static char uri_static[100];
-    static char response[1000];
+    static char response[10000];
     static ccnl_isContentFunc isContent;
     static ccnl_isFragmentFunc isFragment;
     static ccnl_mkInterestFunc mkInterest;
