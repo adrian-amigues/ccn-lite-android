@@ -95,7 +95,7 @@ public class AreasAdapter extends RecyclerView.Adapter<AreasAdapter.AreaViewHold
         TextView hidden;
         Boolean isExpanded;
         LineChart predictionChart;
-        
+
 
         AreaViewHolder(View itemView) {
             super(itemView);
