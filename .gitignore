@@ -1,12 +1,16 @@
 .gradle
 .idea
-build
+build/*
+app/build/*
+app/src/main/obj/*
+app/src/main/libs/*
+app/app.iml
 gradle
 gradlew
 gradlew.bat
-app/build
-app/app.iml
-app/src/main/obj
-app/src/main/libs
 local.properties
 ccn-lite-android.iml
+
+#include everything within those
+!app/build/outputs
+!app/build/outputs/*

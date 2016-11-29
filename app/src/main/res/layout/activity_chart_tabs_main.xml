@@ -4,7 +4,7 @@ xmlns:tools="http://schemas.android.com/tools"
 android:layout_width="match_parent"
 android:background="#dfdfdf"
 android:layout_height="match_parent"
-tools:context="ch.unibas.ccn_lite_android.ChartTabsActivity_main">
+tools:context="ch.unibas.ccn_lite_android.activities.ChartTabsActivity_main">
 
 <android.support.design.widget.TabLayout
     android:id="@+id/tabs"

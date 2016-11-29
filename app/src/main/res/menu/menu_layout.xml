@@ -1,15 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
-    <!--<item android:id="@+id/action_settings"-->
-        <!--android:title="@string/menu_item_ccn_suite"-->
-        <!--app:showAsAction="never"/>-->
-    <group android:checkableBehavior="single">
-        <item android:id="@+id/radio_item_ccnx"
-            android:title="CCNX2015" />
-        <item android:id="@+id/radio_item_ndn"
-            android:title="NDN2013" />
-    </group>
-    <item android:id="@+id/item_relay_options"
-        android:title="Relay options" />
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".MainActivity">
+
+    <item android:id="@+id/menu_item_sync_sds"
+        android:title="@string/menu_item_sync_sds"
+        android:icon="@drawable/ic_sync_black_48dp"
+        app:showAsAction="ifRoom"/>
+
+    <item android:id="@+id/menu_item_sync_prediction"
+        android:title="@string/menu_item_sync_prediction"
+        android:icon="@drawable/ic_trending_up_black_48dp"
+        app:showAsAction="ifRoom"/>
+
+    <!--<card_item android:id="@+id/menu_item_settings"-->
+        <!--android:title="@string/menu_item_settings"-->
+        <!--android:icon="@drawable/ic_settings_black_48dp"-->
+        <!--app:showAsAction="ifRoom"/>-->
+
+    <item android:id="@+id/menu_item_network_settings"
+        android:title="@string/menu_item_network_settings_title"
+        app:showAsAction="never"/>
+
+    <!--<group android:checkableBehavior="all"-->
+        <!--app:showAsAction="never">-->
+        <!--<card_item android:id="@+id/menu_item_auto_refresh_checkbox"-->
+            <!--android:title="@string/menu_item_auto_refresh_checkbox_title" />-->
+    <!--</group>-->
+
+    <!--<group android:checkableBehavior="single"-->
+        <!--app:showAsAction="never">-->
+        <!--<card_item android:id="@+id/menu_radio_item_ccnx"-->
+            <!--android:title="@string/menu_radio_item_ccnx_title" />-->
+        <!--<card_item android:id="@+id/menu_radio_item_ndn"-->
+            <!--android:title="@string/menu_radio_item_ndn_title" />-->
+    <!--</group>-->
+
 </menu>

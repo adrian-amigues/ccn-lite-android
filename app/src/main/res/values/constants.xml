@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="localIp">127.0.0.1</string>
+    <string name="port">9695</string>
+    <string name="sds_uri">sds/sensors</string>
+    <string name="sds_port">9999</string>
+    <string name="prediction_uri">prediction-foobar</string>
+
+    <string name="bundle_name_externalIp">externalIp</string>
+    <string name="bundle_name_ccnSuite">ccnSuite</string>
+    <string name="bundle_name_useServiceRelay">useServiceRelay</string>
+    <string name="bundle_name_useAutoRefresh">useAutoRefresh</string>
+    
+    <integer name="auto_refresh_delay_seconds">10</integer>
+
+    <string-array name="ccn_suites">
+        <item>ndn2013</item>
+        <item>ccnx2015</item>
+    </string-array>
+</resources>
