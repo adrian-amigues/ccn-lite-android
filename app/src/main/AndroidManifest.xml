@@ -29,6 +29,7 @@
     <application
         android:theme="@style/Theme.AppCompat.Light.NoActionBar"
         android:label="@string/app_name">
+
         <activity
             android:name=".activities.CcnLiteAndroid"
             android:configChanges="orientation|keyboardHidden">
