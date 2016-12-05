@@ -3,7 +3,6 @@ package ch.unibas.ccn_lite_android.activities;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.InputStream;
 import java.util.Calendar;
 import java.util.Random;
 import java.util.concurrent.Executors;
@@ -193,7 +192,7 @@ public class CcnLiteAndroid extends AppCompatActivity
 //        areaManager.addArea(new Area("Uthgård", "Mote 2", R.drawable.uthgard, "/demo/mote2/"));
 //        areaManager.addArea(new Area("Rullan", "Mote 3", R.drawable.rullan, "/p/4b4b6683/foobar/opt"));
 
-//        areaManager.setAreaImages(dbTable);
+        areaManager.setAreaImages(dbTable);
         adapter.notifyDataSetChanged();
     }
 
