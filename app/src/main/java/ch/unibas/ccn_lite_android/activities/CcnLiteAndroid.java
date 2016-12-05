@@ -3,6 +3,7 @@ package ch.unibas.ccn_lite_android.activities;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.util.Calendar;
 import java.util.Random;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -178,19 +179,19 @@ public class CcnLiteAndroid extends AppCompatActivity
      * Initializes the areas array with data
      */
     private void initializeData() {
-//        Area a = new Area("FooBar Origins");
-//        Sensor s = new Sensor("0", "/p/4b4b6683/foobar/opt", Calendar.getInstance(), 1, 5);
-//        s.setLight("260");
-//        s.setTemperature("19.6");
-//        a.addSensor(s);
-//        a.setPhotoId(R.drawable.foobar);
-//        areaManager.addArea(a);
+        Area a = new Area("FooBar Origins");
+        Sensor s = new Sensor("0", "/p/4b4b6683/foobar/opt", Calendar.getInstance(), 1, 5);
+        s.setLight("260");
+        s.setTemperature("19.6");
+        a.addSensor(s);
+        a.setPhotoId(R.drawable.foobar);
+        areaManager.addArea(a);
 
 //        areaManager.addArea(new Area("FooBar", "Mote 1", R.drawable.foobar, "/demo/mote1/"));
 //        areaManager.addArea(new Area("Uthgård", "Mote 2", R.drawable.uthgard, "/demo/mote2/"));
 //        areaManager.addArea(new Area("Rullan", "Mote 3", R.drawable.rullan, "/p/4b4b6683/foobar/opt"));
 
-//        areaManager.setAreaImages(dbTable);
+        areaManager.setAreaImages(dbTable);
         adapter.notifyDataSetChanged();
     }
 
