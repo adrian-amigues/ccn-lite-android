@@ -41,19 +41,20 @@ public class AreaManager {
             JSONArray jsonArray = new JSONArray(jsonStr);
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject areaObject = jsonArray.getJSONObject(i);
-                String areaName = areaObject.getString("location");
+                String areaName = areaObject.getString("lo");
                 Area area = new Area(areaName);
-                String uri = areaObject.getString("prefix");
-                String sensorMac = areaObject.getString("sensor_mac");
-                Calendar sensorInitialDate = Helper.stringToDate(areaObject.getString("time"));
-                int initialSeqno = Integer.parseInt(areaObject.getString("sqn"));
-                int looptime = Integer.parseInt(areaObject.getString("looptime"));
+                String uri = areaObject.getString("pf");
+                String sensorMac = areaObject.getString("bn");
+                Calendar sensorInitialDate = Helper.stringToCalendar(areaObject.getString("bt"));
+                int initialSeqno = Integer.parseInt(areaObject.getString("ver"));
+//                int looptime = Integer.parseInt(areaObject.getString("looptime"));
+                int looptime = 10;
                 Sensor sensor = new Sensor(sensorMac, uri, sensorInitialDate, initialSeqno, looptime);
                 area.addSensor(sensor);
-                area.setPhotoId(R.drawable.foobar);
+//                area.setPhotoId(R.drawable.foobar);
                 areas.add(area);
             }
-        } catch(org.json.JSONException e) {
+        } catch (org.json.JSONException e) {
             Log.e(TAG, "Unvalid Json: "+e);
         } catch (Exception e) {
             Log.e(TAG, "Error when handling Json: "+e);

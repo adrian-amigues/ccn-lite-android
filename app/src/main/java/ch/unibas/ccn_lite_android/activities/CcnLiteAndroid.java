@@ -32,6 +32,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -298,16 +299,36 @@ public class CcnLiteAndroid extends AppCompatActivity
         }
     }
 
-    private void refreshPrediction() {
+    public void refreshPrediction() {
         String port = getString(R.string.port);
 //        String targetIp = useServiceRelay ? getString(R.string.localIp) : externalIp;
-        String targetIp = "130.238.15.227";
+        String targetIp = getString(R.string.databasse_ip);
         String uri = getString(R.string.prediction_uri);
 
         if (peekTaskCounter != null && peekTaskCounter.getRunningTasks() > 0) {
             peekTaskCounter.setRunningTasks(1 + peekTaskCounter.getRunningTasks());
         } else {
             peekTaskCounter = new AndroidPeekTaskCounter(1, AndroidPeekTaskCounter.PREDICTION_TASK);
+        }
+        Log.d(TAG, "refresh predictions called");
+        swipeContainer.setRefreshing(true);
+        if (useParallelTaskExecution && Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+            new AndroidPeekTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, targetIp, port, uri);
+        } else {
+            new AndroidPeekTask().execute(targetIp, port, uri);
+        }
+    }
+
+    public void refreshHistory() {
+        String port = getString(R.string.port);
+//        String targetIp = useServiceRelay ? getString(R.string.localIp) : externalIp;
+        String targetIp = getString(R.string.databasse_ip);
+        String uri = getString(R.string.history_uri);
+
+        if (peekTaskCounter != null && peekTaskCounter.getRunningTasks() > 0) {
+            peekTaskCounter.setRunningTasks(1 + peekTaskCounter.getRunningTasks());
+        } else {
+            peekTaskCounter = new AndroidPeekTaskCounter(1, AndroidPeekTaskCounter.HISTORY_TASK);
         }
         Log.d(TAG, "refresh predictions called");
         swipeContainer.setRefreshing(true);
@@ -394,7 +415,13 @@ public class CcnLiteAndroid extends AppCompatActivity
             }
             else if (peekTaskCounter.getTaskType() == AndroidPeekTaskCounter.PREDICTION_TASK) {
                 Log.i(TAG, "onPostExecute prediction result = " + result);
+                // TODO: handle prediction, result contains the database's response
                 peekTaskCounter.taskFinished(AndroidPeekTaskCounter.PREDICTION);
+            }
+            else if (peekTaskCounter.getTaskType() == AndroidPeekTaskCounter.HISTORY_TASK) {
+                Log.i(TAG, "onPostExecute history result = " + result);
+                // TODO: handle history, result contains the database's response
+                peekTaskCounter.taskFinished(AndroidPeekTaskCounter.HISTORY);
             }
             else if (areaPos == -1 || sensorPos == -1) {
                 Log.e(TAG, "Sensor reading received but has no link to an area or a sensor");
@@ -444,10 +471,12 @@ public class CcnLiteAndroid extends AppCompatActivity
         static final int UNLINKED_RESULT = 5;
         static final int UNKNOWN_RESULT = 6;
         static final int PREDICTION = 7;
+        static final int HISTORY = 8;
 
         static final int SDS_TASK = 20;
         static final int PREDICTION_TASK = 21;
         static final int REFRESH_TASK = 22;
+        static final int HISTORY_TASK = 23;
 
         AndroidPeekTaskCounter(int numberOfTasks, int taskType) {
             this.runningTasks = numberOfTasks;
@@ -469,7 +498,11 @@ public class CcnLiteAndroid extends AppCompatActivity
                         }
                         break;
                     case PREDICTION_TASK:
-                        // TODO: handle prediction
+                        // TODO: handle prediction - when all is done
+                        swipeContainer.setRefreshing(false);
+                        break;
+                    case HISTORY_TASK:
+                        // TODO: handle history - when all is done
                         swipeContainer.setRefreshing(false);
                         break;
                     case REFRESH_TASK:
@@ -618,6 +651,11 @@ public class CcnLiteAndroid extends AppCompatActivity
             adapter.notifyItemChanged(ppp);
         }
 
+    }
+
+    public void launchHistoryActivity(View v) {
+        Intent intent = new Intent(this, ChartTabsActivity_main.class);
+        startActivity(intent);
     }
 }
 

@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import ch.unibas.ccn_lite_android.activities.CcnLiteAndroid;
 import ch.unibas.ccn_lite_android.models.Prediction;
 import ch.unibas.ccn_lite_android.models.Area;
 import ch.unibas.ccn_lite_android.R;
@@ -104,6 +105,7 @@ public class AreasAdapter extends RecyclerView.Adapter<AreasAdapter.AreaViewHold
 
         @Override
         public void onClick(View v) {
+//            ((CcnLiteAndroid) context).launchHistoryActivity(v);
             Intent intent = new Intent(context, ChartTabsActivity_main.class);
             context.startActivity(intent);
         }
@@ -136,6 +138,10 @@ public class AreasAdapter extends RecyclerView.Adapter<AreasAdapter.AreaViewHold
             public void onClick(View v) {
                 mExpandedPosition = isExpanded ? -1 : holder.getAdapterPosition();
                 TransitionManager.beginDelayedTransition(rv);
+                if (isExpanded) {
+                    ((CcnLiteAndroid) context).refreshPrediction();
+                    ((CcnLiteAndroid) context).refreshHistory();
+                }
                 notifyDataSetChanged();
             }
         });
