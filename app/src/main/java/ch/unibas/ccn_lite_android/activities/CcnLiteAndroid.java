@@ -3,11 +3,14 @@ package ch.unibas.ccn_lite_android.activities;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.util.Calendar;
 import java.util.Random;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -112,15 +115,15 @@ public class CcnLiteAndroid extends AppCompatActivity
         });
 
         initializeData();
+        refreshSds();
+        if (useAutoRefresh) {
+            startAutoRefresh();
+        }
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        refreshSds();
-        if (useAutoRefresh) {
-            startAutoRefresh();
-        }
     }
 
     @Override
@@ -178,13 +181,13 @@ public class CcnLiteAndroid extends AppCompatActivity
      * Initializes the areas array with data
      */
     private void initializeData() {
-//        Area a = new Area("FooBar Origins");
-//        Sensor s = new Sensor("0", "/p/4b4b6683/foobar/opt", Calendar.getInstance(), 1, 5);
-//        s.setLight("260");
-//        s.setTemperature("19.6");
-//        a.addSensor(s);
-//        a.setPhotoId(R.drawable.foobar);
-//        areaManager.addArea(a);
+        Area a = new Area("FooBar Origins");
+        Sensor s = new Sensor("0", "/p/4b4b6683/foobar/opt", Calendar.getInstance(), 1, 5);
+        s.setLight("260");
+        s.setTemperature("19.6");
+        a.addSensor(s);
+        a.setPhotoId(R.drawable.foobar);
+        areaManager.addArea(a);
 
 //        areaManager.addArea(new Area("FooBar", "Mote 1", R.drawable.foobar, "/demo/mote1/"));
 //        areaManager.addArea(new Area("Uthgård", "Mote 2", R.drawable.uthgard, "/demo/mote2/"));

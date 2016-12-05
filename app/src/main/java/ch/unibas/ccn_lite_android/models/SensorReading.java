@@ -11,8 +11,10 @@ import ch.unibas.ccn_lite_android.helpers.Helper;
 public class SensorReading {
     private Sensor sensor;
     private String seqNo;
+    private String interval;
     private String light;
     private String temperature;
+    private String humidity;
     private final String TAG = "SensorReading";
 
     public SensorReading(String content, Sensor sensor) throws Exception {
@@ -21,10 +23,10 @@ public class SensorReading {
         try {
             String[] parts = content.split("-");
             this.seqNo = parts[0];
-//            this.temperature = Integer.toString(Math.round(Float.parseFloat(parts[1])));
-//            this.light = Integer.toString(Math.round(Float.parseFloat(parts[2])));
-            this.light = parts[1];
-            this.temperature = parts[2];
+            this.interval = parts[1];
+            this.light = parts[2];
+            this.temperature = parts[3];
+            this.humidity = parts[4];
         } catch(Exception e) {
             Log.e(TAG, "Error creating a SensorReading");
             throw new Exception("Error creating a SensorReading: " + e);
@@ -32,7 +34,7 @@ public class SensorReading {
     }
 
     public static boolean isSensorReading(String content) {
-        return (content.split("-").length == 3);
+        return (content.split("-").length == 5);
     }
 
 //    @Override
