@@ -182,7 +182,7 @@ public class CcnLiteAndroid extends AppCompatActivity
      */
     private void initializeData() {
         Area a = new Area("FooBar Origins");
-        Sensor s = new Sensor("0", "/p/4b4b6683/foobar/opt", Calendar.getInstance(), 1, 5);
+        Sensor s = new Sensor("/p/4b4b6683/foobar/opt", Calendar.getInstance(), 1, 5);
         s.setLight("260");
         s.setTemperature("19.6");
         a.addSensor(s);
@@ -299,6 +299,9 @@ public class CcnLiteAndroid extends AppCompatActivity
         }
     }
 
+    /**
+     * Retreives the prediction data
+     */
     public void refreshPrediction() {
         String port = getString(R.string.port);
 //        String targetIp = useServiceRelay ? getString(R.string.localIp) : externalIp;
@@ -319,6 +322,9 @@ public class CcnLiteAndroid extends AppCompatActivity
         }
     }
 
+    /**
+     * Retreives the historical data
+     */
     public void refreshHistory() {
         String port = getString(R.string.port);
 //        String targetIp = useServiceRelay ? getString(R.string.localIp) : externalIp;
@@ -506,8 +512,9 @@ public class CcnLiteAndroid extends AppCompatActivity
                         swipeContainer.setRefreshing(false);
                         break;
                     case REFRESH_TASK:
+                        areaManager.updateSmileyValues();
                         areaManager.sortAreas();
-                        adapter.resetExpandedPosition();
+//                        adapter.resetExpandedPosition();
                         adapter.notifyDataSetChanged();
                         swipeContainer.setRefreshing(false);
                         break;

@@ -129,7 +129,7 @@ public class AreasAdapter extends RecyclerView.Adapter<AreasAdapter.AreaViewHold
         holder.areaName.setText(area.getName());
         holder.areaPhoto.setImageResource(area.getPhotoId());
         holder.areaPhoto.setImageBitmap(area.getBitmap());
-        holder.areaSmiley.setImageResource(getSmiley(area.getCurrentValue()));
+        holder.areaSmiley.setImageResource(getSmiley(area.getSmileyValue()));
 
         final boolean isExpanded = position == mExpandedPosition;
         holder.expandedPart.setVisibility(isExpanded ? View.VISIBLE : View.GONE);
@@ -138,7 +138,7 @@ public class AreasAdapter extends RecyclerView.Adapter<AreasAdapter.AreaViewHold
             public void onClick(View v) {
                 mExpandedPosition = isExpanded ? -1 : holder.getAdapterPosition();
                 TransitionManager.beginDelayedTransition(rv);
-                if (isExpanded) {
+                if (!isExpanded) {
                     ((CcnLiteAndroid) context).refreshPrediction();
                     ((CcnLiteAndroid) context).refreshHistory();
                 }
@@ -188,17 +188,21 @@ public class AreasAdapter extends RecyclerView.Adapter<AreasAdapter.AreaViewHold
 
     public void updateValue(int areaPos, int sensorPos, String newValue) {
         Area area= areaManager.getAreas().get(areaPos);
+        Sensor sensor = area.getSensor(sensorPos);
 //        area.setDescription(newValue);
-        area.setCurrentValue(newValue);
+//        area.setSmileyValue(newValue);
+        sensor.setAvailable(false);
     }
+
 
     public void updateValue(int areaPos, int sensorPos, SensorReading sr) {
         Area area = areaManager.getAreas().get(areaPos);
         Sensor sensor = area.getSensor(sensorPos);
+        sensor.setAvailable(true);
         sensor.updateValues(sr);
         float smileyValue = Float.parseFloat(sr.getLight()) / 4;
 //        area.setDescription(Float.toString(smileyValue)); //TODO: Deprecated
-        area.setCurrentValue(Float.toString(smileyValue));
+//        area.setSmileyValue(Float.toString(smileyValue));
         sr.updateSensorValues();
     }
 

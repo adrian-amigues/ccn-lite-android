@@ -1,14 +1,9 @@
 package ch.unibas.ccn_lite_android.models;
 
-import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
-
-import ch.unibas.ccn_lite_android.R;
 
 /**
  * Represents an Area
@@ -19,7 +14,7 @@ import ch.unibas.ccn_lite_android.R;
 public class Area {
     private String name;
     private List<Sensor> sensors;
-    private String currentValue;
+    private String smileyValue;
 
     private int photoId;
     private Bitmap bitmap;
@@ -34,7 +29,7 @@ public class Area {
 //    public Area(String name, String description, int photoId, String uriBase) {
 //        this.name = name;
 //        this.sensors = new ArrayList<>();
-//        this.currentValue = description;
+//        this.smileyValue = description;
 //
 //        this.description = description;
 //        this.photoId = photoId;
@@ -44,7 +39,7 @@ public class Area {
     public Area(String name) {
         this.name = name;
         this.sensors = new ArrayList<>();
-        this.currentValue = "";
+        this.smileyValue = "";
 //        this.isDeprecatedArea = false;
     }
 
@@ -72,12 +67,12 @@ public class Area {
         this.photoId = photoId;
     }
 
-    public String getCurrentValue() {
-        return currentValue;
+    public String getSmileyValue() {
+        return smileyValue;
     }
 
-    public void setCurrentValue(String currentValue) {
-        this.currentValue = currentValue;
+    public void setSmileyValue(String smileyValue) {
+        this.smileyValue = smileyValue;
     }
 
     public Bitmap getBitmap() {
@@ -122,6 +117,23 @@ public class Area {
 
     public void addSensor(Sensor s) {
         sensors.add(s);
+    }
+
+    public void updateSmileyValue() {
+        int sum = 0;
+        int n = 0;
+        for (int i = 0; i < sensors.size(); i++) {
+            Sensor s = sensors.get(i);
+            if (s.isAvailable()) {
+                sum += Integer.parseInt(s.getLight());
+                n++;
+            }
+            if (n > 0) {
+                this.smileyValue = Integer.toString(sum / n);
+            } else {
+                this.smileyValue = "";
+            }
+        }
     }
 
 //    public boolean updateSensors(SensorReading sr) {

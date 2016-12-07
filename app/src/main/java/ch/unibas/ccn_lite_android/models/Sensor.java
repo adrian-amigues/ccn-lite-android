@@ -7,7 +7,7 @@ import java.util.Calendar;
  */
 
 public class Sensor {
-    private String id;
+//    private String id;
     private String uri;
     private Calendar initialDate;
     private int initialSeqno;
@@ -15,9 +15,11 @@ public class Sensor {
     private String light;
     private String temperature;
     private String humidity;
+    private boolean available;
 
-    public Sensor(String id, String uri, Calendar initialDate, int seqno, int looptime) {
-        this.id = id;
+//    public Sensor(String id, String uri, Calendar initialDate, int seqno, int looptime) {
+    public Sensor(String uri, Calendar initialDate, int seqno, int looptime) {
+//        this.id = id;
         this.uri = uri;
         this.initialDate = initialDate;
         this.initialSeqno = seqno;
@@ -25,15 +27,16 @@ public class Sensor {
         this.light = "0";
         this.temperature = "0";
         this.humidity = "0";
+        this.available = true;
     }
 
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
+//    public String getId() {
+//        return id;
+//    }
+//
+//    public void setId(String id) {
+//        this.id = id;
+//    }
 
     public String getBaseUri() {
         return uri;
@@ -69,6 +72,14 @@ public class Sensor {
 
     public void setHumidity(String humidity) {
         this.humidity = humidity;
+    }
+
+    public boolean isAvailable() {
+        return available;
+    }
+
+    public void setAvailable(boolean available) {
+        this.available = available;
     }
 
     public void updateValues(SensorReading sr) {
