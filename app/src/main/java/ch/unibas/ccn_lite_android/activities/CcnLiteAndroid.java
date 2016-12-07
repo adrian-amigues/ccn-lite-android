@@ -99,7 +99,7 @@ public class CcnLiteAndroid extends AppCompatActivity
 
 //        areas = new ArrayList<>();
         areaManager = new AreaManager(this);
-        adapter = new AreasAdapter(areaManager, this);
+        adapter = new AreasAdapter(areaManager, this, dbTable);
 
         // Initialize the RecyclerView
         RecyclerView rv = (RecyclerView) findViewById(R.id.rv);
@@ -613,7 +613,7 @@ public class CcnLiteAndroid extends AppCompatActivity
                 adapter.updateImage(ppp, newProfilePic);
                 adapter.notifyItemChanged(ppp);
             }
-        }else{
+        }else if (requestCode == 2){
             Uri selectedImageUri = data.getData();
             String selectedImagePath = selectedImageUri.getPath();
             File file = new File(selectedImagePath);

@@ -11,7 +11,7 @@ import static android.content.Context.MODE_PRIVATE;
  */
 
 public class DatabaseTable {
-    public final String tableName = "PicturePathTable";
+    public final String tableName = "PicturePathTable2";
     public final String firstColumnName = "Name";
     public final String secondColumnName = "PictureAddress";
     SQLiteDatabase myDB=null;
@@ -43,6 +43,12 @@ public class DatabaseTable {
                 + tableName
                 + " (Name, PictureAddress)"
                 + " VALUES ('" + areaName + "','" + uri + "');");
+    }
+
+    public void deleteFromTable(String areaName){
+        myDB.execSQL("DELETE from "
+                + tableName
+                + " WHERE Name = '" + areaName + "'");
     }
 
 
