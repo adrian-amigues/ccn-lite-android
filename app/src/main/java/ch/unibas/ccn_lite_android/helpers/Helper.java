@@ -24,17 +24,27 @@ public class Helper {
         return str;
     }
 
-    static public Calendar stringToDate(String dateString) {
+    static public Calendar stringToCalendar(String timeSeconds) {
+//        try {
+//            String[] parts = dateString.split("-");
+//            int year = Integer.parseInt(parts[0]);
+//            int month = Integer.parseInt(parts[1]) - 1;
+//            int day = Integer.parseInt(parts[2]);
+//            int hour = Integer.parseInt(parts[3]);
+//            int minute = Integer.parseInt(parts[4]);
+//            int second = Integer.parseInt(parts[5]);
+//            Calendar cal = Calendar.getInstance();
+//            cal.set(year, month, day, hour, minute, second);
+//            return cal;
+//        }
+//        catch(Exception e) {
+//            Log.e(TAG, "Error reading date string: "+e);
+//            return null;
+//        }
         try {
-            String[] parts = dateString.split("-");
-            int year = Integer.parseInt(parts[0]);
-            int month = Integer.parseInt(parts[1]) - 1;
-            int day = Integer.parseInt(parts[2]);
-            int hour = Integer.parseInt(parts[3]);
-            int minute = Integer.parseInt(parts[4]);
-            int second = Integer.parseInt(parts[5]);
             Calendar cal = Calendar.getInstance();
-            cal.set(year, month, day, hour, minute, second);
+            long timeMillis = Integer.parseInt(timeSeconds) * 1000;
+            cal.setTimeInMillis(timeMillis);
             return cal;
         }
         catch(Exception e) {

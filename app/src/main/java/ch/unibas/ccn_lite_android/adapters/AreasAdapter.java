@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import ch.unibas.ccn_lite_android.activities.CcnLiteAndroid;
 import ch.unibas.ccn_lite_android.models.Prediction;
 import ch.unibas.ccn_lite_android.models.Area;
 import ch.unibas.ccn_lite_android.R;
@@ -104,6 +105,7 @@ public class AreasAdapter extends RecyclerView.Adapter<AreasAdapter.AreaViewHold
 
         @Override
         public void onClick(View v) {
+//            ((CcnLiteAndroid) context).launchHistoryActivity(v);
             Intent intent = new Intent(context, ChartTabsActivity_main.class);
             context.startActivity(intent);
         }
@@ -136,6 +138,10 @@ public class AreasAdapter extends RecyclerView.Adapter<AreasAdapter.AreaViewHold
             public void onClick(View v) {
                 mExpandedPosition = isExpanded ? -1 : holder.getAdapterPosition();
                 TransitionManager.beginDelayedTransition(rv);
+                if (isExpanded) {
+                    ((CcnLiteAndroid) context).refreshPrediction();
+                    ((CcnLiteAndroid) context).refreshHistory();
+                }
                 notifyDataSetChanged();
             }
         });
@@ -154,9 +160,11 @@ public class AreasAdapter extends RecyclerView.Adapter<AreasAdapter.AreaViewHold
                     TextView sensorName = (TextView)readingsList.findViewById(R.id.card_item_sensor_name);
                     TextView light = (TextView)readingsList.findViewById(R.id.card_item_sensor_light);
                     TextView temperature = (TextView)readingsList.findViewById(R.id.card_item_sensor_temperature);
+                    TextView humidity = (TextView)readingsList.findViewById(R.id.card_item_sensor_humidity);
                     sensorName.setText(s.getUri());
                     light.setText(s.getLight());
                     temperature.setText(s.getTemperature());
+                    humidity.setText(s.getHumidity());
 
                     holder.sensorList.addView(readingsList);
                 }
@@ -237,7 +245,7 @@ public class AreasAdapter extends RecyclerView.Adapter<AreasAdapter.AreaViewHold
                     galleryIntent();
                 }else if (items[item].equals("Delete photo")) {
                     Bitmap icon = BitmapFactory.decodeResource(context.getResources(),
-                            R.drawable.ic_add_a_photo_black_48dp);
+                            R.drawable.take_photo_thumbnail);
                     updateImage(position, icon);
                     notifyItemChanged(position);
                 }

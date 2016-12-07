@@ -45,7 +45,7 @@
                 android:layout_width="20dp"
                 android:layout_height="20dp"
                 android:contentDescription="Reading icon"
-                android:background="@drawable/ic_brightness_low_black_48dp"
+                android:background="@drawable/ic_wb_sunny_black_48dp"
                 android:scaleType="fitXY"
                 android:layout_marginRight="6dp"
                 />
@@ -64,7 +64,7 @@
                 android:layout_width="20dp"
                 android:layout_height="20dp"
                 android:contentDescription="Reading icon"
-                android:background="@drawable/ic_ac_unit_black_48dp"
+                android:background="@drawable/thermometer"
                 android:scaleType="fitXY"
                 android:layout_marginRight="6dp"
                 />
@@ -72,6 +72,25 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/card_item_sensor_temperature"
+                />
+        </LinearLayout>
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:contentDescription="Reading icon"
+                android:background="@drawable/water"
+                android:scaleType="fitXY"
+                android:layout_marginRight="6dp"
+                />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/card_item_sensor_humidity"
                 />
         </LinearLayout>
 
