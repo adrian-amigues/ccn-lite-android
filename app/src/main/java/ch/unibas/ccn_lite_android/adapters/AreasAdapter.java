@@ -25,6 +25,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import ch.unibas.ccn_lite_android.activities.CcnLiteAndroid;
+import ch.unibas.ccn_lite_android.models.DatabaseTable;
 import ch.unibas.ccn_lite_android.models.Prediction;
 import ch.unibas.ccn_lite_android.models.Area;
 import ch.unibas.ccn_lite_android.R;
@@ -45,12 +46,14 @@ public class AreasAdapter extends RecyclerView.Adapter<AreasAdapter.AreaViewHold
     private Context context;
     private RecyclerView rv;
     private OnItemClickListener listener;
+    private DatabaseTable dbTable;
 
     private final List<Integer> bounds = new ArrayList<>(Arrays.asList(15, 20, 25, 30));
 
-    public AreasAdapter(AreaManager areaManager, Context context){
+    public AreasAdapter(AreaManager areaManager, Context context, DatabaseTable dbTable){
         this.areaManager = areaManager;
         this.context = context;
+        this.dbTable = dbTable;
     }
 
     // Define the listener interface
@@ -250,6 +253,8 @@ public class AreasAdapter extends RecyclerView.Adapter<AreasAdapter.AreaViewHold
                 }else if (items[item].equals("Delete photo")) {
                     Bitmap icon = BitmapFactory.decodeResource(context.getResources(),
                             R.drawable.take_photo_thumbnail);
+                    String areaName = areaManager.getAreas().get(position).getName();
+                    dbTable.deleteFromTable(areaName);
                     updateImage(position, icon);
                     notifyItemChanged(position);
                 }
