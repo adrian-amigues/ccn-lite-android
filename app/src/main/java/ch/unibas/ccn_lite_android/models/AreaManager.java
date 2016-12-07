@@ -41,19 +41,21 @@ public class AreaManager {
             JSONArray jsonArray = new JSONArray(jsonStr);
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject areaObject = jsonArray.getJSONObject(i);
-                String areaName = areaObject.getString("location");
+                String areaName = areaObject.getString("lo");
                 Area area = new Area(areaName);
-                String uri = areaObject.getString("prefix");
-                String sensorMac = areaObject.getString("sensor_mac");
-                Calendar sensorInitialDate = Helper.stringToDate(areaObject.getString("time"));
-                int initialSeqno = Integer.parseInt(areaObject.getString("sqn"));
-                int looptime = Integer.parseInt(areaObject.getString("looptime"));
-                Sensor sensor = new Sensor(sensorMac, uri, sensorInitialDate, initialSeqno, looptime);
+                String uri = areaObject.getString("pf");
+//                String sensorMac = areaObject.getString("bn");
+                Calendar sensorInitialDate = Helper.stringToCalendar(areaObject.getString("bt"));
+                int initialSeqno = Integer.parseInt(areaObject.getString("ver"));
+//                int looptime = Integer.parseInt(areaObject.getString("looptime"));
+                int looptime = 10;
+//                Sensor sensor = new Sensor(sensorMac, uri, sensorInitialDate, initialSeqno, looptime);
+                Sensor sensor = new Sensor(uri, sensorInitialDate, initialSeqno, looptime);
                 area.addSensor(sensor);
-                area.setPhotoId(R.drawable.foobar);
+//                area.setPhotoId(R.drawable.foobar);
                 areas.add(area);
             }
-        } catch(org.json.JSONException e) {
+        } catch (org.json.JSONException e) {
             Log.e(TAG, "Unvalid Json: "+e);
         } catch (Exception e) {
             Log.e(TAG, "Error when handling Json: "+e);
@@ -88,11 +90,11 @@ public class AreaManager {
         @Override
         public int compare(Area a1, Area a2) {
             try {
-                int value1 = Integer.parseInt(a1.getCurrentValue());
-                int value2 = Integer.parseInt(a2.getCurrentValue());
+                int value1 = Integer.parseInt(a1.getSmileyValue());
+                int value2 = Integer.parseInt(a2.getSmileyValue());
                 return value1 - value2;
             } catch (Exception e) {
-                return a1.getCurrentValue().compareTo(a2.getCurrentValue());
+                return a1.getSmileyValue().compareTo(a2.getSmileyValue());
             }
         }
     }
@@ -106,9 +108,16 @@ public class AreaManager {
         return count;
     }
 
+    public void updateSmileyValues() {
+        for (int i = 0; i < areas.size(); i++) {
+            Area a = areas.get(i);
+            a.updateSmileyValue();
+        }
+    }
+
     public void setAreaImages(DatabaseTable dbTable) {
         Bitmap icon = BitmapFactory.decodeResource(context.getResources(),
-                R.drawable.ic_add_a_photo_black_48dp);
+                R.drawable.take_photo_thumbnail);
 
         Cursor c = dbTable.selectData();
         int count = c.getCount();
