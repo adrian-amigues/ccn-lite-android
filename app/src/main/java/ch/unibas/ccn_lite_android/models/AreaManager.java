@@ -109,7 +109,7 @@ public class AreaManager {
 
     public void setAreaImages(DatabaseTable dbTable) {
         Bitmap icon = BitmapFactory.decodeResource(context.getResources(),
-                R.drawable.ic_add_a_photo_black_48dp);
+                R.drawable.take_photo_thumbnail);
 
         Cursor c = dbTable.selectData();
         int count = c.getCount();

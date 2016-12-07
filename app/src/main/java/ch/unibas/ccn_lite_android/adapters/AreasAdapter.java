@@ -160,9 +160,11 @@ public class AreasAdapter extends RecyclerView.Adapter<AreasAdapter.AreaViewHold
                     TextView sensorName = (TextView)readingsList.findViewById(R.id.card_item_sensor_name);
                     TextView light = (TextView)readingsList.findViewById(R.id.card_item_sensor_light);
                     TextView temperature = (TextView)readingsList.findViewById(R.id.card_item_sensor_temperature);
+                    TextView humidity = (TextView)readingsList.findViewById(R.id.card_item_sensor_humidity);
                     sensorName.setText(s.getUri());
                     light.setText(s.getLight());
                     temperature.setText(s.getTemperature());
+                    humidity.setText(s.getHumidity());
 
                     holder.sensorList.addView(readingsList);
                 }
@@ -243,7 +245,7 @@ public class AreasAdapter extends RecyclerView.Adapter<AreasAdapter.AreaViewHold
                     galleryIntent();
                 }else if (items[item].equals("Delete photo")) {
                     Bitmap icon = BitmapFactory.decodeResource(context.getResources(),
-                            R.drawable.ic_add_a_photo_black_48dp);
+                            R.drawable.take_photo_thumbnail);
                     updateImage(position, icon);
                     notifyItemChanged(position);
                 }

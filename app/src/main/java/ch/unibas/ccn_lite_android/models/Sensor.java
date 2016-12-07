@@ -14,6 +14,7 @@ public class Sensor {
     private int looptime;
     private String light;
     private String temperature;
+    private String humidity;
 
     public Sensor(String id, String uri, Calendar initialDate, int seqno, int looptime) {
         this.id = id;
@@ -23,6 +24,7 @@ public class Sensor {
         this.looptime = looptime;
         this.light = "0";
         this.temperature = "0";
+        this.humidity = "0";
     }
 
     public String getId() {
@@ -61,9 +63,18 @@ public class Sensor {
         this.temperature = temperature;
     }
 
+    public String getHumidity() {
+        return humidity;
+    }
+
+    public void setHumidity(String humidity) {
+        this.humidity = humidity;
+    }
+
     public void updateValues(SensorReading sr) {
         this.light = sr.getLight();
         this.temperature = sr.getTemperature();
+        this.humidity = sr.getHumidity();
     }
 
     public int getCurrentSeqno() {
