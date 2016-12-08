@@ -120,16 +120,16 @@ public class Area {
     }
 
     public void updateSmileyValue() {
-        int sum = 0;
+        float sum = 0;
         int n = 0;
         for (int i = 0; i < sensors.size(); i++) {
             Sensor s = sensors.get(i);
             if (s.isAvailable()) {
-                sum += Integer.parseInt(s.getLight());
+                sum += Float.parseFloat(s.getLight());
                 n++;
             }
             if (n > 0) {
-                this.smileyValue = Integer.toString(sum / n);
+                this.smileyValue = Float.toString(sum / n);
             } else {
                 this.smileyValue = "";
             }

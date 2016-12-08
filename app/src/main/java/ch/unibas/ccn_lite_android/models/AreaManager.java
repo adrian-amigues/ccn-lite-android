@@ -37,23 +37,31 @@ public class AreaManager {
 
     public void updateFromSds(String jsonStr) {
         areas = new ArrayList<>();
+        Area area;
         try {
             JSONArray jsonArray = new JSONArray(jsonStr);
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject areaObject = jsonArray.getJSONObject(i);
                 String areaName = areaObject.getString("lo");
-                Area area = new Area(areaName);
+
+                area = getAreaByName(areaName);
+                if (area == null) {
+                    area = new Area(areaName);
+                    areas.add(area);
+                }
+
                 String uri = areaObject.getString("pf");
 //                String sensorMac = areaObject.getString("bn");
-                Calendar sensorInitialDate = Helper.stringToCalendar(areaObject.getString("bt"));
-                int initialSeqno = Integer.parseInt(areaObject.getString("ver"));
-//                int looptime = Integer.parseInt(areaObject.getString("looptime"));
-                int looptime = 10;
+//                Calendar sensorInitialDate = Helper.stringToCalendar(areaObject.getString("bt"));
+                long sensorInitialDate = Long.parseLong(areaObject.getString("bt"));
+//                int initialSeqno = Integer.parseInt(areaObject.getString("ver"));
+                int initialSeqno = 1;
+                int looptime = Integer.parseInt(areaObject.getString("but"));
+//                int looptime = 10;
 //                Sensor sensor = new Sensor(sensorMac, uri, sensorInitialDate, initialSeqno, looptime);
                 Sensor sensor = new Sensor(uri, sensorInitialDate, initialSeqno, looptime);
                 area.addSensor(sensor);
 //                area.setPhotoId(R.drawable.foobar);
-                areas.add(area);
             }
         } catch (org.json.JSONException e) {
             Log.e(TAG, "Unvalid Json: "+e);
@@ -113,6 +121,26 @@ public class AreaManager {
             Area a = areas.get(i);
             a.updateSmileyValue();
         }
+    }
+
+    public boolean areaIsPresent(String areaName) {
+        for (int i = 0; i < areas.size(); i++) {
+            Area a = areas.get(i);
+            if (a.getName().equals(areaName)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public Area getAreaByName(String areaName) {
+        for (int i = 0; i < areas.size(); i++) {
+            Area a = areas.get(i);
+            if (a.getName().equals(areaName)) {
+                return a;
+            }
+        }
+        return null;
     }
 
     public void setAreaImages(DatabaseTable dbTable) {

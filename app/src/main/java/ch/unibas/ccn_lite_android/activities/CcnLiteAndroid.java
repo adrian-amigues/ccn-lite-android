@@ -3,7 +3,9 @@ package ch.unibas.ccn_lite_android.activities;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Random;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -181,20 +183,16 @@ public class CcnLiteAndroid extends AppCompatActivity
      * Initializes the areas array with data
      */
     private void initializeData() {
-        Area a = new Area("FooBar Origins");
-        Sensor s = new Sensor("/p/4b4b6683/foobar/opt", Calendar.getInstance(), 1, 5);
-        s.setLight("260");
-        s.setTemperature("19.6");
-        a.addSensor(s);
-        a.setPhotoId(R.drawable.foobar);
-        areaManager.addArea(a);
-
-//        areaManager.addArea(new Area("FooBar", "Mote 1", R.drawable.foobar, "/demo/mote1/"));
-//        areaManager.addArea(new Area("Uthgård", "Mote 2", R.drawable.uthgard, "/demo/mote2/"));
-//        areaManager.addArea(new Area("Rullan", "Mote 3", R.drawable.rullan, "/p/4b4b6683/foobar/opt"));
-
-        areaManager.setAreaImages(dbTable);
-        adapter.notifyDataSetChanged();
+//        Area a = new Area("FooBar Origins");
+//        Sensor s = new Sensor("/p/4b4b6683/foobar/opt", Calendar.getInstance().getTimeInMillis() / 1000, 1, 5);
+//        s.setLight("260");
+//        s.setTemperature("19.6");
+//        a.addSensor(s);
+//        a.setPhotoId(R.drawable.foobar);
+//        areaManager.addArea(a);
+//
+//        areaManager.setAreaImages(dbTable);
+//        adapter.notifyDataSetChanged();
     }
 
     /**
@@ -285,17 +283,13 @@ public class CcnLiteAndroid extends AppCompatActivity
         String targetIp = useServiceRelay ? getString(R.string.localIp) : externalIp;
         String uri = getString(R.string.sds_uri);
 
-        if (peekTaskCounter != null && peekTaskCounter.getRunningTasks() > 0) {
-            peekTaskCounter.setRunningTasks(1 + peekTaskCounter.getRunningTasks());
-        } else {
-            peekTaskCounter = new AndroidPeekTaskCounter(1, AndroidPeekTaskCounter.SDS_TASK);
-        }
         Log.d(TAG, "refreshSds called");
         swipeContainer.setRefreshing(true);
         if (useParallelTaskExecution && Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-            new AndroidPeekTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, targetIp, port, uri);
+            new AndroidPeekTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR
+                    , AndroidPeekTask.SDS_TASK, targetIp, port, uri);
         } else {
-            new AndroidPeekTask().execute(targetIp, port, uri);
+            new AndroidPeekTask().execute(AndroidPeekTask.SDS_TASK, targetIp, port, uri);
         }
     }
 
@@ -308,17 +302,13 @@ public class CcnLiteAndroid extends AppCompatActivity
         String targetIp = getString(R.string.databasse_ip);
         String uri = getString(R.string.prediction_uri);
 
-        if (peekTaskCounter != null && peekTaskCounter.getRunningTasks() > 0) {
-            peekTaskCounter.setRunningTasks(1 + peekTaskCounter.getRunningTasks());
-        } else {
-            peekTaskCounter = new AndroidPeekTaskCounter(1, AndroidPeekTaskCounter.PREDICTION_TASK);
-        }
         Log.d(TAG, "refresh predictions called");
         swipeContainer.setRefreshing(true);
         if (useParallelTaskExecution && Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-            new AndroidPeekTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, targetIp, port, uri);
+            new AndroidPeekTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR
+                    , AndroidPeekTask.PREDICTION_TASK, targetIp, port, uri);
         } else {
-            new AndroidPeekTask().execute(targetIp, port, uri);
+            new AndroidPeekTask().execute(AndroidPeekTask.PREDICTION_TASK, targetIp, port, uri);
         }
     }
 
@@ -331,17 +321,13 @@ public class CcnLiteAndroid extends AppCompatActivity
         String targetIp = getString(R.string.databasse_ip);
         String uri = getString(R.string.history_uri);
 
-        if (peekTaskCounter != null && peekTaskCounter.getRunningTasks() > 0) {
-            peekTaskCounter.setRunningTasks(1 + peekTaskCounter.getRunningTasks());
-        } else {
-            peekTaskCounter = new AndroidPeekTaskCounter(1, AndroidPeekTaskCounter.HISTORY_TASK);
-        }
         Log.d(TAG, "refresh predictions called");
         swipeContainer.setRefreshing(true);
         if (useParallelTaskExecution && Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-            new AndroidPeekTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, targetIp, port, uri);
+            new AndroidPeekTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR
+                    , AndroidPeekTask.HISTORY_TASK, targetIp, port, uri);
         } else {
-            new AndroidPeekTask().execute(targetIp, port, uri);
+            new AndroidPeekTask().execute(AndroidPeekTask.HISTORY_TASK, targetIp, port, uri);
         }
     }
 
@@ -358,7 +344,7 @@ public class CcnLiteAndroid extends AppCompatActivity
         if (peekTaskCounter != null && peekTaskCounter.getRunningTasks() > 0) {
             peekTaskCounter.setRunningTasks(totalUris + peekTaskCounter.getRunningTasks());
         } else {
-            peekTaskCounter = new AndroidPeekTaskCounter(totalUris, AndroidPeekTaskCounter.REFRESH_TASK);
+            peekTaskCounter = new AndroidPeekTaskCounter(totalUris);
         }
         Log.d(TAG, "refresh called with "+totalUris+" URIs");
         swipeContainer.setRefreshing(true);
@@ -369,11 +355,11 @@ public class CcnLiteAndroid extends AppCompatActivity
 
                 requestedURI = a.getSensor(j).getUri();
                 if (useParallelTaskExecution && Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-                    new AndroidPeekTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, targetIp,
-                            port, requestedURI, Integer.toString(i), Integer.toString(j));
+                    new AndroidPeekTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, AndroidPeekTask.REFRESH_TASK
+                            , targetIp, port, requestedURI, Integer.toString(i), Integer.toString(j));
                 } else {
-                    new AndroidPeekTask().execute(targetIp, port, requestedURI,
-                            Integer.toString(i), Integer.toString(j));
+                    new AndroidPeekTask().execute(AndroidPeekTask.REFRESH_TASK, targetIp, port, requestedURI
+                            , Integer.toString(i), Integer.toString(j));
                 }
             }
         }
@@ -385,6 +371,11 @@ public class CcnLiteAndroid extends AppCompatActivity
      */
     private class AndroidPeekTask extends AsyncTask<String, Void, String> {
         // position of the area in areas which will recieve the results
+        static final String REFRESH_TASK = "refreshTask";
+        static final String SDS_TASK = "sdsTask";
+        static final String PREDICTION_TASK = "predictionTask";
+        static final String HISTORY_TASK = "historyTask";
+        private String taskType;
         private int areaPos = -1;
         private int sensorPos = -1;
 
@@ -394,12 +385,13 @@ public class CcnLiteAndroid extends AppCompatActivity
          * @return the answer from androidPeek, passing it to onPostExecute
          */
         protected String doInBackground(String... params) {
-            String ipString = params[0];
-            int portInt = Integer.parseInt(params[1]);
-            String contentString = params[2];
-            if (params.length == 5 && params[3] != null && params[4] != null) {
-                areaPos = Integer.parseInt(params[3]);
-                sensorPos = Integer.parseInt(params[4]);
+            taskType = params[0];
+            String ipString = params[1];
+            int portInt = Integer.parseInt(params[2]);
+            String contentString = params[3];
+            if (params.length == 5 && params[4] != null && params[5] != null) {
+                areaPos = Integer.parseInt(params[4]);
+                sensorPos = Integer.parseInt(params[5]);
             }
             Log.i(TAG, contentString+" ("+ccnSuite+") sent to "+ipString+" on port "+portInt);
             return androidPeek(ccnSuite, ipString, portInt, contentString);
@@ -410,54 +402,64 @@ public class CcnLiteAndroid extends AppCompatActivity
          * @param result the returned string from androidPeek
          */
         protected void onPostExecute(String result) {
-            if (peekTaskCounter.getTaskType() == AndroidPeekTaskCounter.SDS_TASK) {
-                Log.i(TAG, "onPostExecute SDS result = " + result);
-                if (isJSONValid(result)) {
-                    areaManager.updateFromSds(result);
-                    peekTaskCounter.taskFinished(AndroidPeekTaskCounter.VALID_SDS);
-                } else {
-                    peekTaskCounter.taskFinished(AndroidPeekTaskCounter.UNVALID_SDS);
-                }
-            }
-            else if (peekTaskCounter.getTaskType() == AndroidPeekTaskCounter.PREDICTION_TASK) {
-                Log.i(TAG, "onPostExecute prediction result = " + result);
-                // TODO: handle prediction, result contains the database's response
-                peekTaskCounter.taskFinished(AndroidPeekTaskCounter.PREDICTION);
-            }
-            else if (peekTaskCounter.getTaskType() == AndroidPeekTaskCounter.HISTORY_TASK) {
-                Log.i(TAG, "onPostExecute history result = " + result);
-                // TODO: handle history, result contains the database's response
-                peekTaskCounter.taskFinished(AndroidPeekTaskCounter.HISTORY);
-            }
-            else if (areaPos == -1 || sensorPos == -1) {
-                Log.e(TAG, "Sensor reading received but has no link to an area or a sensor");
-                peekTaskCounter.taskFinished(AndroidPeekTaskCounter.UNLINKED_RESULT);
-            }
-            else if (SensorReading.isSensorReading(result)) {
-                Log.i(TAG, "onPostExecute "+peekTaskCounter.runningTasks+" sensor reading result = " + result);
-                try {
-                    Sensor s = areaManager.getAreas().get(areaPos).getSensor(sensorPos);
-                    SensorReading sr = new SensorReading(result, s);
-                    adapter.updateValue(areaPos, sensorPos, sr);
-                    peekTaskCounter.taskFinished(AndroidPeekTaskCounter.VALID_READING);
-                } catch (Exception e) {
-                    Log.e(TAG, "Unvalid SensorReading: "+e);
-                    result = "Unvalid SensorReading";
-                    adapter.updateValue(areaPos, sensorPos, result);
-                    peekTaskCounter.taskFinished(AndroidPeekTaskCounter.UNVALID_READING);
-                }
-            }
-            else {
-                Log.i(TAG, "onPostExecute "+peekTaskCounter.runningTasks+" unknown result = " + result);
-                if (result.equals("\n")) {
-                    result = "No data available";
-                } else {
-                    result = Helper.cleanResultString(result);
-                }
-                if (areaPos >= 0 && sensorPos >= 0) {
-                    adapter.updateValue(areaPos, sensorPos, result);
-                }
-                peekTaskCounter.taskFinished(AndroidPeekTaskCounter.UNKNOWN_RESULT);
+            switch (taskType) {
+                case SDS_TASK:
+                    Log.i(TAG, "onPostExecute SDS result = " + result);
+                    if (isJSONValid(result)) {
+                        areaManager.updateFromSds(result);
+                    } else {
+                        Toast.makeText(CcnLiteAndroid.this, "SDS not found. Using old sensor info", Toast.LENGTH_LONG).show();
+                    }
+                    areaManager.setAreaImages(dbTable);
+                    refresh();
+                    if (useAutoRefresh) {
+                        startAutoRefresh();
+                    }
+                    break;
+                case PREDICTION_TASK:
+                    Log.i(TAG, "onPostExecute prediction result = " + result);
+                    // TODO: handle prediction, result contains the database's response
+                    swipeContainer.setRefreshing(false);
+                    break;
+                case HISTORY_TASK:
+                    Log.i(TAG, "onPostExecute history result = " + result);
+                    // TODO: handle history, result contains the database's response
+                    swipeContainer.setRefreshing(false);
+                    break;
+                case REFRESH_TASK:
+                    Log.e(TAG, "onPostExecute sensor reading result = " + result);
+                    if (areaPos == -1 || sensorPos == -1) {
+                        Log.e(TAG, "Sensor reading received but has no link to an area or a sensor");
+                        peekTaskCounter.taskFinished();
+                    } else if (SensorReading.isSensorReading(result)) {
+                        Log.i(TAG, "onPostExecute " + peekTaskCounter.runningTasks + " sensor reading result = " + result);
+                        try {
+                            Sensor s = areaManager.getAreas().get(areaPos).getSensor(sensorPos);
+                            SensorReading sr = new SensorReading(result, s);
+                            adapter.updateValue(areaPos, sensorPos, sr);
+                            peekTaskCounter.taskFinished();
+                        } catch (Exception e) {
+                            Log.e(TAG, "Unvalid SensorReading: " + e);
+                            result = "Unvalid SensorReading";
+                            adapter.updateValue(areaPos, sensorPos, result);
+                            peekTaskCounter.taskFinished();
+                        }
+                    } else {
+                        Log.i(TAG, "onPostExecute " + peekTaskCounter.runningTasks + " unknown result = " + result);
+                        if (result.equals("\n")) {
+                            result = "No data available";
+                        } else {
+                            result = Helper.cleanResultString(result);
+                        }
+                        if (areaPos >= 0 && sensorPos >= 0) {
+                            adapter.updateValue(areaPos, sensorPos, result);
+                        }
+                        peekTaskCounter.taskFinished();
+                    }
+                    break;
+                default:
+                    Log.e(TAG, "Unknown task finished");
+                    break;
             }
         }
     }
@@ -468,69 +470,28 @@ public class CcnLiteAndroid extends AppCompatActivity
      */
     public class AndroidPeekTaskCounter {
         private int runningTasks;
-        private int taskType;
 
-        static final int VALID_SDS = 1;
-        static final int UNVALID_SDS = 2;
-        static final int VALID_READING = 3;
-        static final int UNVALID_READING = 4;
-        static final int UNLINKED_RESULT = 5;
-        static final int UNKNOWN_RESULT = 6;
-        static final int PREDICTION = 7;
-        static final int HISTORY = 8;
-
-        static final int SDS_TASK = 20;
-        static final int PREDICTION_TASK = 21;
-        static final int REFRESH_TASK = 22;
-        static final int HISTORY_TASK = 23;
-
-        AndroidPeekTaskCounter(int numberOfTasks, int taskType) {
+        AndroidPeekTaskCounter(int numberOfTasks) {
             this.runningTasks = numberOfTasks;
-            this.taskType = taskType;
         }
 
-        void taskFinished(int flag) {
-            Log.v(TAG, "Task finished with flag = "+flag);
+        void taskFinished() {
+            Log.v(TAG, "Refresh finished");
             if (--runningTasks == 0) {
-                switch(taskType) {
-                    case SDS_TASK:
-                        if (flag == UNVALID_SDS) {
-                            Toast.makeText(CcnLiteAndroid.this, "SDS not found. Using old sensor info", Toast.LENGTH_LONG).show();
-                        }
-//                        areaManager.setAreaImages(dbTable);
-                        refresh();
-                        if (useAutoRefresh) {
-                            startAutoRefresh();
-                        }
-                        break;
-                    case PREDICTION_TASK:
-                        // TODO: handle prediction - when all is done
-                        swipeContainer.setRefreshing(false);
-                        break;
-                    case HISTORY_TASK:
-                        // TODO: handle history - when all is done
-                        swipeContainer.setRefreshing(false);
-                        break;
-                    case REFRESH_TASK:
-                        areaManager.updateSmileyValues();
-                        areaManager.sortAreas();
-//                        adapter.resetExpandedPosition();
-                        adapter.notifyDataSetChanged();
-                        swipeContainer.setRefreshing(false);
-                        break;
-                }
+                areaManager.updateSmileyValues();
+//                areaManager.sortAreas();
+//                adapter.resetExpandedPosition();
+                adapter.notifyDataSetChanged();
+                swipeContainer.setRefreshing(false);
             }
         }
+
         int getRunningTasks() {
             return runningTasks;
         }
 
         void setRunningTasks(int runningTasks) {
             this.runningTasks = runningTasks;
-        }
-
-        public int getTaskType() {
-            return taskType;
         }
     }
 

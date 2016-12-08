@@ -165,9 +165,9 @@ public class AreasAdapter extends RecyclerView.Adapter<AreasAdapter.AreaViewHold
                     TextView temperature = (TextView)readingsList.findViewById(R.id.card_item_sensor_temperature);
                     TextView humidity = (TextView)readingsList.findViewById(R.id.card_item_sensor_humidity);
                     sensorName.setText(s.getUri());
-                    light.setText(s.getLight());
-                    temperature.setText(s.getTemperature());
-                    humidity.setText(s.getHumidity());
+                    light.setText(s.printLight());
+                    temperature.setText(s.printTemperature());
+                    humidity.setText(s.printHumidity());
 
                     holder.sensorList.addView(readingsList);
                 }
@@ -204,6 +204,7 @@ public class AreasAdapter extends RecyclerView.Adapter<AreasAdapter.AreaViewHold
         sensor.setAvailable(true);
         sensor.updateValues(sr);
         float smileyValue = Float.parseFloat(sr.getLight()) / 4;
+        area.setSmileyValue(Float.toString(smileyValue));
 //        area.setDescription(Float.toString(smileyValue)); //TODO: Deprecated
 //        area.setSmileyValue(Float.toString(smileyValue));
         sr.updateSensorValues();
@@ -216,7 +217,7 @@ public class AreasAdapter extends RecyclerView.Adapter<AreasAdapter.AreaViewHold
 
     private int getSmiley(String valueStr) {
         try {
-            int v = Integer.parseInt(valueStr);
+            float v = Float.parseFloat(valueStr);
             if (v < bounds.get(0)) {
                 return R.drawable.face1;
             } else if (v < bounds.get(1)) {
