@@ -9,10 +9,10 @@
         android:icon="@drawable/ic_sync_black_48dp"
         app:showAsAction="ifRoom"/>
 
-    <item android:id="@+id/menu_item_sync_prediction"
-        android:title="@string/menu_item_sync_prediction"
-        android:icon="@drawable/ic_trending_up_black_48dp"
-        app:showAsAction="ifRoom"/>
+    <!--<item android:id="@+id/menu_item_sync_prediction"-->
+        <!--android:title="@string/menu_item_sync_prediction"-->
+        <!--android:icon="@drawable/ic_trending_up_black_48dp"-->
+        <!--app:showAsAction="ifRoom"/>-->
 
     <!--<card_item android:id="@+id/menu_item_settings"-->
         <!--android:title="@string/menu_item_settings"-->
