@@ -1,16 +1,20 @@
 package ch.unibas.ccn_lite_android.activities;
 
+import android.app.ActionBar;
 import android.content.Context;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import java.text.DateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -55,6 +59,15 @@ public class HistorySearch extends AppCompatActivity {
                     }).display();
             }
         });
+//        displayFakeData();
+    }
+
+    private void displayFakeData() {
+        Sensor s = new Sensor("fakeHistory", 11111111, 24, 10);
+        try {
+            SensorReading sr = new SensorReading("32-10-240.3-23.2-22", s);
+            updateShownReading(sr);
+        } catch(Exception e) {}
     }
 
     private void requestHistoricalData(Calendar cal) {
@@ -75,6 +88,7 @@ public class HistorySearch extends AppCompatActivity {
             LayoutInflater inflater = LayoutInflater.from(context);
             LinearLayout readingsList = (LinearLayout) inflater.inflate(R.layout.card_item_sensor, null);
             TextView sensorName = (TextView)readingsList.findViewById(R.id.card_item_sensor_name);
+            TextView dateField = (TextView)readingsList.findViewById(R.id.card_item_date);
             TextView light = (TextView)readingsList.findViewById(R.id.card_item_sensor_light);
             TextView temperature = (TextView)readingsList.findViewById(R.id.card_item_sensor_temperature);
             TextView humidity = (TextView)readingsList.findViewById(R.id.card_item_sensor_humidity);
@@ -83,10 +97,22 @@ public class HistorySearch extends AppCompatActivity {
             light.setText(sensor.printLight());
             temperature.setText(sensor.printTemperature());
             humidity.setText(sensor.printHumidity());
-            historyLink.setEnabled(false);
+            historyLink.setVisibility(View.GONE);
+
+            Calendar cal = Helper.getCalendarFromSeqno(sensor.getInitialTime(), sensor.getLooptime(),
+                    sensor.getInitialSeqno(), Integer.parseInt(sr.getSeqNo()));
+            dateField.setVisibility(View.VISIBLE);
+            dateField.setText(String.format("%1$tA %1$tb %1$td %1$tY at %1$tI:%1$tM %1$Tp", cal));
 
             lv.addView(readingsList);
         }
+        View v = new View(context);
+        v.setLayoutParams(new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                2
+        ));
+        v.setBackgroundColor(Color.parseColor("#B3B3B3"));
+        lv.addView(v);
     }
 
     /**
