@@ -3,15 +3,10 @@ package ch.unibas.ccn_lite_android.activities;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.List;
 import java.util.Random;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -31,7 +26,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.os.Bundle;
@@ -52,8 +46,6 @@ import ch.unibas.ccn_lite_android.R;
 import ch.unibas.ccn_lite_android.models.Sensor;
 import ch.unibas.ccn_lite_android.models.SensorReading;
 import ch.unibas.ccn_lite_android.models.AreaManager;
-
-import static java.util.concurrent.TimeUnit.SECONDS;
 
 public class CcnLiteAndroid extends AppCompatActivity
         implements NetworkSettingsFragment.NoticeDialogListener
@@ -366,7 +358,7 @@ public class CcnLiteAndroid extends AppCompatActivity
             Area a = areaManager.getAreas().get(i);
             for (int j = 0; j < a.getSensors().size(); j++) {
 
-                requestedURI = a.getSensor(j).getUri();
+                requestedURI = a.getSensor(j).getUriWithSeqno();
                 if (useParallelTaskExecution && Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
                     new AndroidPeekTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, AndroidPeekTask.REFRESH_TASK
                             , targetIp, port, requestedURI, Integer.toString(i), Integer.toString(j));

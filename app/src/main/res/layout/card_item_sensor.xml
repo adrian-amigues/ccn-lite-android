@@ -93,6 +93,18 @@
                 android:id="@+id/card_item_sensor_humidity"
                 />
         </LinearLayout>
+        <TextView
+            android:id="@+id/history_link"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scaleType="fitXY"
+            android:text="past chart"
+            android:textColor="@android:color/holo_blue_dark"
+            android:clickable="true"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:paddingBottom="16dp"
+            />
 
     </LinearLayout>
 
