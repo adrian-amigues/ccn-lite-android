@@ -133,7 +133,7 @@ public class AreasAdapter extends RecyclerView.Adapter<AreasAdapter.AreaViewHold
         Area area = areaManager.getAreas().get(position);
         holder.areaName.setText(area.getName());
         holder.areaPhoto.setImageResource(area.getPhotoId());
-        holder.areaPhoto.setImageBitmap(area.getBitmap());
+//        holder.areaPhoto.setImageBitmap(area.getBitmap());
         holder.areaSmiley.setImageResource(getSmiley(area.getSmileyValue()));
 
         final boolean isExpanded = position == mExpandedPosition;

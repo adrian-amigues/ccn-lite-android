@@ -110,7 +110,7 @@ public class CcnLiteAndroid extends AppCompatActivity
         });
 
         initializeData();
-        refreshSds();
+//        refreshSds();
 //        if (useAutoRefresh) {
 //            startAutoRefresh();
 //        }
@@ -173,14 +173,27 @@ public class CcnLiteAndroid extends AppCompatActivity
      * Initializes the areas array with data
      */
     private void initializeData() {
-        Area a = new Area("FooBar Origins");
-        Sensor s = new Sensor("/p/4b4b6683/foobar/opt", Calendar.getInstance().getTimeInMillis() / 1000, 1, 5);
-        s.setLight("260");
-        s.setTemperature("19.6");
-        s.setHumidity("20");
-        a.addSensor(s);
+        Area a = new Area("FooBar");
         a.setPhotoId(R.drawable.foobar);
+        a.setSmileyValue("3");
+        Sensor s = new Sensor("/p/4b4b6683/foobar/opt", Calendar.getInstance().getTimeInMillis() / 1000, 1, 5);
+        s.setLight("4.3");
+        s.setTemperature("19.6");
+        s.setHumidity("21");
+        a.addSensor(s);
         areaManager.addArea(a);
+
+        a = new Area("Rullan");
+        a.setPhotoId(R.drawable.rullan);
+        a.setSmileyValue("15");
+        areaManager.addArea(a);
+
+        a = new Area("Uthgård");
+        a.setPhotoId(R.drawable.uthgard);
+        a.setSmileyValue("30");
+        areaManager.addArea(a);
+
+
 
         areaManager.setAreaImages(dbTable);
         adapter.notifyDataSetChanged();
