@@ -309,11 +309,11 @@ public class CcnLiteAndroid extends AppCompatActivity
     /**
      * Retreives the prediction data
      */
-    public void refreshPrediction() {
+    public void refreshPrediction(Area area) {
         String port = getString(R.string.port);
-//        String targetIp = useServiceRelay ? getString(R.string.localIp) : externalIp;
-        String targetIp = getString(R.string.databasse_ip);
-        String uri = getString(R.string.prediction_uri);
+        String targetIp = useServiceRelay ? getString(R.string.localIp) : externalIp;
+//        String targetIp = getString(R.string.databasse_ip);
+        String uri = getString(R.string.prediction_base) + "/" + area.getName();
 
         Log.d(TAG, "refresh predictions called");
         startSwipeAnimation();
@@ -328,11 +328,11 @@ public class CcnLiteAndroid extends AppCompatActivity
     /**
      * Retreives the historical data
      */
-    public void refreshHistory() {
+    public void refreshHistory(Area area) {
         String port = getString(R.string.port);
-//        String targetIp = useServiceRelay ? getString(R.string.localIp) : externalIp;
-        String targetIp = getString(R.string.databasse_ip);
-        String uri = getString(R.string.history_uri);
+        String targetIp = useServiceRelay ? getString(R.string.localIp) : externalIp;
+//        String targetIp = getString(R.string.databasse_ip);
+        String uri = getString(R.string.history_base) + "/" + area.getName();
 
         Log.d(TAG, "refresh predictions called");
         startSwipeAnimation();

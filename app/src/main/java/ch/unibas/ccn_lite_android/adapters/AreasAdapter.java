@@ -128,7 +128,7 @@ public class AreasAdapter extends RecyclerView.Adapter<AreasAdapter.AreaViewHold
 
     @Override
     public void onBindViewHolder(final AreaViewHolder holder, int position) {
-        Area area = areaManager.getAreas().get(position);
+        final Area area = areaManager.getAreas().get(position);
         holder.areaName.setText(area.getName());
         holder.areaPhoto.setImageResource(area.getPhotoId());
         holder.areaPhoto.setImageBitmap(area.getBitmap());
@@ -142,8 +142,8 @@ public class AreasAdapter extends RecyclerView.Adapter<AreasAdapter.AreaViewHold
                 mExpandedPosition = isExpanded ? -1 : holder.getAdapterPosition();
                 TransitionManager.beginDelayedTransition(rv);
                 if (!isExpanded) {
-                    ((CcnLiteAndroid) context).refreshPrediction();
-                    ((CcnLiteAndroid) context).refreshHistory();
+                    ((CcnLiteAndroid) context).refreshPrediction(area);
+                    ((CcnLiteAndroid) context).refreshHistory(area);
                 }
                 notifyDataSetChanged();
             }
