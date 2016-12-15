@@ -3,7 +3,9 @@ package ch.unibas.ccn_lite_android.activities;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Random;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -29,6 +31,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.os.Bundle;
@@ -67,7 +70,7 @@ public class CcnLiteAndroid extends AppCompatActivity
     private ScheduledFuture scheduledFuture;
 
     private Boolean useServiceRelay;
-    private Boolean useAutoRefresh;
+//    private Boolean useAutoRefresh;
     private String externalIp;
     private String ccnSuite;
 
@@ -116,9 +119,9 @@ public class CcnLiteAndroid extends AppCompatActivity
 
         initializeData();
         refreshSds();
-        if (useAutoRefresh) {
-            startAutoRefresh();
-        }
+//        if (useAutoRefresh) {
+//            startAutoRefresh();
+//        }
     }
 
     @Override
@@ -142,16 +145,13 @@ public class CcnLiteAndroid extends AppCompatActivity
             case R.id.menu_item_sync_sds:
                 refreshSds();
                 break;
-            case R.id.menu_item_sync_prediction:
-                refreshPrediction();
-                break;
             case R.id.menu_item_network_settings:
                 DialogFragment dialog = new NetworkSettingsFragment();
                 Bundle bundle = new Bundle();
                 bundle.putString(getString(R.string.bundle_name_externalIp), externalIp);
                 bundle.putString(getString(R.string.bundle_name_ccnSuite), ccnSuite);
                 bundle.putBoolean(getString(R.string.bundle_name_useServiceRelay), useServiceRelay);
-                bundle.putBoolean(getString(R.string.bundle_name_useAutoRefresh), useAutoRefresh);
+//                bundle.putBoolean(getString(R.string.bundle_name_useAutoRefresh), useAutoRefresh);
                 dialog.setArguments(bundle);
                 dialog.show(getSupportFragmentManager(), "dialog_network_settings");
                 break;
@@ -173,8 +173,8 @@ public class CcnLiteAndroid extends AppCompatActivity
                 res.getString(R.string.default_external_ip));
         useServiceRelay = sharedPref.getBoolean(res.getString(R.string.pref_key_use_service_relay),
                 res.getBoolean(R.bool.default_use_service_relay));
-        useAutoRefresh = sharedPref.getBoolean(res.getString(R.string.pref_key_use_auto_refresh),
-                res.getBoolean(R.bool.default_use_auto_refresh));
+//        useAutoRefresh = sharedPref.getBoolean(res.getString(R.string.pref_key_use_auto_refresh),
+//                res.getBoolean(R.bool.default_use_auto_refresh));
     }
 
     /**
@@ -182,16 +182,13 @@ public class CcnLiteAndroid extends AppCompatActivity
      */
     private void initializeData() {
         Area a = new Area("FooBar Origins");
-        Sensor s = new Sensor("/p/4b4b6683/foobar/opt", Calendar.getInstance(), 1, 5);
+        Sensor s = new Sensor("/p/4b4b6683/foobar/opt", Calendar.getInstance().getTimeInMillis() / 1000, 1, 5);
         s.setLight("260");
         s.setTemperature("19.6");
+        s.setHumidity("20");
         a.addSensor(s);
         a.setPhotoId(R.drawable.foobar);
         areaManager.addArea(a);
-
-//        areaManager.addArea(new Area("FooBar", "Mote 1", R.drawable.foobar, "/demo/mote1/"));
-//        areaManager.addArea(new Area("Uthgård", "Mote 2", R.drawable.uthgard, "/demo/mote2/"));
-//        areaManager.addArea(new Area("Rullan", "Mote 3", R.drawable.rullan, "/p/4b4b6683/foobar/opt"));
 
         areaManager.setAreaImages(dbTable);
         adapter.notifyDataSetChanged();
@@ -205,6 +202,10 @@ public class CcnLiteAndroid extends AppCompatActivity
         swipe.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
+//                if (useAutoRefresh) {
+//                    stopAutoRefresh();
+//                    startAutoRefresh();
+//                }
                 refresh();
             }
         });
@@ -234,114 +235,112 @@ public class CcnLiteAndroid extends AppCompatActivity
      */
     @Override
     public void onNetworkSettingsDialogPositiveClick(NetworkSettingsFragment dialog) {
-        Boolean newUseAutoRefresh = dialog.getUseAutoRefresh();
-        if (newUseAutoRefresh != useAutoRefresh) {
-            if (newUseAutoRefresh) {
-                startAutoRefresh();
-            } else {
-                stopAutoRefresh();
-            }
-        }
-        useAutoRefresh = newUseAutoRefresh;
+//        Boolean newUseAutoRefresh = dialog.getUseAutoRefresh();
+//        if (newUseAutoRefresh != useAutoRefresh) {
+//            if (newUseAutoRefresh) {
+//                startAutoRefresh();
+//            } else {
+//                stopAutoRefresh();
+//            }
+//        }
+//        useAutoRefresh = newUseAutoRefresh;
         useServiceRelay = dialog.getUseServiceRelay();
         externalIp = dialog.getExternalIp();
         ccnSuite = dialog.getCcnSuite();
         SharedPreferences.Editor prefEditor = sharedPref.edit();
         prefEditor.putBoolean(getString(R.string.pref_key_use_service_relay), useServiceRelay);
-        prefEditor.putBoolean(getString(R.string.pref_key_use_auto_refresh), useAutoRefresh);
+//        prefEditor.putBoolean(getString(R.string.pref_key_use_auto_refresh), useAutoRefresh);
         prefEditor.putString(getString(R.string.pref_key_external_ip), externalIp);
         prefEditor.putString(getString(R.string.pref_key_ccn_suite), ccnSuite);
         prefEditor.apply();
     }
 
-    /**
-     * Starts the automatic refreshing at a fixed rate
-     */
-    private void startAutoRefresh() {
-        ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
-        int delay = getResources().getInteger(R.integer.auto_refresh_delay_seconds);
-        scheduledFuture = scheduler.scheduleAtFixedRate(new Runnable() {
-            public void run() {
-                refresh();
-            }
-        }, delay, delay, SECONDS);
-    }
+//    /**
+//     * Starts the automatic refreshing at a fixed rate
+//     */
+//    private void startAutoRefresh() {
+//        ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+//        int delay = getResources().getInteger(R.integer.auto_refresh_delay_seconds);
+//        scheduledFuture = scheduler.scheduleAtFixedRate(new Runnable() {
+//            public void run() {
+//                refresh();
+//            }
+//        }, delay, delay, SECONDS);
+//    }
+//
+//    /**
+//     * Stops the automatic refreshing
+//     */
+//    private void stopAutoRefresh() {
+//        if (scheduledFuture != null) {
+//            scheduledFuture.cancel(true);
+//        }
+//    }
 
-    /**
-     * Stops the automatic refreshing
-     */
-    private void stopAutoRefresh() {
-        if (scheduledFuture != null) {
-            scheduledFuture.cancel(true);
-        }
+    private void startSwipeAnimation() {
+//        if(!swipeContainer.isRefreshing()) {
+//            TypedValue typed_value = new TypedValue();
+//            this.getTheme().resolveAttribute(android.support.v7.appcompat.R.attr.actionBarSize, typed_value, true);
+//            swipeContainer.setProgressViewOffset(false, 0, getResources().getDimensionPixelSize(typed_value.resourceId));
+//            swipeContainer.setRefreshing(true);
+//        }
+        swipeContainer.setRefreshing(true);
     }
 
     /**
      * Retreives SDS data, creates a peekTask with a specific uri aiming at the SDS
      */
     private void refreshSds() {
-        stopAutoRefresh();
+//        stopAutoRefresh();
         String port = getString(R.string.sds_port);
         String targetIp = useServiceRelay ? getString(R.string.localIp) : externalIp;
         String uri = getString(R.string.sds_uri);
 
-        if (peekTaskCounter != null && peekTaskCounter.getRunningTasks() > 0) {
-            peekTaskCounter.setRunningTasks(1 + peekTaskCounter.getRunningTasks());
-        } else {
-            peekTaskCounter = new AndroidPeekTaskCounter(1, AndroidPeekTaskCounter.SDS_TASK);
-        }
         Log.d(TAG, "refreshSds called");
-        swipeContainer.setRefreshing(true);
+        startSwipeAnimation();
         if (useParallelTaskExecution && Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-            new AndroidPeekTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, targetIp, port, uri);
+            new AndroidPeekTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR
+                    , AndroidPeekTask.SDS_TASK, targetIp, port, uri);
         } else {
-            new AndroidPeekTask().execute(targetIp, port, uri);
+            new AndroidPeekTask().execute(AndroidPeekTask.SDS_TASK, targetIp, port, uri);
         }
     }
 
     /**
      * Retreives the prediction data
      */
-    public void refreshPrediction() {
+    public void refreshPrediction(Area area) {
         String port = getString(R.string.port);
-//        String targetIp = useServiceRelay ? getString(R.string.localIp) : externalIp;
-        String targetIp = getString(R.string.databasse_ip);
-        String uri = getString(R.string.prediction_uri);
+        String targetIp = useServiceRelay ? getString(R.string.localIp) : externalIp;
+//        String targetIp = getString(R.string.databasse_ip);
+        String uri = getString(R.string.prediction_base) + "/" + area.getName();
 
-        if (peekTaskCounter != null && peekTaskCounter.getRunningTasks() > 0) {
-            peekTaskCounter.setRunningTasks(1 + peekTaskCounter.getRunningTasks());
-        } else {
-            peekTaskCounter = new AndroidPeekTaskCounter(1, AndroidPeekTaskCounter.PREDICTION_TASK);
-        }
         Log.d(TAG, "refresh predictions called");
-        swipeContainer.setRefreshing(true);
+        startSwipeAnimation();
         if (useParallelTaskExecution && Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-            new AndroidPeekTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, targetIp, port, uri);
+            new AndroidPeekTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR
+                    , AndroidPeekTask.PREDICTION_TASK, targetIp, port, uri);
         } else {
-            new AndroidPeekTask().execute(targetIp, port, uri);
+            new AndroidPeekTask().execute(AndroidPeekTask.PREDICTION_TASK, targetIp, port, uri);
         }
     }
 
     /**
      * Retreives the historical data
      */
-    public void refreshHistory() {
+    public void refreshHistory(Area area) {
         String port = getString(R.string.port);
-//        String targetIp = useServiceRelay ? getString(R.string.localIp) : externalIp;
-        String targetIp = getString(R.string.databasse_ip);
-        String uri = getString(R.string.history_uri);
+        String targetIp = useServiceRelay ? getString(R.string.localIp) : externalIp;
+//        String targetIp = getString(R.string.databasse_ip);
+        String uri = getString(R.string.history_base) + "/" + area.getName();
 
-        if (peekTaskCounter != null && peekTaskCounter.getRunningTasks() > 0) {
-            peekTaskCounter.setRunningTasks(1 + peekTaskCounter.getRunningTasks());
-        } else {
-            peekTaskCounter = new AndroidPeekTaskCounter(1, AndroidPeekTaskCounter.HISTORY_TASK);
-        }
         Log.d(TAG, "refresh predictions called");
-        swipeContainer.setRefreshing(true);
+        startSwipeAnimation();
         if (useParallelTaskExecution && Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-            new AndroidPeekTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, targetIp, port, uri);
+            new AndroidPeekTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR
+                    , AndroidPeekTask.HISTORY_TASK, targetIp, port, uri);
         } else {
-            new AndroidPeekTask().execute(targetIp, port, uri);
+            new AndroidPeekTask().execute(AndroidPeekTask.HISTORY_TASK, targetIp, port, uri);
         }
     }
 
@@ -355,13 +354,13 @@ public class CcnLiteAndroid extends AppCompatActivity
         int totalUris = areaManager.getTotalUris();
         int areaCount = areaManager.getAreas().size();
 
-        if (peekTaskCounter != null && peekTaskCounter.getRunningTasks() > 0) {
-            peekTaskCounter.setRunningTasks(totalUris + peekTaskCounter.getRunningTasks());
-        } else {
-            peekTaskCounter = new AndroidPeekTaskCounter(totalUris, AndroidPeekTaskCounter.REFRESH_TASK);
-        }
+//        if (peekTaskCounter != null && peekTaskCounter.getRunningTasks() > 0) {
+//            peekTaskCounter.setRunningTasks(totalUris + peekTaskCounter.getRunningTasks());
+//        } else {
+            peekTaskCounter = new AndroidPeekTaskCounter(totalUris);
+//        }
         Log.d(TAG, "refresh called with "+totalUris+" URIs");
-        swipeContainer.setRefreshing(true);
+        startSwipeAnimation();
 
         for (int i = 0; i < areaCount; i++) {
             Area a = areaManager.getAreas().get(i);
@@ -369,11 +368,11 @@ public class CcnLiteAndroid extends AppCompatActivity
 
                 requestedURI = a.getSensor(j).getUri();
                 if (useParallelTaskExecution && Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-                    new AndroidPeekTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, targetIp,
-                            port, requestedURI, Integer.toString(i), Integer.toString(j));
+                    new AndroidPeekTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, AndroidPeekTask.REFRESH_TASK
+                            , targetIp, port, requestedURI, Integer.toString(i), Integer.toString(j));
                 } else {
-                    new AndroidPeekTask().execute(targetIp, port, requestedURI,
-                            Integer.toString(i), Integer.toString(j));
+                    new AndroidPeekTask().execute(AndroidPeekTask.REFRESH_TASK, targetIp, port, requestedURI
+                            , Integer.toString(i), Integer.toString(j));
                 }
             }
         }
@@ -385,6 +384,11 @@ public class CcnLiteAndroid extends AppCompatActivity
      */
     private class AndroidPeekTask extends AsyncTask<String, Void, String> {
         // position of the area in areas which will recieve the results
+        static final String REFRESH_TASK = "refreshTask";
+        static final String SDS_TASK = "sdsTask";
+        static final String PREDICTION_TASK = "predictionTask";
+        static final String HISTORY_TASK = "historyTask";
+        private String taskType;
         private int areaPos = -1;
         private int sensorPos = -1;
 
@@ -394,12 +398,13 @@ public class CcnLiteAndroid extends AppCompatActivity
          * @return the answer from androidPeek, passing it to onPostExecute
          */
         protected String doInBackground(String... params) {
-            String ipString = params[0];
-            int portInt = Integer.parseInt(params[1]);
-            String contentString = params[2];
-            if (params.length == 5 && params[3] != null && params[4] != null) {
-                areaPos = Integer.parseInt(params[3]);
-                sensorPos = Integer.parseInt(params[4]);
+            taskType = params[0];
+            String ipString = params[1];
+            int portInt = Integer.parseInt(params[2]);
+            String contentString = params[3];
+            if (params.length == 6 && params[4] != null && params[5] != null) {
+                areaPos = Integer.parseInt(params[4]);
+                sensorPos = Integer.parseInt(params[5]);
             }
             Log.i(TAG, contentString+" ("+ccnSuite+") sent to "+ipString+" on port "+portInt);
             return androidPeek(ccnSuite, ipString, portInt, contentString);
@@ -410,54 +415,64 @@ public class CcnLiteAndroid extends AppCompatActivity
          * @param result the returned string from androidPeek
          */
         protected void onPostExecute(String result) {
-            if (peekTaskCounter.getTaskType() == AndroidPeekTaskCounter.SDS_TASK) {
-                Log.i(TAG, "onPostExecute SDS result = " + result);
-                if (isJSONValid(result)) {
-                    areaManager.updateFromSds(result);
-                    peekTaskCounter.taskFinished(AndroidPeekTaskCounter.VALID_SDS);
-                } else {
-                    peekTaskCounter.taskFinished(AndroidPeekTaskCounter.UNVALID_SDS);
-                }
-            }
-            else if (peekTaskCounter.getTaskType() == AndroidPeekTaskCounter.PREDICTION_TASK) {
-                Log.i(TAG, "onPostExecute prediction result = " + result);
-                // TODO: handle prediction, result contains the database's response
-                peekTaskCounter.taskFinished(AndroidPeekTaskCounter.PREDICTION);
-            }
-            else if (peekTaskCounter.getTaskType() == AndroidPeekTaskCounter.HISTORY_TASK) {
-                Log.i(TAG, "onPostExecute history result = " + result);
-                // TODO: handle history, result contains the database's response
-                peekTaskCounter.taskFinished(AndroidPeekTaskCounter.HISTORY);
-            }
-            else if (areaPos == -1 || sensorPos == -1) {
-                Log.e(TAG, "Sensor reading received but has no link to an area or a sensor");
-                peekTaskCounter.taskFinished(AndroidPeekTaskCounter.UNLINKED_RESULT);
-            }
-            else if (SensorReading.isSensorReading(result)) {
-                Log.i(TAG, "onPostExecute "+peekTaskCounter.runningTasks+" sensor reading result = " + result);
-                try {
-                    Sensor s = areaManager.getAreas().get(areaPos).getSensor(sensorPos);
-                    SensorReading sr = new SensorReading(result, s);
-                    adapter.updateValue(areaPos, sensorPos, sr);
-                    peekTaskCounter.taskFinished(AndroidPeekTaskCounter.VALID_READING);
-                } catch (Exception e) {
-                    Log.e(TAG, "Unvalid SensorReading: "+e);
-                    result = "Unvalid SensorReading";
-                    adapter.updateValue(areaPos, sensorPos, result);
-                    peekTaskCounter.taskFinished(AndroidPeekTaskCounter.UNVALID_READING);
-                }
-            }
-            else {
-                Log.i(TAG, "onPostExecute "+peekTaskCounter.runningTasks+" unknown result = " + result);
-                if (result.equals("\n")) {
-                    result = "No data available";
-                } else {
-                    result = Helper.cleanResultString(result);
-                }
-                if (areaPos >= 0 && sensorPos >= 0) {
-                    adapter.updateValue(areaPos, sensorPos, result);
-                }
-                peekTaskCounter.taskFinished(AndroidPeekTaskCounter.UNKNOWN_RESULT);
+            switch (taskType) {
+                case SDS_TASK:
+                    Log.i(TAG, "onPostExecute SDS result = " + result);
+                    if (isJSONValid(result)) {
+                        areaManager.updateFromSds(result);
+                    } else {
+                        Toast.makeText(CcnLiteAndroid.this, "SDS not found. Using old sensor info", Toast.LENGTH_LONG).show();
+                    }
+                    areaManager.setAreaImages(dbTable);
+                    refresh();
+//                    if (useAutoRefresh) {
+//                        startAutoRefresh();
+//                    }
+                    break;
+                case PREDICTION_TASK:
+                    Log.i(TAG, "onPostExecute prediction result = " + result);
+                    // TODO: handle prediction, result contains the database's response
+                    swipeContainer.setRefreshing(false);
+                    break;
+                case HISTORY_TASK:
+                    Log.i(TAG, "onPostExecute history result = " + result);
+                    // TODO: handle history, result contains the database's response
+                    swipeContainer.setRefreshing(false);
+                    break;
+                case REFRESH_TASK:
+                    Log.e(TAG, "onPostExecute refresh result = " + result);
+                    if (areaPos == -1 || sensorPos == -1) {
+                        Log.e(TAG, "Sensor reading received but has no link to an area or a sensor");
+                        peekTaskCounter.taskFinished();
+                    } else if (SensorReading.isSensorReading(result)) {
+                        Log.i(TAG, "onPostExecute " + peekTaskCounter.runningTasks + " sensor reading result = " + result);
+                        try {
+                            Sensor s = areaManager.getAreas().get(areaPos).getSensor(sensorPos);
+                            SensorReading sr = new SensorReading(result, s);
+                            adapter.updateValue(areaPos, sensorPos, sr);
+                            peekTaskCounter.taskFinished();
+                        } catch (Exception e) {
+                            Log.e(TAG, "Unvalid SensorReading: " + e);
+                            result = "Unvalid SensorReading";
+                            adapter.updateValue(areaPos, sensorPos, result);
+                            peekTaskCounter.taskFinished();
+                        }
+                    } else {
+                        Log.i(TAG, "onPostExecute " + peekTaskCounter.runningTasks + " unknown result = " + result);
+                        if (result.equals("\n")) {
+                            result = "No data available";
+                        } else {
+                            result = Helper.cleanResultString(result);
+                        }
+                        if (areaPos >= 0 && sensorPos >= 0) {
+                            adapter.updateValue(areaPos, sensorPos, result);
+                        }
+                        peekTaskCounter.taskFinished();
+                    }
+                    break;
+                default:
+                    Log.e(TAG, "Unknown task finished");
+                    break;
             }
         }
     }
@@ -468,69 +483,28 @@ public class CcnLiteAndroid extends AppCompatActivity
      */
     public class AndroidPeekTaskCounter {
         private int runningTasks;
-        private int taskType;
 
-        static final int VALID_SDS = 1;
-        static final int UNVALID_SDS = 2;
-        static final int VALID_READING = 3;
-        static final int UNVALID_READING = 4;
-        static final int UNLINKED_RESULT = 5;
-        static final int UNKNOWN_RESULT = 6;
-        static final int PREDICTION = 7;
-        static final int HISTORY = 8;
-
-        static final int SDS_TASK = 20;
-        static final int PREDICTION_TASK = 21;
-        static final int REFRESH_TASK = 22;
-        static final int HISTORY_TASK = 23;
-
-        AndroidPeekTaskCounter(int numberOfTasks, int taskType) {
+        AndroidPeekTaskCounter(int numberOfTasks) {
             this.runningTasks = numberOfTasks;
-            this.taskType = taskType;
         }
 
-        void taskFinished(int flag) {
-            Log.v(TAG, "Task finished with flag = "+flag);
+        void taskFinished() {
+            Log.v(TAG, "Refresh finished");
             if (--runningTasks == 0) {
-                switch(taskType) {
-                    case SDS_TASK:
-                        if (flag == UNVALID_SDS) {
-                            Toast.makeText(CcnLiteAndroid.this, "SDS not found. Using old sensor info", Toast.LENGTH_LONG).show();
-                        }
-//                        areaManager.setAreaImages(dbTable);
-                        refresh();
-                        if (useAutoRefresh) {
-                            startAutoRefresh();
-                        }
-                        break;
-                    case PREDICTION_TASK:
-                        // TODO: handle prediction - when all is done
-                        swipeContainer.setRefreshing(false);
-                        break;
-                    case HISTORY_TASK:
-                        // TODO: handle history - when all is done
-                        swipeContainer.setRefreshing(false);
-                        break;
-                    case REFRESH_TASK:
-                        areaManager.updateSmileyValues();
-                        areaManager.sortAreas();
-//                        adapter.resetExpandedPosition();
-                        adapter.notifyDataSetChanged();
-                        swipeContainer.setRefreshing(false);
-                        break;
-                }
+                areaManager.updateSmileyValues();
+//                areaManager.sortAreas();
+//                adapter.resetExpandedPosition();
+                adapter.notifyDataSetChanged();
+                swipeContainer.setRefreshing(false);
             }
         }
+
         int getRunningTasks() {
             return runningTasks;
         }
 
         void setRunningTasks(int runningTasks) {
             this.runningTasks = runningTasks;
-        }
-
-        public int getTaskType() {
-            return taskType;
         }
     }
 

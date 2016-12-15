@@ -43,7 +43,7 @@ public class Helper {
 //        }
         try {
             Calendar cal = Calendar.getInstance();
-            long timeMillis = Integer.parseInt(timeSeconds) * 1000;
+            long timeMillis = Long.parseLong(timeSeconds) * 1000;
             cal.setTimeInMillis(timeMillis);
             return cal;
         }

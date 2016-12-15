@@ -92,14 +92,14 @@ public class NetworkSettingsFragment extends DialogFragment {
         });
 
         // Auto refresh checkbox
-        CheckBox cb = (CheckBox) dialogView.findViewById(R.id.dialog_suite_checkbox_auto_refresh);
-        cb.setChecked(useAutoRefresh);
-        cb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                useAutoRefresh = isChecked;
-            }
-        });
+//        CheckBox cb = (CheckBox) dialogView.findViewById(R.id.dialog_suite_checkbox_auto_refresh);
+//        cb.setChecked(useAutoRefresh);
+//        cb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+//            @Override
+//            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+//                useAutoRefresh = isChecked;
+//            }
+//        });
 
         // IP address field
         final EditText ipField = (EditText) dialogView.findViewById(R.id.dialog_ip_address);

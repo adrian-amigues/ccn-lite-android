@@ -22,16 +22,16 @@
             />
     </RadioGroup>
 
-    <View
-        android:layout_width="fill_parent"
-        android:layout_height="2dp"
-        android:background="#c0c0c0"/>
+    <!--<View-->
+        <!--android:layout_width="fill_parent"-->
+        <!--android:layout_height="2dp"-->
+        <!--android:background="#c0c0c0"/>-->
 
-    <CheckBox android:id="@+id/dialog_suite_checkbox_auto_refresh"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Auto refresh"
-        />
+    <!--<CheckBox android:id="@+id/dialog_suite_checkbox_auto_refresh"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:text="Auto refresh"-->
+        <!--/>-->
 
     <View
         android:layout_width="fill_parent"
