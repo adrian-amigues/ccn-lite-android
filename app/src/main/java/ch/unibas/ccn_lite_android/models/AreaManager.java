@@ -115,6 +115,7 @@ public class AreaManager {
         }
     }
 
+    //set the images into the areas based on the paths stored in the smart phone's database
     public void setAreaImages(DatabaseTable dbTable) {
         Bitmap icon = BitmapFactory.decodeResource(context.getResources(),
                 R.drawable.take_photo_thumbnail);
