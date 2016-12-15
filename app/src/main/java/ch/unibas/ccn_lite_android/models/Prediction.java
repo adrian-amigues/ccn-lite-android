@@ -1,6 +1,7 @@
 package ch.unibas.ccn_lite_android.models;
 
 import android.graphics.Color;
+import android.util.Log;
 
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.Legend;
@@ -11,6 +12,9 @@ import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.github.mikephil.charting.utils.ViewPortHandler;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
@@ -47,7 +51,7 @@ public class Prediction {
                 if(columns.length == 3) {
                     String time = columns[1];
                     String[] HHMMArray = time.split(":");
-                    predictionTimeValue.add(HHMMArray[0] + HHMMArray[1]);
+                    predictionTimeValue.add(HHMMArray[0] + ":" + HHMMArray[1]);
                     predictionYValue[i - 1] = Float.parseFloat(columns[2]);
                 }
             }
@@ -55,7 +59,24 @@ public class Prediction {
     }
 
     void  parseHistoricString(String histo){
+        Area area;
+        try {
+            JSONArray jsonArray = new JSONArray(histo);
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject areaObject = jsonArray.getJSONObject(i);
 
+                String uri = areaObject.getString("pf");
+                long sensorInitialDate = Long.parseLong(areaObject.getString("bt"));
+                int initialSeqno = 1;
+                int looptime = Integer.parseInt(areaObject.getString("but"));
+
+
+            }
+        } catch (org.json.JSONException e) {
+
+        } catch (Exception e) {
+
+        }
     }
 
 
@@ -168,7 +189,12 @@ float counter = 10.00f;
         xAxis.setGranularity(1f);// minimum axis-step (interval) is 1
         xAxis.setAxisMinValue(0);
         // the labels that should be drawn on the XAxis
-        final String[] quarters = new String[] { "9.00", "10.00", "11.00", "12.00", "13.00", "14.00", "15.00", "16.00", "17.00", "18.00", "19.00", "20.00", "21.00", "22.00", "23.00", "00.00", "00.01" };
+        final String[] quarters = new String[10+predictionTimeValue.size()];
+        for(int a=0;a<10;a++)
+            quarters[a]="9.00";
+        for(int a = 0;a<predictionTimeValue.size();a++)
+            quarters[a+10] = predictionTimeValue.get(a);
+       // { "9.00", "10.00", "11.00", "12.00", "13.00", "14.00", "15.00", "16.00", "17.00", "18.00", "19.00", "20.00", "21.00", "22.00", "23.00", "00.00", "00.01" };
         xAxis.setValueFormatter(new AxisFormatter(quarters));
         xAxis.setLabelRotationAngle(90.0f);
 

@@ -9,19 +9,24 @@ import java.util.Calendar;
 public class Sensor {
 //    private String id;
     private String uri;
-    private Calendar initialDate;
+//    private Calendar initialDate;
+    private long initialDate;
     private int initialSeqno;
     private int looptime;
     private String light;
     private String temperature;
     private String humidity;
+    private final String lightUnit = " lx";
+    private final String temperatureUnit = " °C";
+    private final String humidityUnit = " %";
     private boolean available;
 
 //    public Sensor(String id, String uri, Calendar initialDate, int seqno, int looptime) {
-    public Sensor(String uri, Calendar initialDate, int seqno, int looptime) {
+//    public Sensor(String uri, Calendar initialDate, int seqno, int looptime) {
+    public Sensor(String uri, long initialTime, int seqno, int looptime) {
 //        this.id = id;
         this.uri = uri;
-        this.initialDate = initialDate;
+        this.initialDate = initialTime;
         this.initialSeqno = seqno;
         this.looptime = looptime;
         this.light = "0";
@@ -58,6 +63,10 @@ public class Sensor {
         this.light = light;
     }
 
+    public String printLight() {
+        return light + lightUnit;
+    }
+
     public String getTemperature() {
         return temperature;
     }
@@ -66,12 +75,20 @@ public class Sensor {
         this.temperature = temperature;
     }
 
+    public String printTemperature() {
+        return temperature + temperatureUnit;
+    }
+
     public String getHumidity() {
         return humidity;
     }
 
     public void setHumidity(String humidity) {
         this.humidity = humidity;
+    }
+
+    public String printHumidity() {
+        return humidity + humidityUnit;
     }
 
     public boolean isAvailable() {
@@ -90,11 +107,10 @@ public class Sensor {
 
     public int getCurrentSeqno() {
         Calendar dateNow = Calendar.getInstance();
-        long nowTimeMillis = dateNow.getTimeInMillis();
-        long initialTimeMillis = initialDate.getTimeInMillis();
-        long diffTimeMillis = nowTimeMillis - initialTimeMillis;
-        Double diffSeqno = Math.floor(diffTimeMillis / (looptime * 1000));
-        int test = dateNow.get(Calendar.MONTH);
-        return initialSeqno + diffSeqno.intValue();
+        long nowTime = dateNow.getTimeInMillis() / 1000;
+        long initialTime = initialDate;
+        long diffTime = nowTime - initialTime;
+        Double diffSeqno = Math.floor(diffTime / looptime);
+        return initialSeqno + diffSeqno.intValue() - 1;
     }
 }

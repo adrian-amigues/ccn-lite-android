@@ -130,7 +130,7 @@ public class AreasAdapter extends RecyclerView.Adapter<AreasAdapter.AreaViewHold
 
     @Override
     public void onBindViewHolder(final AreaViewHolder holder, int position) {
-        Area area = areaManager.getAreas().get(position);
+        final Area area = areaManager.getAreas().get(position);
         holder.areaName.setText(area.getName());
         holder.areaPhoto.setImageResource(area.getPhotoId());
         holder.areaPhoto.setImageBitmap(area.getBitmap());
@@ -147,8 +147,8 @@ public class AreasAdapter extends RecyclerView.Adapter<AreasAdapter.AreaViewHold
                 } else {
                     mExpandedPosition = holder.getAdapterPosition();
                     expandedChart = holder.predictionChart;
-                    ((CcnLiteAndroid) context).refreshPrediction();
-                    ((CcnLiteAndroid) context).refreshHistory();
+                    ((CcnLiteAndroid) context).refreshPrediction(area);
+                    ((CcnLiteAndroid) context).refreshHistory(area);
 //                    prediction.makepredictionGraph(predictionChart);
                 }
 //                mExpandedPosition = isExpanded ? -1 : holder.getAdapterPosition();
@@ -173,9 +173,9 @@ public class AreasAdapter extends RecyclerView.Adapter<AreasAdapter.AreaViewHold
                     TextView temperature = (TextView)readingsList.findViewById(R.id.card_item_sensor_temperature);
                     TextView humidity = (TextView)readingsList.findViewById(R.id.card_item_sensor_humidity);
                     sensorName.setText(s.getUri());
-                    light.setText(s.getLight());
-                    temperature.setText(s.getTemperature());
-                    humidity.setText(s.getHumidity());
+                    light.setText(s.printLight());
+                    temperature.setText(s.printTemperature());
+                    humidity.setText(s.printHumidity());
 
                     holder.sensorList.addView(readingsList);
                 }
@@ -212,6 +212,7 @@ public class AreasAdapter extends RecyclerView.Adapter<AreasAdapter.AreaViewHold
         sensor.setAvailable(true);
         sensor.updateValues(sr);
         float smileyValue = Float.parseFloat(sr.getLight()) / 4;
+        area.setSmileyValue(Float.toString(smileyValue));
 //        area.setDescription(Float.toString(smileyValue)); //TODO: Deprecated
 //        area.setSmileyValue(Float.toString(smileyValue));
         sr.updateSensorValues();
@@ -225,7 +226,7 @@ public class AreasAdapter extends RecyclerView.Adapter<AreasAdapter.AreaViewHold
 
     private int getSmiley(String valueStr) {
         try {
-            int v = Integer.parseInt(valueStr);
+            float v = Float.parseFloat(valueStr);
             if (v < bounds.get(0)) {
                 return R.drawable.face1;
             } else if (v < bounds.get(1)) {

@@ -6,8 +6,8 @@
     <string name="sds_port">9695</string>
     <string name="database_port">9997</string>
     <string name="databasse_ip">130.238.15.214</string>
-    <string name="prediction_uri">prediction/office</string>
-    <string name="history_uri">historical/office</string>
+    <string name="prediction_base">/prediction</string>
+    <string name="history_base">/historical</string>
 
     <string name="bundle_name_externalIp">externalIp</string>
     <string name="bundle_name_ccnSuite">ccnSuite</string>
