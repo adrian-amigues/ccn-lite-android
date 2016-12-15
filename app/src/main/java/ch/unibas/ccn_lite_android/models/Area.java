@@ -83,7 +83,7 @@ public class Area {
         this.bitmap = bitmap;
     }
 
-    //    public String getUri() {
+    //    public String getUriWithSeqno() {
 //        return uriBase;
 //    }
 

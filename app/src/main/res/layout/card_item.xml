@@ -105,19 +105,19 @@
                        android:layout_height="0.5dp"
                        android:background="@android:color/black" />
 
-                   <TextView
-                       android:id="@+id/past_chart_link"
-                       android:layout_width="match_parent"
-                       android:layout_height="wrap_content"
-                       android:layout_below="@id/sensor_list"
-                       android:scaleType="fitXY"
-                       android:text="past chart"
-                       android:textColor="@android:color/holo_blue_dark"
-                       android:clickable="true"
-                       android:paddingStart="16dp"
-                       android:paddingEnd="16dp"
-                       android:paddingBottom="16dp"
-                       />
+                   <!--<TextView-->
+                       <!--android:id="@+id/past_chart_link"-->
+                       <!--android:layout_width="match_parent"-->
+                       <!--android:layout_height="wrap_content"-->
+                       <!--android:layout_below="@id/sensor_list"-->
+                       <!--android:scaleType="fitXY"-->
+                       <!--android:text="past chart"-->
+                       <!--android:textColor="@android:color/holo_blue_dark"-->
+                       <!--android:clickable="true"-->
+                       <!--android:paddingStart="16dp"-->
+                       <!--android:paddingEnd="16dp"-->
+                       <!--android:paddingBottom="16dp"-->
+                       <!--/>-->
 
                    <View
                        android:layout_width="match_parent"
@@ -130,7 +130,6 @@
                        android:layout_width="match_parent"
                        android:layout_height="250dp"
                        android:layout_alignParentBottom="true"
-                       android:layout_below="@id/past_chart_link"
                        android:scaleType="fitXY"
                        android:background="@android:color/background_light"
                        android:paddingStart="16dp"

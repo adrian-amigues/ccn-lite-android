@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
+    <string name="separator_color">#c0c0c0</string>
 </resources>

@@ -52,4 +52,20 @@ public class Helper {
             return null;
         }
     }
+
+    static public int getSeqno(long initialTime, long time, int looptime, int initialSeqno) {
+//        Calendar dateNow = Calendar.getInstance();
+//        long nowTime = dateNow.getTimeInMillis() / 1000;
+        long diffTime = time - initialTime;
+        Double diffSeqno = Math.floor(diffTime / looptime);
+        return initialSeqno + diffSeqno.intValue() - 1;
+    }
+
+    static public Calendar getCalendarFromSeqno(long initialTime, int looptime, int initialSeqno, int currentSeqno) {
+        Calendar cal = Calendar.getInstance();
+        int diffSeqno = currentSeqno - initialSeqno + 1;
+        long diffTime = diffSeqno * looptime;
+        cal.setTimeInMillis(initialTime + diffTime);
+        return cal;
+    }
 }

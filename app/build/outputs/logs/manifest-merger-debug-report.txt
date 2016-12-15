@@ -1,6 +1,6 @@
 -- Merging decision tree log ---
 manifest
-ADDED from /home/adrian/android-ndk/android4-ccnlite/app/src/main/AndroidManifest.xml:2:1-46:12
+ADDED from /home/adrian/android-ndk/android4-ccnlite/app/src/main/AndroidManifest.xml:2:1-47:12
 	package
 		ADDED from /home/adrian/android-ndk/android4-ccnlite/app/src/main/AndroidManifest.xml:3:5-41
 		INJECTED from /home/adrian/android-ndk/android4-ccnlite/app/src/main/AndroidManifest.xml
@@ -19,14 +19,15 @@ uses-sdk
 ADDED from /home/adrian/android-ndk/android4-ccnlite/app/src/main/AndroidManifest.xml:7:5-10:41
 MERGED from [com.android.support:design:23.4.0] /home/adrian/android-ndk/android4-ccnlite/app/build/intermediates/exploded-aar/com.android.support/design/23.4.0/AndroidManifest.xml:20:5-43
 MERGED from [com.android.support:recyclerview-v7:23.4.0] /home/adrian/android-ndk/android4-ccnlite/app/build/intermediates/exploded-aar/com.android.support/recyclerview-v7/23.4.0/AndroidManifest.xml:20:5-43
-MERGED from [com.android.support:support-v4:23.4.0] /home/adrian/android-ndk/android4-ccnlite/app/build/intermediates/exploded-aar/com.android.support/support-v4/23.4.0/AndroidManifest.xml:20:5-43
-MERGED from [com.android.support:appcompat-v7:23.4.0] /home/adrian/android-ndk/android4-ccnlite/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.4.0/AndroidManifest.xml:21:5-23:78
-MERGED from [com.android.support:animated-vector-drawable:23.4.0] /home/adrian/android-ndk/android4-ccnlite/app/build/intermediates/exploded-aar/com.android.support/animated-vector-drawable/23.4.0/AndroidManifest.xml:5:5-44
-MERGED from [com.android.support:support-vector-drawable:23.4.0] /home/adrian/android-ndk/android4-ccnlite/app/build/intermediates/exploded-aar/com.android.support/support-vector-drawable/23.4.0/AndroidManifest.xml:5:5-43
+MERGED from [com.android.support:support-v4:24.0.0] /home/adrian/android-ndk/android4-ccnlite/app/build/intermediates/exploded-aar/com.android.support/support-v4/24.0.0/AndroidManifest.xml:21:5-23:54
+MERGED from [com.android.support:appcompat-v7:24.0.0] /home/adrian/android-ndk/android4-ccnlite/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/24.0.0/AndroidManifest.xml:21:5-23:78
+MERGED from [com.android.support:support-vector-drawable:24.0.0] /home/adrian/android-ndk/android4-ccnlite/app/build/intermediates/exploded-aar/com.android.support/support-vector-drawable/24.0.0/AndroidManifest.xml:21:5-43
+MERGED from [com.android.support:animated-vector-drawable:24.0.0] /home/adrian/android-ndk/android4-ccnlite/app/build/intermediates/exploded-aar/com.android.support/animated-vector-drawable/24.0.0/AndroidManifest.xml:20:5-44
 MERGED from [com.android.support:cardview-v7:23.4.0] /home/adrian/android-ndk/android4-ccnlite/app/build/intermediates/exploded-aar/com.android.support/cardview-v7/23.4.0/AndroidManifest.xml:20:5-43
 MERGED from [com.bignerdranch.android:expandablerecyclerview:1.0.3] /home/adrian/android-ndk/android4-ccnlite/app/build/intermediates/exploded-aar/com.bignerdranch.android/expandablerecyclerview/1.0.3/AndroidManifest.xml:7:5-9:41
+MERGED from [com.github.florent37:singledateandtimepicker:1.0.0] /home/adrian/android-ndk/android4-ccnlite/app/build/intermediates/exploded-aar/com.github.florent37/singledateandtimepicker/1.0.0/AndroidManifest.xml:8:5-10:41
 	tools:overrideLibrary
-		ADDED from [com.android.support:appcompat-v7:23.4.0] /home/adrian/android-ndk/android4-ccnlite/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.4.0/AndroidManifest.xml:23:9-75
+		ADDED from [com.android.support:support-v4:24.0.0] /home/adrian/android-ndk/android4-ccnlite/app/build/intermediates/exploded-aar/com.android.support/support-v4/24.0.0/AndroidManifest.xml:23:9-51
 	android:maxSdkVersion
 		ADDED from /home/adrian/android-ndk/android4-ccnlite/app/src/main/AndroidManifest.xml:8:9-35
 	android:targetSdkVersion
@@ -82,12 +83,12 @@ ADDED from /home/adrian/android-ndk/android4-ccnlite/app/src/main/AndroidManifes
 	android:name
 		ADDED from /home/adrian/android-ndk/android4-ccnlite/app/src/main/AndroidManifest.xml:24:19-57
 application
-ADDED from /home/adrian/android-ndk/android4-ccnlite/app/src/main/AndroidManifest.xml:29:5-44:19
+ADDED from /home/adrian/android-ndk/android4-ccnlite/app/src/main/AndroidManifest.xml:29:5-45:19
 MERGED from [com.android.support:design:23.4.0] /home/adrian/android-ndk/android4-ccnlite/app/build/intermediates/exploded-aar/com.android.support/design/23.4.0/AndroidManifest.xml:22:5-20
-MERGED from [com.android.support:support-v4:23.4.0] /home/adrian/android-ndk/android4-ccnlite/app/build/intermediates/exploded-aar/com.android.support/support-v4/23.4.0/AndroidManifest.xml:22:5-20
-MERGED from [com.android.support:appcompat-v7:23.4.0] /home/adrian/android-ndk/android4-ccnlite/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.4.0/AndroidManifest.xml:25:5-20
-MERGED from [com.android.support:animated-vector-drawable:23.4.0] /home/adrian/android-ndk/android4-ccnlite/app/build/intermediates/exploded-aar/com.android.support/animated-vector-drawable/23.4.0/AndroidManifest.xml:7:5-20
-MERGED from [com.android.support:support-vector-drawable:23.4.0] /home/adrian/android-ndk/android4-ccnlite/app/build/intermediates/exploded-aar/com.android.support/support-vector-drawable/23.4.0/AndroidManifest.xml:7:5-20
+MERGED from [com.android.support:support-v4:24.0.0] /home/adrian/android-ndk/android4-ccnlite/app/build/intermediates/exploded-aar/com.android.support/support-v4/24.0.0/AndroidManifest.xml:25:5-20
+MERGED from [com.android.support:appcompat-v7:24.0.0] /home/adrian/android-ndk/android4-ccnlite/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/24.0.0/AndroidManifest.xml:25:5-20
+MERGED from [com.android.support:support-vector-drawable:24.0.0] /home/adrian/android-ndk/android4-ccnlite/app/build/intermediates/exploded-aar/com.android.support/support-vector-drawable/24.0.0/AndroidManifest.xml:23:5-20
+MERGED from [com.android.support:animated-vector-drawable:24.0.0] /home/adrian/android-ndk/android4-ccnlite/app/build/intermediates/exploded-aar/com.android.support/animated-vector-drawable/24.0.0/AndroidManifest.xml:22:5-20
 MERGED from [com.android.support:cardview-v7:23.4.0] /home/adrian/android-ndk/android4-ccnlite/app/build/intermediates/exploded-aar/com.android.support/cardview-v7/23.4.0/AndroidManifest.xml:22:5-20
 MERGED from [com.bignerdranch.android:expandablerecyclerview:1.0.3] /home/adrian/android-ndk/android4-ccnlite/app/build/intermediates/exploded-aar/com.bignerdranch.android/expandablerecyclerview/1.0.3/AndroidManifest.xml:11:5-14:19
 	android:label
@@ -116,3 +117,7 @@ activity#ch.unibas.ccn_lite_android.activities.ChartTabsActivity_main
 ADDED from /home/adrian/android-ndk/android4-ccnlite/app/src/main/AndroidManifest.xml:43:9-80
 	android:name
 		ADDED from /home/adrian/android-ndk/android4-ccnlite/app/src/main/AndroidManifest.xml:43:19-68
+activity#ch.unibas.ccn_lite_android.activities.HistorySearch
+ADDED from /home/adrian/android-ndk/android4-ccnlite/app/src/main/AndroidManifest.xml:44:9-71
+	android:name
+		ADDED from /home/adrian/android-ndk/android4-ccnlite/app/src/main/AndroidManifest.xml:44:19-59

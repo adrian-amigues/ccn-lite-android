@@ -29,6 +29,18 @@ Java_ch_unibas_ccn_1lite_1android_activities_CcnLiteAndroid_androidPeek(JNIEnv* 
     return (*env)->NewStringUTF(env, ccnl_android_peek(suite, ip, port, content));
 }
 
+JNIEXPORT jstring JNICALL
+Java_ch_unibas_ccn_1lite_1android_activities_HistorySearch_androidPeek(JNIEnv* env,
+                                jobject thiz, jstring suiteString, jstring ipString, jint portString, jstring contentString)
+{
+    char buf[128];
+    const char *ip = (*env)->GetStringUTFChars(env, ipString, 0);
+    const char *suite = (*env)->GetStringUTFChars(env, suiteString, 0);
+    int port = (int) portString;
+    const char *content = (*env)->GetStringUTFChars(env, contentString, 0);
+    return (*env)->NewStringUTF(env, ccnl_android_peek(suite, ip, port, content));
+}
+
 
 void jni_append_to_log(char *line)
 {
