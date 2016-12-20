@@ -1,7 +1,9 @@
 package ch.unibas.ccn_lite_android.models;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 import ch.unibas.ccn_lite_android.helpers.Helper;
 

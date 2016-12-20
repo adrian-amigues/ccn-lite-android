@@ -144,8 +144,11 @@ public class AreasAdapter extends RecyclerView.Adapter<AreasAdapter.AreaViewHold
                 mExpandedPosition = isExpanded ? -1 : holder.getAdapterPosition();
                 TransitionManager.beginDelayedTransition(rv);
                 if (!isExpanded) {
-                    ((CcnLiteAndroid) context).refreshPrediction(area);
-                    ((CcnLiteAndroid) context).refreshHistory(area);
+                    if (area.getNamedFunctions().containsKey("prediction") &&
+                            area.getNamedFunctions().containsKey("historical")) {
+                        ((CcnLiteAndroid) context).refreshPrediction(area);
+                        ((CcnLiteAndroid) context).refreshHistory(area);
+                    }
                 }
                 notifyDataSetChanged();
             }

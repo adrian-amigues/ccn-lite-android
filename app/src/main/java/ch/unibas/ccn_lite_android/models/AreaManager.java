@@ -42,6 +42,8 @@ public class AreaManager {
             JSONArray jsonArray = new JSONArray(jsonStr);
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject areaObject = jsonArray.getJSONObject(i);
+                Log.i(TAG, String.valueOf(areaObject));
+                Log.i(TAG, areaObject.getString("lo"));
                 String areaName = areaObject.getString("lo");
 
                 area = getAreaByName(areaName);
@@ -50,21 +52,26 @@ public class AreaManager {
                     areas.add(area);
                 }
 
+                //JSONArray jsonNamedFunctions = areaObject.getJSONArray("nfn");
+                //area.getNamedFunctions().put("prediction", jsonNamedFunctions.getString(0));
+                //area.getNamedFunctions().put("historical", jsonNamedFunctions.getString(1));
+//                area.getNamedFunctions().put("historical", "/historical");
+
                 String uri = areaObject.getString("pf");
-//                String sensorMac = areaObject.getString("bn");
-//                Calendar sensorInitialDate = Helper.stringToCalendar(areaObject.getString("bt"));
-                long sensorInitialDate = Long.parseLong(areaObject.getString("bt"));
-//                int initialSeqno = Integer.parseInt(areaObject.getString("ver"));
+                Double timeDouble = Double.parseDouble(areaObject.getString("bt"));
+                long sensorInitialDate = timeDouble.intValue();
                 int initialSeqno = 1;
                 int looptime = Integer.parseInt(areaObject.getString("but"));
-//                int looptime = 10;
-//                Sensor sensor = new Sensor(sensorMac, uri, sensorInitialDate, initialSeqno, looptime);
+                Log.d(TAG, "initial date: " +   String.valueOf(sensorInitialDate));
+
                 Sensor sensor = new Sensor(uri, sensorInitialDate, initialSeqno, looptime);
+
                 area.addSensor(sensor);
-//                area.setPhotoId(R.drawable.foobar);
             }
         } catch (org.json.JSONException e) {
             Log.e(TAG, "Unvalid Json: "+e);
+            Log.getStackTraceString(e);
+            e.printStackTrace();
         } catch (Exception e) {
             Log.e(TAG, "Error when handling Json: "+e);
         }

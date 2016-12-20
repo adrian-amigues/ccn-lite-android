@@ -305,7 +305,7 @@ public class CcnLiteAndroid extends AppCompatActivity
         String port = getString(R.string.port);
         String targetIp = useServiceRelay ? getString(R.string.localIp) : externalIp;
 //        String targetIp = getString(R.string.databasse_ip);
-        String uri = getString(R.string.prediction_base) + "/" + area.getName();
+        String uri = getString(R.string.named_function_base) + area.getNamedFunctions().get("prediction") + "/" + area.getName();
 
         Log.d(TAG, "refresh predictions called");
         startSwipeAnimation();
@@ -324,7 +324,7 @@ public class CcnLiteAndroid extends AppCompatActivity
         String port = getString(R.string.port);
         String targetIp = useServiceRelay ? getString(R.string.localIp) : externalIp;
 //        String targetIp = getString(R.string.databasse_ip);
-        String uri = getString(R.string.history_base) + "/" + area.getName();
+        String uri = getString(R.string.named_function_base) + area.getNamedFunctions().get("historical") + "/" + area.getName();
 
         Log.d(TAG, "refresh predictions called");
         startSwipeAnimation();
@@ -411,15 +411,13 @@ public class CcnLiteAndroid extends AppCompatActivity
                 case SDS_TASK:
                     Log.i(TAG, "onPostExecute SDS result = " + result);
                     if (isJSONValid(result)) {
+                        Log.i(TAG, "is valid");
                         areaManager.updateFromSds(result);
                     } else {
                         Toast.makeText(CcnLiteAndroid.this, "SDS not found. Using old sensor info", Toast.LENGTH_LONG).show();
                     }
                     areaManager.setAreaImages(dbTable);
                     refresh();
-//                    if (useAutoRefresh) {
-//                        startAutoRefresh();
-//                    }
                     break;
                 case PREDICTION_TASK:
                     Log.i(TAG, "onPostExecute prediction result = " + result);

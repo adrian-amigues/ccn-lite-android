@@ -54,11 +54,10 @@ public class Helper {
     }
 
     static public int getSeqno(long initialTime, long time, int looptime, int initialSeqno) {
-//        Calendar dateNow = Calendar.getInstance();
-//        long nowTime = dateNow.getTimeInMillis() / 1000;
-        long diffTime = time - initialTime;
-        Double diffSeqno = Math.floor(diffTime / looptime);
-        return initialSeqno + diffSeqno.intValue() - 1;
+        long nowTime = Calendar.getInstance().getTimeInMillis() / 1000;
+        long diffTime = nowTime - initialTime;
+        long diffSeqno =  diffTime / looptime;
+        return (int) (diffSeqno - 3);
     }
 
     static public Calendar getCalendarFromSeqno(long initialTime, int looptime, int initialSeqno, int currentSeqno) {
