@@ -23,6 +23,9 @@ public class SensorReading {
         try {
             String[] parts = content.split("-");
             this.seqNo = parts[0];
+           /* int s = Integer.getInteger(seqNo);
+            s--;
+            this.seqNo= String.valueOf(s);*/
             this.interval = parts[1];
             this.light = parts[2];
             this.temperature = parts[3];

@@ -98,15 +98,17 @@
                        android:layout_height="wrap_content"
                        android:orientation="vertical"
                        android:paddingBottom="8dp"
+                       android:background="@drawable/border"
+                       android:layout_marginLeft="10dp"
+                       android:layout_marginRight="10dp"
+                       android:layout_marginTop="2dp"
+                       android:layout_marginBottom="2dp"
                        >
                    </LinearLayout>
 
-                   <View
-                       android:layout_width="match_parent"
-                       android:layout_height="2dp"
-                       android:background="@android:color/black" />
 
-                   <TextView
+
+                  <!-- <TextView
                        android:id="@+id/past_chart_link"
                        android:layout_width="match_parent"
                        android:layout_height="wrap_content"
@@ -118,26 +120,67 @@
                        android:paddingStart="16dp"
                        android:paddingEnd="16dp"
                        android:paddingBottom="16dp"
-                       />
+                       android:background="@drawable/border"
+                       android:layout_marginLeft="10dp"
+                       android:layout_marginRight="10dp"
+                       android:layout_marginTop="2dp"
+                       android:layout_marginBottom="2dp"
+                       />-->
 
-                   <View
+                   <!--<View
                        android:layout_width="match_parent"
                        android:layout_height="2dp"
-                       android:background="@android:color/black" />
+                       android:background="@android:color/black" />-->
 
-
-                   <com.github.mikephil.charting.charts.LineChart
-                       android:id="@+id/predictionChart"
+                   <LinearLayout
+                       android:id="@+id/predictionLayout"
                        android:layout_width="match_parent"
-                       android:layout_height="250dp"
-                       android:layout_alignParentBottom="true"
-                       android:layout_below="@id/past_chart_link"
-                       android:scaleType="fitXY"
-                       android:background="@android:color/background_light"
-                       android:paddingStart="16dp"
-                       android:paddingEnd="16dp"
-                       android:paddingBottom="16dp"
-                       />
+                       android:layout_height="wrap_content"
+                       android:orientation="vertical"
+                       android:paddingBottom="8dp"
+                       android:background="@drawable/border"
+                       android:layout_marginLeft="10dp"
+                       android:layout_marginRight="10dp"
+                       android:layout_marginTop="2dp"
+                       android:layout_marginBottom="2dp"
+                       >
+
+                       <TextView
+                           android:id="@+id/predictionLayoutTitle"
+                           android:layout_width="match_parent"
+                           android:layout_height="wrap_content"
+                           android:text="Prediction Chart"
+                           android:textColor="#000000"
+                           android:textSize="16sp"
+                           android:layout_gravity="center"
+                           android:gravity="center"
+                           tools:textStyle="bold"
+                           android:background="@drawable/title_border" />
+
+                       <com.github.mikephil.charting.charts.LineChart
+                           android:id="@+id/predictionChart"
+                           android:layout_width="match_parent"
+                           android:layout_height="250dp"
+                           android:layout_alignParentBottom="true"
+                           android:scaleType="fitXY"
+                           android:layout_marginLeft="10dp"
+                           android:layout_marginRight="10dp"
+                           android:layout_marginTop="2dp"
+                           android:layout_marginBottom="2dp"
+                           android:paddingStart="16dp"
+                           android:paddingEnd="16dp"
+                           android:paddingBottom="16dp"
+                           />
+
+                   </LinearLayout>
+
+
+
+
+
+                   <!--android:background="@android:color/background_light"-->
+
+
 
                    <!--<ImageView-->
                        <!--android:id="@+id/prediction_graph"-->

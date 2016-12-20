@@ -1,6 +1,7 @@
 package ch.unibas.ccn_lite_android.models;
 
 import android.graphics.Color;
+import android.text.format.DateUtils;
 import android.util.Log;
 
 import com.github.mikephil.charting.charts.LineChart;
@@ -59,21 +60,37 @@ public class Prediction {
     }
 
     void  parseHistoricString(String histo){
-        Area area;
         try {
             JSONArray jsonArray = new JSONArray(histo);
+            historicalYValue = new float[jsonArray.length()];
             for (int i = 0; i < jsonArray.length(); i++) {
-                JSONObject areaObject = jsonArray.getJSONObject(i);
+                JSONObject object = jsonArray.getJSONObject(i);
 
-                String uri = areaObject.getString("pf");
-                long sensorInitialDate = Long.parseLong(areaObject.getString("bt"));
-                int initialSeqno = 1;
-                int looptime = Integer.parseInt(areaObject.getString("but"));
+                /*long sensorInitialDate = Long.parseLong(areaObject.getString("bt"));
+                Calendar cal = Calendar.getInstance();
+                cal.setTimeInMillis(sensorInitialDate * 1000);*/
 
+                JSONArray valuesJson = object.getJSONArray("e");
+                for (int j = 0; j < valuesJson.length(); j++) {
+                    JSONObject valueObject = valuesJson.getJSONObject(j);
 
+                    String time = valueObject.getString("bt");
+                    long t = Long.parseLong(time);
+                    //String s = DateUtils.formatElapsedTime(t);
+                    Calendar cal = Calendar.getInstance();
+                    cal.setTimeInMillis(t * 1000);
+                    historicalTimeValue.add(time);
+
+                    String attribute = valueObject.getString("v");
+                    float humidtyValue;
+                    if(attribute.equals("Humidity")) {//humidity
+                        humidtyValue = Float.parseFloat(valueObject.getString("v"));
+                        historicalYValue[i]=humidtyValue;
+                    }
+                }
             }
         } catch (org.json.JSONException e) {
-
+            historicalYValue = new float[0];
         } catch (Exception e) {
 
         }
@@ -88,7 +105,14 @@ public class Prediction {
 
         //An arrayList of old data
         ArrayList<Entry> valueSetPast = new ArrayList<>();
-        Entry v1e1 = new Entry(1.00f, 300);
+        float counter = 1.00f;
+        for(int i=0;i<historicalYValue.length;i++){
+            Entry v = new Entry(counter, historicalYValue[i]);
+            counter++;
+            valueSetPast.add(v);
+        }
+        counter = historicalYValue.length;
+       /* Entry v1e1 = new Entry(1.00f, 300);
         valueSetPast.add(v1e1);
         Entry v1e2 = new Entry(2.00f, 350);
         valueSetPast.add(v1e2);
@@ -107,8 +131,10 @@ public class Prediction {
         Entry v1e9 = new Entry(9.00f, 790);
         valueSetPast.add(v1e9);
         Entry v1e10 = new Entry(10.00f, 325);
-        valueSetPast.add(v1e10);
-float counter = 10.00f;
+        valueSetPast.add(v1e10);*/
+
+
+
         //an arrayList of predicted data
         ArrayList<Entry> valueSetFuture = new ArrayList<>();
         for(int i=0;i<predictionYValue.length;i++){
@@ -163,20 +189,20 @@ float counter = 10.00f;
         chartTest.setData(data);
 
         //Configures the description of the chart
-        String description = "Prediction Chart";
+       /* String description = "Prediction Chart";
         chartTest.setDescription(description);
         chartTest.setDescriptionPosition(handler.contentLeft() + 2*handler.offsetLeft() + 2*description.length(), handler.contentTop());
-        chartTest.setDescriptionTextSize(14f);
+        chartTest.setDescriptionTextSize(14f);*/
 
         //chartTest.setFitBars(true);
         chartTest.setVisibleXRangeMaximum(7);//It makes the chart scrollable
 
         //Configures the legend of the chart.
-        Legend legend = chartTest.getLegend();
+      /*  Legend legend = chartTest.getLegend();
         legend.setPosition(Legend.LegendPosition.ABOVE_CHART_RIGHT);
         int[] legendColors = {Color.BLUE, Color.rgb(128, 232, 242)};
         String[] legendLabels = {"Past", "Prediction"};
-        legend.setCustom(legendColors, legendLabels);
+        legend.setCustom(legendColors, legendLabels);*/
 
         //Configures the X Axis of the chart
         XAxis xAxis = chartTest.getXAxis();
@@ -189,11 +215,11 @@ float counter = 10.00f;
         xAxis.setGranularity(1f);// minimum axis-step (interval) is 1
         xAxis.setAxisMinValue(0);
         // the labels that should be drawn on the XAxis
-        final String[] quarters = new String[10+predictionTimeValue.size()];
-        for(int a=0;a<10;a++)
+        final String[] quarters = new String[historicalTimeValue.size()+predictionTimeValue.size()];
+        for(int a=0;a<historicalTimeValue.size();a++)
             quarters[a]="9.00";
         for(int a = 0;a<predictionTimeValue.size();a++)
-            quarters[a+10] = predictionTimeValue.get(a);
+            quarters[a+historicalTimeValue.size()] = predictionTimeValue.get(a);
        // { "9.00", "10.00", "11.00", "12.00", "13.00", "14.00", "15.00", "16.00", "17.00", "18.00", "19.00", "20.00", "21.00", "22.00", "23.00", "00.00", "00.01" };
         xAxis.setValueFormatter(new AxisFormatter(quarters));
         xAxis.setLabelRotationAngle(90.0f);
@@ -214,16 +240,6 @@ float counter = 10.00f;
         chartTest.invalidate();
     }
 
-}
-
-
-class GraphAxis{
-    ArrayList<String> times;
-    ArrayList<String> values;
-    public GraphAxis(ArrayList<String> YValue, ArrayList<String> timeValue){
-        this.values = YValue;
-        this.times = timeValue;
-    }
 }
 
 

@@ -25,6 +25,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import ch.unibas.ccn_lite_android.activities.CcnLiteAndroid;
+import ch.unibas.ccn_lite_android.activities.HistorySearch;
 import ch.unibas.ccn_lite_android.models.DatabaseTable;
 import ch.unibas.ccn_lite_android.models.Prediction;
 import ch.unibas.ccn_lite_android.models.Area;
@@ -32,15 +33,15 @@ import ch.unibas.ccn_lite_android.R;
 import ch.unibas.ccn_lite_android.models.AreaManager;
 import ch.unibas.ccn_lite_android.models.Sensor;
 import ch.unibas.ccn_lite_android.models.SensorReading;
-import ch.unibas.ccn_lite_android.activities.ChartTabsActivity_main;
 
 /**
  *
  * Created by adrian on 2016-10-18.
  */
 
-public class AreasAdapter extends RecyclerView.Adapter<AreasAdapter.AreaViewHolder>{
-
+public class AreasAdapter extends RecyclerView.Adapter<AreasAdapter.AreaViewHolder>
+{
+    private String TAG = "unoise";
     private AreaManager areaManager;
     private int mExpandedPosition = -1;
     private LineChart expandedChart;
@@ -68,7 +69,7 @@ public class AreasAdapter extends RecyclerView.Adapter<AreasAdapter.AreaViewHold
         this.listener = listener;
     }
 
-    class AreaViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+    class AreaViewHolder extends RecyclerView.ViewHolder{
         CardView cv;
         TextView areaName;
         ImageView areaPhoto;
@@ -90,10 +91,10 @@ public class AreasAdapter extends RecyclerView.Adapter<AreasAdapter.AreaViewHold
 //            predictionGraph = (ImageView)itemView.findViewById(R.id.prediction_graph);
             expandedPart = (LinearLayout)itemView.findViewById(R.id.expanded_part);
             sensorList = (LinearLayout)itemView.findViewById(R.id.sensor_list);
-            pastChart = (TextView)itemView.findViewById(R.id.past_chart_link);
+//            pastChart = (TextView)itemView.findViewById(R.id.past_chart_link);
             isExpanded = false;
             predictionChart = (LineChart) itemView.findViewById(R.id.predictionChart);
-            pastChart.setOnClickListener(this);
+//            pastChart.setOnClickListener(this);
             areaPhoto.setOnClickListener(new View.OnClickListener(){
                 public void onClick(View v) {
                     int position = getAdapterPosition();
@@ -108,12 +109,13 @@ public class AreasAdapter extends RecyclerView.Adapter<AreasAdapter.AreaViewHold
             });
         }
 
-        @Override
-        public void onClick(View v) {
-//            ((CcnLiteAndroid) context).launchHistoryActivity(v);
-            Intent intent = new Intent(context, ChartTabsActivity_main.class);
-            context.startActivity(intent);
-        }
+//        @Override
+//        public void onClick(View v) {
+////            ((CcnLiteAndroid) context).launchHistoryActivity(v);
+////            Intent intent = new Intent(context, ChartTabsActivity_main.class);
+//            Intent intent = new Intent(context, HistorySearch.class);
+//            context.startActivity(intent);
+//        }
     }
 
     @Override
@@ -172,10 +174,23 @@ public class AreasAdapter extends RecyclerView.Adapter<AreasAdapter.AreaViewHold
                     TextView light = (TextView)readingsList.findViewById(R.id.card_item_sensor_light);
                     TextView temperature = (TextView)readingsList.findViewById(R.id.card_item_sensor_temperature);
                     TextView humidity = (TextView)readingsList.findViewById(R.id.card_item_sensor_humidity);
-                    sensorName.setText(s.getUri());
+
+                    TextView historyLink = (TextView)readingsList.
+                            findViewById(R.id.history_link);
+                    sensorName.setText(s.getUriWithSeqno());
                     light.setText(s.printLight());
                     temperature.setText(s.printTemperature());
                     humidity.setText(s.printHumidity());
+
+                    final Sensor finalS = s;
+                    historyLink.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Intent intent = new Intent(context, HistorySearch.class);
+                            intent.putExtra("SENSOR", finalS);
+                            context.startActivity(intent);
+                        }
+                    });
 
                     holder.sensorList.addView(readingsList);
                 }
@@ -191,9 +206,9 @@ public class AreasAdapter extends RecyclerView.Adapter<AreasAdapter.AreaViewHold
 //    public String getURI(int i) {
 //        Area area = areaManager.getAreas().get(i);
 //        if (area.isDeprecatedArea()) {
-//            return area.getUri();
+//            return area.getUriWithSeqno();
 //        } else {
-//            return area.getSensor(0).getUri(); //TODO: update to not only get the first URI
+//            return area.getSensor(0).getUriWithSeqno(); //TODO: update to not only get the first URI
 //        }
 //    }
 
