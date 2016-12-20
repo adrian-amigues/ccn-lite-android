@@ -5,9 +5,9 @@
     android:layout_width="match_parent"
     >
     <gradient
-        android:startColor="#a5a6ab"
-        android:centerColor="#D6D6D6"
-        android:endColor="#8a8c8f"
+        android:startColor="#575c63"
+        android:centerColor="#575c63"
+        android:endColor="#575c63"
         android:angle="0"/>
     <corners android:radius="0dp"/>
     <padding android:left="7dp" android:right="7dp" android:top="7dp" android:bottom="7dp"/>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">uNoise</string>
+    <string name="app_name">CCN-APP</string>
 
     <string name="area_photo_content_description">Area Photo</string>
     <string name="area_smiley_description">Area Smiley</string>
