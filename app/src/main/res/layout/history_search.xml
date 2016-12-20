@@ -3,21 +3,57 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    >
+    android:weightSum="1"
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <android.support.v7.widget.AppCompatButton
+   <!-- <android.support.v7.widget.AppCompatButton
         android:id="@+id/select_date_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Request Reading"
+        />-->
+
+    <TextView
+        android:id="@+id/pastDateTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="You Can Request Past Data Here"
+        android:textColor="#000000"
+        android:textSize="16sp"
+        android:layout_gravity="center"
+        android:gravity="center"
+        tools:textStyle="bold"
+        android:background="@drawable/title_border"
+        android:layout_marginTop="20dp" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:hint="Import Date:"
+        android:ems="9"
+        android:layout_marginTop="20dp"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:id="@+id/dateEditText"
+        style="@android:style/Widget.DeviceDefault.Light.Spinner"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:focusable="false"
         />
 
     <LinearLayout
         android:id="@+id/reading_list"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:orientation="vertical"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="20dp"
+        android:background="@drawable/past_result_theme_background"
+
         >
     </LinearLayout>
+
 
 </LinearLayout>

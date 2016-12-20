@@ -44,10 +44,12 @@ public class AreasAdapter extends RecyclerView.Adapter<AreasAdapter.AreaViewHold
     private String TAG = "unoise";
     private AreaManager areaManager;
     private int mExpandedPosition = -1;
+    private LineChart expandedChart;
     private Context context;
     private RecyclerView rv;
     private OnItemClickListener listener;
     private DatabaseTable dbTable;
+    private Prediction prediction;
 
     private final List<Integer> bounds = new ArrayList<>(Arrays.asList(15, 20, 25, 30));
 
@@ -55,6 +57,7 @@ public class AreasAdapter extends RecyclerView.Adapter<AreasAdapter.AreaViewHold
         this.areaManager = areaManager;
         this.context = context;
         this.dbTable = dbTable;
+
     }
 
     // Define the listener interface
@@ -78,6 +81,7 @@ public class AreasAdapter extends RecyclerView.Adapter<AreasAdapter.AreaViewHold
         TextView pastChart;
         LineChart predictionChart;
 
+
         AreaViewHolder(View itemView) {
             super(itemView);
             cv = (CardView)itemView.findViewById(R.id.card_view);
@@ -91,8 +95,6 @@ public class AreasAdapter extends RecyclerView.Adapter<AreasAdapter.AreaViewHold
             isExpanded = false;
             predictionChart = (LineChart) itemView.findViewById(R.id.predictionChart);
 //            pastChart.setOnClickListener(this);
-            Prediction prediction = new Prediction();
-            prediction.makepredictionGraph(predictionChart);
             areaPhoto.setOnClickListener(new View.OnClickListener(){
                 public void onClick(View v) {
                     int position = getAdapterPosition();
@@ -141,15 +143,20 @@ public class AreasAdapter extends RecyclerView.Adapter<AreasAdapter.AreaViewHold
         holder.cv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mExpandedPosition = isExpanded ? -1 : holder.getAdapterPosition();
-                TransitionManager.beginDelayedTransition(rv);
-                if (!isExpanded) {
-                    if (area.getNamedFunctions().containsKey("prediction") &&
-                            area.getNamedFunctions().containsKey("historical")) {
-                        ((CcnLiteAndroid) context).refreshPrediction(area);
-                        ((CcnLiteAndroid) context).refreshHistory(area);
-                    }
+
+                if (isExpanded) {
+                    mExpandedPosition = -1;
+                    expandedChart = null;
+                } else {
+                    mExpandedPosition = holder.getAdapterPosition();
+                    expandedChart = holder.predictionChart;
+                    ((CcnLiteAndroid) context).refreshPrediction(area);
+                    ((CcnLiteAndroid) context).refreshHistory(area);
+//                    prediction.makepredictionGraph(predictionChart);
+
                 }
+//                mExpandedPosition = isExpanded ? -1 : holder.getAdapterPosition();
+                TransitionManager.beginDelayedTransition(rv);
                 notifyDataSetChanged();
             }
         });
@@ -169,6 +176,7 @@ public class AreasAdapter extends RecyclerView.Adapter<AreasAdapter.AreaViewHold
                     TextView light = (TextView)readingsList.findViewById(R.id.card_item_sensor_light);
                     TextView temperature = (TextView)readingsList.findViewById(R.id.card_item_sensor_temperature);
                     TextView humidity = (TextView)readingsList.findViewById(R.id.card_item_sensor_humidity);
+
                     TextView historyLink = (TextView)readingsList.
                             findViewById(R.id.history_link);
                     sensorName.setText(s.getUriWithSeqno());
@@ -227,6 +235,7 @@ public class AreasAdapter extends RecyclerView.Adapter<AreasAdapter.AreaViewHold
         sr.updateSensorValues();
     }
 
+    //Updates the image of an area
     public void updateImage(int i, Bitmap newImage) {
         Area area= areaManager.getAreas().get(i);
         area.setBitmap(newImage);
@@ -253,8 +262,10 @@ public class AreasAdapter extends RecyclerView.Adapter<AreasAdapter.AreaViewHold
 
     public void resetExpandedPosition() {
         mExpandedPosition = -1;
+        expandedChart = null;
     }
 
+    //Opens an alertDialog that enable users to choose any image or delete an available image in a specific area specified with "position"
     private void selectImage(final int position) {
         final CharSequence[] items = { "Take Photo", "Choose from Gallery",
                 "Delete photo" };
@@ -281,11 +292,13 @@ public class AreasAdapter extends RecyclerView.Adapter<AreasAdapter.AreaViewHold
         builder.show();
     }
 
+    //Provides the camera facility of the user's cell phone
     public void cameraIntent(){
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         ((Activity) context).startActivityForResult(intent, 1);
     }
 
+    //Provides a facility for users to pick up any image from the SD card
     public void galleryIntent(){
         Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         intent.setType("image/*");
@@ -293,7 +306,14 @@ public class AreasAdapter extends RecyclerView.Adapter<AreasAdapter.AreaViewHold
         ((Activity) context).startActivityForResult(Intent.createChooser(intent, "Select File"),2);
     }
 
+    //Whenever user clicks on an image in an area, this function is called and cal selectImage function
     public void startActivityForResultFunction(int position){
         selectImage(position);
+    }
+
+    public void updatePredictionGraph(Prediction p) {
+        if (expandedChart != null) {
+            p.makepredictionGraph(expandedChart);
+        }
     }
 }

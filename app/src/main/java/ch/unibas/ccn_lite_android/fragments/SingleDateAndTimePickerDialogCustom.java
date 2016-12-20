@@ -1,8 +1,13 @@
 package ch.unibas.ccn_lite_android.fragments;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.support.annotation.Nullable;
 import android.view.View;
+import android.view.ViewParent;
+import android.widget.EditText;
 import android.widget.TextView;
 import com.github.florent37.singledateandtimepicker.R;
 import com.github.florent37.singledateandtimepicker.SingleDateAndTimePicker;
@@ -48,14 +53,22 @@ public class SingleDateAndTimePickerDialogCustom {
     }
 
     private void init(View view) {
+
         picker = (SingleDateAndTimePicker) view.findViewById(R.id.picker);
+        TextView butOk = (TextView) view.findViewById(R.id.buttonOk);
+        butOk.setTextColor(Color.BLACK);
+        picker.setSelectedTextColor(Color.BLACK);
         picker.setCanBeOnPast(true);
+
+
+
         view.findViewById(R.id.buttonOk).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 close();
             }
         });
+
         view.findViewById(R.id.sheetContentLayout).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -64,8 +77,14 @@ public class SingleDateAndTimePickerDialogCustom {
         });
 
         TextView titleTextView = (TextView) view.findViewById(R.id.sheetTitle);
+        ViewParent titleHolder = titleTextView.getParent();
+        View titleHolderView = (View) titleHolder;
+        titleHolderView.setBackgroundColor(Color.rgb(87, 92, 99));
+
+
         if (titleTextView != null) {
             titleTextView.setText(title);
+
         }
 
         if (curved) {

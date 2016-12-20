@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Random;
 import java.util.concurrent.ScheduledFuture;
 
@@ -43,6 +44,7 @@ import ch.unibas.ccn_lite_android.helpers.Helper;
 import ch.unibas.ccn_lite_android.models.Area;
 import ch.unibas.ccn_lite_android.adapters.AreasAdapter;
 import ch.unibas.ccn_lite_android.R;
+import ch.unibas.ccn_lite_android.models.Prediction;
 import ch.unibas.ccn_lite_android.models.Sensor;
 import ch.unibas.ccn_lite_android.models.SensorReading;
 import ch.unibas.ccn_lite_android.models.AreaManager;
@@ -65,11 +67,12 @@ public class CcnLiteAndroid extends AppCompatActivity
 //    private Boolean useAutoRefresh;
     private String externalIp;
     private String ccnSuite;
-
+    Prediction prediction;
     SQLiteDatabase myDB= null;
     DatabaseTable dbTable;
     int ppp;
     static ImageView selectedImage;
+    String predictionData = "";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -110,7 +113,7 @@ public class CcnLiteAndroid extends AppCompatActivity
         });
 
         initializeData();
-        refreshSds();
+//        refreshSds();
 //        if (useAutoRefresh) {
 //            startAutoRefresh();
 //        }
@@ -326,7 +329,7 @@ public class CcnLiteAndroid extends AppCompatActivity
 //        String targetIp = getString(R.string.databasse_ip);
         String uri = getString(R.string.named_function_base) + area.getNamedFunctions().get("historical") + "/" + area.getName();
 
-        Log.d(TAG, "refresh predictions called");
+        Log.d(TAG, "refresh history called");
         startSwipeAnimation();
         if (useParallelTaskExecution && Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
             new AndroidPeekTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR
@@ -421,12 +424,17 @@ public class CcnLiteAndroid extends AppCompatActivity
                     break;
                 case PREDICTION_TASK:
                     Log.i(TAG, "onPostExecute prediction result = " + result);
-                    // TODO: handle prediction, result contains the database's response
-                    swipeContainer.setRefreshing(false);
+                    predictionData = parsePredictionData(result);
+                    predictionData = "Date\n2016-12-14 12:04:44     8.83\n2016-12-14 12:04:57     12.03\ndtype";
+//                    swipeContainer.setRefreshing(false);
                     break;
                 case HISTORY_TASK:
                     Log.i(TAG, "onPostExecute history result = " + result);
-                    // TODO: handle history, result contains the database's response
+                    String historicalData = parseHistoricalData(result);
+                    if (!predictionData.equals("")) {
+                        Prediction p = new Prediction(predictionData, historicalData);
+                        adapter.updatePredictionGraph(p);
+                    }
                     swipeContainer.setRefreshing(false);
                     break;
                 case REFRESH_TASK:
@@ -465,6 +473,24 @@ public class CcnLiteAndroid extends AppCompatActivity
                     break;
             }
         }
+    }
+
+    String parsePredictionData(String result) {
+        String[] eachLineArray = result.split("\n");
+       // ArrayList<String> predictionData = new ArrayList<String>();
+        for(int i=1; i < eachLineArray.length-1; i++){
+            String[] columns = eachLineArray[i].split("\\s+");
+            String time = columns[1];
+            String[] HHMMArray = time.split(":");
+          //  predictionData.add(HHMMArray[0]+HHMMArray[1]);
+            //values.add(columns[2]);
+        }
+        predictionData = result;
+        return predictionData;
+    }
+
+    String parseHistoricalData(String result){
+        return result;
     }
 
     /**
@@ -523,12 +549,13 @@ public class CcnLiteAndroid extends AppCompatActivity
         return true;
     }
 
+    //This function is called automatically when another activity sends back any data to this activity. In this case, another activity is the dialog for the camera or gallery.
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode != RESULT_OK) {
             return;
         }
-        if (requestCode == 1) {
+        if (requestCode == 1) {//It means that the Camera Intent had been selected by the user and now the data is back
             final Bundle extras = data.getExtras();
             if (extras != null) {
 
@@ -537,6 +564,7 @@ public class CcnLiteAndroid extends AppCompatActivity
                 File myDir = new File(root);
                 myDir.mkdirs();
 
+                //Creates a name for the taken photo by camera
                 Random generator = new Random();
                 int n = 10000;
                 n = generator.nextInt(n);
@@ -570,21 +598,21 @@ public class CcnLiteAndroid extends AppCompatActivity
                     while(index < count){
                         String nameOfPicture = c.getString(Column1);
                         String j = c.getString(Column2);
-                        if(nameOfPicture.equals(areaName)){
+                        if(nameOfPicture.equals(areaName)){//If the area name is available in the database, then the table is just updated.
                             dbTable.updateTable(uri, areaName);
                             break;
                         }
                         c.moveToNext();
                         index++;
                     }
-                    if(index == count)
+                    if(index == count)//If the area name is not available in the database, then the new row is inserted into the table.
                         dbTable.insertToTable(uri, areaName);
                 }
 
                 adapter.updateImage(ppp, newProfilePic);
                 adapter.notifyItemChanged(ppp);
             }
-        }else if (requestCode == 2){
+        }else if (requestCode == 2){//It means that the Gallery Intent had been selected by the user and now the data is back
             Uri selectedImageUri = data.getData();
             String selectedImagePath = selectedImageUri.getPath();
             File file = new File(selectedImagePath);
@@ -608,14 +636,14 @@ public class CcnLiteAndroid extends AppCompatActivity
                 int Column2 = c.getColumnIndex(dbTable.secondColumnName);
                 while(index < count){
                     String nameOfPicture = c.getString(Column1);
-                    if(nameOfPicture.equals(areaName)){
+                    if(nameOfPicture.equals(areaName)){//If the area name is available in the database, then the table is just updated.
                         dbTable.updateTable(selectedImageUri, areaName);
                         break;
                     }
                     c.moveToNext();
                     index++;
                 }
-                if(index == count)
+                if(index == count)//If the area name is not available in the database, then the new row is inserted into the table.
                     dbTable.insertToTable(selectedImageUri, areaName);
             }
             adapter.updateImage(ppp, b);
