@@ -12,9 +12,9 @@
 
     <string name="database_port">9997</string>
     <string name="databasse_ip">130.238.15.239</string>
+
     <string name="prediction_base">/nfn/pre</string>
     <string name="history_base">/nfn/his</string>
-
 
     <string name="bundle_name_externalIp">externalIp</string>
     <string name="bundle_name_ccnSuite">ccnSuite</string>

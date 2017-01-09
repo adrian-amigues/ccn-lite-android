@@ -21,6 +21,8 @@ import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 /**
@@ -43,56 +45,99 @@ public class Prediction {
     }
 
     void  parsePredictionString(String prediction){
-        String[] eachLineArray = prediction.split("\n");
-        // ArrayList<String> predictionData = new ArrayList<String>();
-        if(eachLineArray.length >= 2) {
-            predictionYValue = new float[eachLineArray.length - 2];
-            for (int i = 1; i < eachLineArray.length - 1; i++) {
-                String[] columns = eachLineArray[i].split("\\s+");
-                if(columns.length == 3) {
-                    String time = columns[1];
-                    String[] HHMMArray = time.split(":");
-                    predictionTimeValue.add(HHMMArray[0] + ":" + HHMMArray[1]);
-                    predictionYValue[i - 1] = Float.parseFloat(columns[2]);
+        if(!prediction.equals("")) {
+            String[] eachLineArray = prediction.split("\n");
+            // ArrayList<String> predictionData = new ArrayList<String>();
+            if (eachLineArray.length >= 2) {
+                predictionYValue = new float[eachLineArray.length - 2];
+                for (int i = 1; i < eachLineArray.length - 1; i++) {
+                    String[] columns = eachLineArray[i].split("\\s+");
+                    if (columns.length == 3) {
+                        String time = columns[1];
+                        String[] HHMMArray = time.split(":");
+                        predictionTimeValue.add(HHMMArray[0] + ":" + HHMMArray[1] + ":" + HHMMArray[2]);
+                        predictionYValue[i - 1] = Float.parseFloat(columns[2]);
+                    }
                 }
             }
         }
     }
 
     void  parseHistoricString(String histo){
-        try {
-            JSONArray jsonArray = new JSONArray(histo);
-            historicalYValue = new float[jsonArray.length()];
-            for (int i = 0; i < jsonArray.length(); i++) {
-                JSONObject object = jsonArray.getJSONObject(i);
+        histo = "[{'sn': 119, 'v': '2.13 ', 'u': '%', 't': 1483524866, 'n': 'Humidity'}," +
+        "{'sn': 119, 'v': '28.843', 'u': 'C', 't': 1483524866, 'n': 'Temperature'}," +
+                "{'sn': 119, 'v': '253.12', 'u': 'Lux', 't': 1483524866, 'n': 'Light'}," +
+                " {'sn': 119, 'v': '2.13 ', 'u': '%', 't': 1483524866, 'n': 'Humidity'}," +
+                " {'sn': 119, 'v': '28.843', 'u': 'C', 't': 1483524866, 'n': 'Temperature'}," +
+                "{'sn': 119, 'v': '253.12', 'u': 'Lux', 't': 1483524866, 'n': 'Light'}]";
+        if(!histo.equals("")) {
+            try {
+                JSONArray jsonArray = new JSONArray(histo);
+                ArrayList historyValueArrayList = new ArrayList();
+
+                // historicalYValue = new float[jsonArray.length()];
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject object = jsonArray.getJSONObject(i);
 
                 /*long sensorInitialDate = Long.parseLong(areaObject.getString("bt"));
                 Calendar cal = Calendar.getInstance();
                 cal.setTimeInMillis(sensorInitialDate * 1000);*/
 
-                JSONArray valuesJson = object.getJSONArray("e");
+                    String attribute = object.getString("n");
+                    float humidtyValue;
+                    if (attribute.equals("Humidity")) {//humidity
+                        humidtyValue = Float.parseFloat(object.getString("v"));
+                        //historicalYValue[i]=humidtyValue;
+                        historyValueArrayList.add(humidtyValue);
+                        String time = object.getString("t");
+                        long t = Long.parseLong(time);
+                        //String s = DateUtils.formatElapsedTime(t);
+                        Calendar cal = Calendar.getInstance();
+                        cal.setTimeInMillis(t * 1000);
+                        Date d = cal.getTime();
+
+
+                        Calendar calendar = GregorianCalendar.getInstance(); // creates a new calendar instance
+                        calendar.setTime(d);   // assigns calendar to given date
+                        int a = calendar.get(Calendar.HOUR_OF_DAY); // gets hour in 24h format
+                        int b = calendar.get(Calendar.MINUTE);        // gets hour in 12h format
+                        int c = calendar.get(Calendar.SECOND);
+
+
+                        historicalTimeValue.add(a + ":" + b + ":" + c);
+                    }
+
+
+
+              /*  JSONArray valuesJson = object.getJSONArray("e");
                 for (int j = 0; j < valuesJson.length(); j++) {
                     JSONObject valueObject = valuesJson.getJSONObject(j);
 
-                    String time = valueObject.getString("bt");
+
+
+                    String attribute = valueObject.getString("n");
+                    float humidtyValue;
+                    if(attribute.equals("Humidity")) {//humidity
+                        humidtyValue = Float.parseFloat(valueObject.getString("v"));
+                        historicalYValue[i]=humidtyValue;
+                         String time = valueObject.getString("bt");
                     long t = Long.parseLong(time);
                     //String s = DateUtils.formatElapsedTime(t);
                     Calendar cal = Calendar.getInstance();
                     cal.setTimeInMillis(t * 1000);
                     historicalTimeValue.add(time);
-
-                    String attribute = valueObject.getString("v");
-                    float humidtyValue;
-                    if(attribute.equals("Humidity")) {//humidity
-                        humidtyValue = Float.parseFloat(valueObject.getString("v"));
-                        historicalYValue[i]=humidtyValue;
                     }
+                }*/
                 }
-            }
-        } catch (org.json.JSONException e) {
-            historicalYValue = new float[0];
-        } catch (Exception e) {
+                historicalYValue = new float[historyValueArrayList.size()];
+                for (int hvalue = 0; hvalue < historicalYValue.length; hvalue++) {
+                    historicalYValue[hvalue] = (float) historyValueArrayList.get(hvalue);
+                }
+            } catch (org.json.JSONException e) {
+                historicalYValue = new float[0];
+            } catch (Exception e) {
 
+            }
         }
     }
 
@@ -106,12 +151,14 @@ public class Prediction {
         //An arrayList of old data
         ArrayList<Entry> valueSetPast = new ArrayList<>();
         float counter = 1.00f;
-        for(int i=0;i<historicalYValue.length;i++){
-            Entry v = new Entry(counter, historicalYValue[i]);
-            counter++;
-            valueSetPast.add(v);
+        if(historicalYValue != null) {
+            for (int i = 0; i < historicalYValue.length; i++) {
+                Entry v = new Entry(counter, historicalYValue[i]);
+                counter++;
+                valueSetPast.add(v);
+            }
+            counter = historicalYValue.length;
         }
-        counter = historicalYValue.length;
        /* Entry v1e1 = new Entry(1.00f, 300);
         valueSetPast.add(v1e1);
         Entry v1e2 = new Entry(2.00f, 350);
@@ -137,10 +184,12 @@ public class Prediction {
 
         //an arrayList of predicted data
         ArrayList<Entry> valueSetFuture = new ArrayList<>();
-        for(int i=0;i<predictionYValue.length;i++){
-            Entry v = new Entry(counter, predictionYValue[i]);
-            counter++;
-            valueSetFuture.add(v);
+        if(predictionYValue != null) {
+            for (int i = 0; i < predictionYValue.length; i++) {
+                Entry v = new Entry(counter, predictionYValue[i]);
+                counter++;
+                valueSetFuture.add(v);
+            }
         }
 
        /* Entry v1e10Join = new Entry(10.00f, 325);
@@ -217,7 +266,7 @@ public class Prediction {
         // the labels that should be drawn on the XAxis
         final String[] quarters = new String[historicalTimeValue.size()+predictionTimeValue.size()];
         for(int a=0;a<historicalTimeValue.size();a++)
-            quarters[a]="9.00";
+            quarters[a]=historicalTimeValue.get(a);
         for(int a = 0;a<predictionTimeValue.size();a++)
             quarters[a+historicalTimeValue.size()] = predictionTimeValue.get(a);
        // { "9.00", "10.00", "11.00", "12.00", "13.00", "14.00", "15.00", "16.00", "17.00", "18.00", "19.00", "20.00", "21.00", "22.00", "23.00", "00.00", "00.01" };
