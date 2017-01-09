@@ -53,7 +53,8 @@ public class AreaManager {
                 String uri = areaObject.getString("pf");
 //                String sensorMac = areaObject.getString("bn");
 //                Calendar sensorInitialDate = Helper.stringToCalendar(areaObject.getString("bt"));
-                long sensorInitialDate = Long.parseLong(areaObject.getString("bt"));
+                Float temp = new Float(Float.parseFloat(areaObject.getString("bt")));
+                long sensorInitialDate = temp.longValue();
 //                int initialSeqno = Integer.parseInt(areaObject.getString("ver"));
                 int initialSeqno = 1;
                 int looptime = Integer.parseInt(areaObject.getString("but"));

@@ -176,17 +176,17 @@ public class CcnLiteAndroid extends AppCompatActivity
      * Initializes the areas array with data
      */
     private void initializeData() {
-        Area a = new Area("FooBar Origins");
-        Sensor s = new Sensor("/p/4b4b6683/foobar/opt", Calendar.getInstance().getTimeInMillis() / 1000, 1, 5);
-        s.setLight("260");
-        s.setTemperature("19.6");
-        s.setHumidity("20");
-        a.addSensor(s);
-        a.setPhotoId(R.drawable.foobar);
-        areaManager.addArea(a);
-
-        areaManager.setAreaImages(dbTable);
-        adapter.notifyDataSetChanged();
+//        Area a = new Area("FooBar Origins");
+//        Sensor s = new Sensor("/p/4b4b6683/foobar/opt", Calendar.getInstance().getTimeInMillis() / 1000, 1, 5);
+//        s.setLight("260");
+//        s.setTemperature("19.6");
+//        s.setHumidity("20");
+//        a.addSensor(s);
+//        a.setPhotoId(R.drawable.foobar);
+//        areaManager.addArea(a);
+//
+//        areaManager.setAreaImages(dbTable);
+//        adapter.notifyDataSetChanged();
     }
 
     /**
@@ -427,7 +427,7 @@ public class CcnLiteAndroid extends AppCompatActivity
                 case PREDICTION_TASK:
                     Log.i(TAG, "onPostExecute prediction result = " + result);
                     predictionData = parsePredictionData(result);
-                    predictionData = "Date\n2016-12-14 12:04:44     8.83\n2016-12-14 12:04:57     12.03\ndtype";
+                    //predictionData = "Date\n2016-12-14 12:04:44     8.83\n2016-12-14 12:04:57     12.03\ndtype";
 //                    swipeContainer.setRefreshing(false);
                     break;
                 case HISTORY_TASK:

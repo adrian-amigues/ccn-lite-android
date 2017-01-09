@@ -38,6 +38,7 @@
 #define LOG_TAG "uNoise"
 #define  LOGD(...)  __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__)
 #define  LOGE(...)  __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
+#define  LOGV(...)  __android_log_print(ANDROID_LOG_VERBOSE, LOG_TAG, __VA_ARGS__)
 
 // Function prototypes
 int frag_cb(struct ccnl_relay_s *relay, struct ccnl_face_s *from,
@@ -127,7 +128,8 @@ char* ccnl_android_peek(char* suiteStr, char* addr, int port, char* uri) {
         len = mkInterest(prefix, &nonce, out, sizeof(out));
 
         // Sending Interest
-        // LOGE("%s sendto: sock=%d, len out=%d, out=%s\n", response, sock, strlen(out), out);
+        // LOGV("%s sendto: sock=%d, len out=%d, out=%s\n", response, sock, strlen(out), out);
+        LOGV("Interest sent len out=%d\n", strlen(out));
         rc = sendto(sock, out, len, 0, (struct sockaddr*)&sa, socksize);
         // LOGE("sendTo RC = %d\n", rc);
         if (rc < 0) {
