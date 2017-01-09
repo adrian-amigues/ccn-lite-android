@@ -76,7 +76,7 @@
                 android:contentDescription="Reading icon"
                 android:background="@drawable/ic_wb_sunny_black_48dp"
                 android:scaleType="fitXY"
-                android:layout_marginRight="6dp"
+                android:layout_marginRight="4dp"
                 />
             <TextView
                 android:layout_width="wrap_content"
@@ -96,7 +96,7 @@
                 android:contentDescription="Reading icon"
                 android:background="@drawable/thermometer"
                 android:scaleType="fitXY"
-                android:layout_marginRight="6dp"
+                android:layout_marginRight="4dp"
                 />
             <TextView
                 android:layout_width="wrap_content"
@@ -116,7 +116,7 @@
                 android:contentDescription="Reading icon"
                 android:background="@drawable/water"
                 android:scaleType="fitXY"
-                android:layout_marginRight="6dp"
+                android:layout_marginRight="4dp"
                 />
             <TextView
                 android:layout_width="wrap_content"

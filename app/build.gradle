@@ -54,4 +54,5 @@ dependencies {
     compile 'com.android.support:support-v4:23.4.0'
     compile 'com.github.PhilJay:MPAndroidChart:v3.0.0-beta1'
     compile 'com.github.florent37:singledateandtimepicker:1.0.0'
+    compile 'joda-time:joda-time:2.9.4'
 }
