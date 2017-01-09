@@ -308,7 +308,8 @@ public class CcnLiteAndroid extends AppCompatActivity
         String port = getString(R.string.port);
         String targetIp = useServiceRelay ? getString(R.string.localIp) : externalIp;
 //        String targetIp = getString(R.string.databasse_ip);
-        String uri = getString(R.string.named_function_base) + area.getNamedFunctions().get("prediction") + "/" + area.getName();
+//        String uri = getString(R.string.named_function_base) + area.getNamedFunctions().get("prediction") + "/" + area.getName();
+        String uri = getString(R.string.prediction_base) + "/" + area.getName();
 
         Log.d(TAG, "refresh predictions called");
         startSwipeAnimation();
@@ -327,7 +328,8 @@ public class CcnLiteAndroid extends AppCompatActivity
         String port = getString(R.string.port);
         String targetIp = useServiceRelay ? getString(R.string.localIp) : externalIp;
 //        String targetIp = getString(R.string.databasse_ip);
-        String uri = getString(R.string.named_function_base) + area.getNamedFunctions().get("historical") + "/" + area.getName();
+//        String uri = getString(R.string.named_function_base) + area.getNamedFunctions().get("historical") + "/" + area.getName();
+        String uri = getString(R.string.history_base) + "/" + area.getName();
 
         Log.d(TAG, "refresh history called");
         startSwipeAnimation();

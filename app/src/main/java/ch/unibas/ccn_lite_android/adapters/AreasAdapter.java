@@ -169,6 +169,7 @@ public class AreasAdapter extends RecyclerView.Adapter<AreasAdapter.AreaViewHold
                 holder.sensorList.addView(v);
             } else {
                 LayoutInflater inflater = LayoutInflater.from(context);
+
                 for (int i = 0; i < area.getSensors().size(); i++) {
                     Sensor s = area.getSensor(i);
                     LinearLayout readingsList = (LinearLayout) inflater.inflate(R.layout.card_item_sensor, null);
