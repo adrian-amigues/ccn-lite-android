@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -41,24 +42,44 @@ public class HistorySearch extends AppCompatActivity {
 
         sensor = (Sensor) getIntent().getSerializableExtra("SENSOR");
 
-        Button dateButton = (Button) findViewById(R.id.select_date_button);
-        dateButton.setOnClickListener(new View.OnClickListener() {
+
+
+        final EditText dateEditText = (EditText) findViewById(R.id.dateEditText);
+        dateEditText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 new SingleDateAndTimePickerDialogCustom.Builder(context)
-                    //.bottomSheet()
-                    //.curved()
-                    .title("Simple")
-                    .listener(new SingleDateAndTimePickerDialogCustom.Listener() {
-                        @Override
-                        public void onDateSelected(Date date) {
-                            Calendar cal = Calendar.getInstance();
-                            cal.setTime(date);
-                            requestHistoricalData(cal);
-                        }
-                    }).display();
+                        //.bottomSheet()
+                        //.curved()
+                        .title("Pick a Date")
+                        .listener(new SingleDateAndTimePickerDialogCustom.Listener() {
+                            @Override
+                            public void onDateSelected(Date date) {
+                                Calendar cal = Calendar.getInstance();
+                                cal.setTime(date);
+                                dateEditText.setText(date.toString());
+
+                                LinearLayout reading_list_layout = (LinearLayout) findViewById(R.id.reading_list);
+                                reading_list_layout.setVisibility(View.VISIBLE);
+                                TextView v = new TextView(context);
+                                v.setText("Result for " + date.toString() + ":");
+                                v.setTextColor(Color.BLACK);
+                                reading_list_layout.addView(v);
+                                requestHistoricalData(cal);
+                            }
+                        }).display();
             }
         });
+
+
+
+       /* Button dateButton = (Button) findViewById(R.id.select_date_button);
+        dateButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });*/
 //        displayFakeData();
     }
 
@@ -92,6 +113,8 @@ public class HistorySearch extends AppCompatActivity {
             TextView light = (TextView)readingsList.findViewById(R.id.card_item_sensor_light);
             TextView temperature = (TextView)readingsList.findViewById(R.id.card_item_sensor_temperature);
             TextView humidity = (TextView)readingsList.findViewById(R.id.card_item_sensor_humidity);
+
+            //LinearLayout ly = (LinearLayout) inflater.inflate(R.layout.card_item, null);
             TextView historyLink = (TextView)readingsList.findViewById(R.id.history_link);
             sensorName.setText(sensor.getUriWithSeqno());
             light.setText(sensor.printLight());
@@ -103,7 +126,6 @@ public class HistorySearch extends AppCompatActivity {
                     sensor.getInitialSeqno(), Integer.parseInt(sr.getSeqNo()));
             dateField.setVisibility(View.VISIBLE);
             dateField.setText(String.format("%1$tA %1$tb %1$td %1$tY at %1$tI:%1$tM %1$Tp", cal));
-
             lv.addView(readingsList);
         }
         View v = new View(context);
