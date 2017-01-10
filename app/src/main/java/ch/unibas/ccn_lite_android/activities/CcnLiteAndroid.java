@@ -427,7 +427,7 @@ public class CcnLiteAndroid extends AppCompatActivity
                 case PREDICTION_TASK:
                     Log.i(TAG, "onPostExecute prediction result = " + result);
                     predictionData = parsePredictionData(result);
-                    //predictionData = "Date\n2016-12-14 12:04:44     8.83\n2016-12-14 12:04:57     12.03\ndtype";
+                    predictionData = "Date\n2016-12-14 12:04:44     8.83\n2016-12-14 12:04:57     12.03\ndtype";
 //                    swipeContainer.setRefreshing(false);
                     break;
                 case HISTORY_TASK:
