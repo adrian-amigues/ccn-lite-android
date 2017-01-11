@@ -50,7 +50,7 @@
                    android:layout_height="wrap_content"
                    android:layout_alignParentTop="true"
                    android:layout_toEndOf="@id/area_photo"
-                   android:textSize="24sp"
+                   android:textSize="20sp"
                    android:paddingEnd="16dp"
                    android:paddingTop="24dp"
                    android:textColor="@android:color/black"
