@@ -64,12 +64,12 @@ public class Prediction {
     }
 
     void  parseHistoricString(String histo){
-        histo = "[{'sn': 119, 'v': '2.13 ', 'u': '%', 't': 1483524866, 'n': 'Humidity'}," +
+      /*  histo = "[{'sn': 119, 'v': '2.13 ', 'u': '%', 't': 1483524866, 'n': 'Humidity'}," +
         "{'sn': 119, 'v': '28.843', 'u': 'C', 't': 1483524866, 'n': 'Temperature'}," +
                 "{'sn': 119, 'v': '253.12', 'u': 'Lux', 't': 1483524866, 'n': 'Light'}," +
                 " {'sn': 119, 'v': '2.13 ', 'u': '%', 't': 1483524866, 'n': 'Humidity'}," +
                 " {'sn': 119, 'v': '28.843', 'u': 'C', 't': 1483524866, 'n': 'Temperature'}," +
-                "{'sn': 119, 'v': '253.12', 'u': 'Lux', 't': 1483524866, 'n': 'Light'}]";
+                "{'sn': 119, 'v': '253.12', 'u': 'Lux', 't': 1483524866, 'n': 'Light'}]";*/
         if(!histo.equals("")) {
             try {
                 JSONArray jsonArray = new JSONArray(histo);
@@ -90,7 +90,9 @@ public class Prediction {
                         //historicalYValue[i]=humidtyValue;
                         historyValueArrayList.add(humidtyValue);
                         String time = object.getString("t");
-                        long t = Long.parseLong(time);
+                        Float f = new Float(Float.parseFloat(time));
+                        long t = f.longValue();
+                        //long t = Long.parseLong(time);
                         //String s = DateUtils.formatElapsedTime(t);
                         Calendar cal = Calendar.getInstance();
                         cal.setTimeInMillis(t * 1000);
@@ -159,25 +161,25 @@ public class Prediction {
             }
             counter = historicalYValue.length;
         }
-       /* Entry v1e1 = new Entry(1.00f, 300);
+        /*Entry v1e1 = new Entry(1.00f, 3);
         valueSetPast.add(v1e1);
-        Entry v1e2 = new Entry(2.00f, 350);
+        Entry v1e2 = new Entry(2.00f, 3);
         valueSetPast.add(v1e2);
-        Entry v1e3 = new Entry(3.00f, 498);
+        Entry v1e3 = new Entry(3.00f, 4);
         valueSetPast.add(v1e3);
-        Entry v1e4 = new Entry(4.00f, 1200);
+        Entry v1e4 = new Entry(4.00f, 9);
         valueSetPast.add(v1e4);
-        Entry v1e5 = new Entry(5.00f, 1100);
+        Entry v1e5 = new Entry(5.00f, 8);
         valueSetPast.add(v1e5);
-        Entry v1e6 = new Entry(6.00f, 900);
+        Entry v1e6 = new Entry(6.00f, 9);
         valueSetPast.add(v1e6);
-        Entry v1e7 = new Entry(7.00f, 307);
+        Entry v1e7 = new Entry(7.00f, 4);
         valueSetPast.add(v1e7);
-        Entry v1e8 = new Entry(8.00f, 350);
+        Entry v1e8 = new Entry(8.00f, 5);
         valueSetPast.add(v1e8);
-        Entry v1e9 = new Entry(9.00f, 790);
+        Entry v1e9 = new Entry(9.00f, 4);
         valueSetPast.add(v1e9);
-        Entry v1e10 = new Entry(10.00f, 325);
+        Entry v1e10 = new Entry(10.00f, 3.75f);
         valueSetPast.add(v1e10);*/
 
 
@@ -192,19 +194,19 @@ public class Prediction {
             }
         }
 
-       /* Entry v1e10Join = new Entry(10.00f, 325);
+        /*Entry v1e10Join = new Entry(10.00f, 3.75f);
         valueSetFuture.add(v1e10Join);
-        Entry v1e11 = new Entry(11.00f, 730);
+        Entry v1e11 = new Entry(11.00f, 4);
         valueSetFuture.add(v1e11);
-        Entry v1e12 = new Entry(12.00f, 298);
+        Entry v1e12 = new Entry(12.00f, 4.3f);
         valueSetFuture.add(v1e12);
-        Entry v1e13 = new Entry(13.00f, 210);
+        Entry v1e13 = new Entry(13.00f, 4);
         valueSetFuture.add(v1e13);
-        Entry v1e14 = new Entry(14.00f, 289);
+        Entry v1e14 = new Entry(14.00f, 6);
         valueSetFuture.add(v1e14);
-        Entry v1e15 = new Entry(15.00f, 304);
+        Entry v1e15 = new Entry(15.00f, 4);
         valueSetFuture.add(v1e15);
-        Entry v1e16 = new Entry(16.00f, 317);
+        Entry v1e16 = new Entry(16.00f, 3);
         valueSetFuture.add(v1e16);*/
 
         LineDataSet lineDataSetPast = new LineDataSet(valueSetPast, "Brand 1");
@@ -264,21 +266,24 @@ public class Prediction {
         xAxis.setGranularity(1f);// minimum axis-step (interval) is 1
         xAxis.setAxisMinValue(0);
         // the labels that should be drawn on the XAxis
-        final String[] quarters = new String[historicalTimeValue.size()+predictionTimeValue.size()];
-        for(int a=0;a<historicalTimeValue.size();a++)
-            quarters[a]=historicalTimeValue.get(a);
+        final String[] quarters = new String[historicalTimeValue.size()+predictionTimeValue.size()+1];
+        quarters[0] = "";
+        for(int a=1;a<=historicalTimeValue.size();a++)
+            quarters[a]=historicalTimeValue.get(a-1);
         for(int a = 0;a<predictionTimeValue.size();a++)
-            quarters[a+historicalTimeValue.size()] = predictionTimeValue.get(a);
+            quarters[a+historicalTimeValue.size()+1] = predictionTimeValue.get(a);
        // { "9.00", "10.00", "11.00", "12.00", "13.00", "14.00", "15.00", "16.00", "17.00", "18.00", "19.00", "20.00", "21.00", "22.00", "23.00", "00.00", "00.01" };
-        xAxis.setValueFormatter(new AxisFormatter(quarters));
+        if(quarters.length != 0)
+            xAxis.setValueFormatter(new AxisFormatter(quarters));
         xAxis.setLabelRotationAngle(90.0f);
 
         //Configures the Y Axis of the chart
         YAxis yAxis = chartTest.getAxisLeft();
         yAxis.setTextSize(14f); // set the text size
         yAxis.setTextColor(Color.BLACK);
-        yAxis.setGranularity(1f); // interval 1
+        yAxis.setGranularity(2f); // interval 1
         yAxis.setDrawGridLines(false);
+        yAxis.setAxisMaxValue(yAxis.getAxisMaximum()+3);
 
         YAxis rightAxis = chartTest.getAxisRight();
         rightAxis.setEnabled(false);

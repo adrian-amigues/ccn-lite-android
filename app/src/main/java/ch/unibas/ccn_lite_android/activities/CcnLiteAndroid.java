@@ -164,17 +164,17 @@ public class CcnLiteAndroid extends AppCompatActivity
      * Initializes the areas array with data
      */
     private void initializeData() {
-//        Area a = new Area("FooBar Origins");
-//        Sensor s = new Sensor("/p/4b4b6683/foobar/opt", Calendar.getInstance().getTimeInMillis() / 1000, 1, 5);
-//        s.setLight("260");
-//        s.setTemperature("19.6");
-//        s.setHumidity("20");
-//        a.addSensor(s);
-//        a.setPhotoId(R.drawable.foobar);
-//        areaManager.addArea(a);
-//
-//        areaManager.setAreaImages(dbTable);
-//        adapter.notifyDataSetChanged();
+       /* Area a = new Area("FooBar Origins");
+        Sensor s = new Sensor("/p/4b4b6683/foobar/opt", Calendar.getInstance().getTimeInMillis() / 1000, 1, 5);
+        s.setLight("260");
+        s.setTemperature("19.6");
+        s.setHumidity("20");
+        a.addSensor(s);
+        a.setPhotoId(R.drawable.foobar);
+        areaManager.addArea(a);
+
+        areaManager.setAreaImages(dbTable);
+        adapter.notifyDataSetChanged();*/
     }
 
     /**
