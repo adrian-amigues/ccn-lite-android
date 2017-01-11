@@ -55,7 +55,6 @@ public class CcnLiteAndroid extends AppCompatActivity
     private String TAG = "unoise";
     private boolean useParallelTaskExecution = false; // native function androidPeek can't handle parallel executions
 
-//    private List<Area> areas;
     private AreaManager areaManager;
     private AreasAdapter adapter;
     private SwipeRefreshLayout swipeContainer;
@@ -64,14 +63,11 @@ public class CcnLiteAndroid extends AppCompatActivity
     private ScheduledFuture scheduledFuture;
 
     private Boolean useServiceRelay;
-//    private Boolean useAutoRefresh;
     private String externalIp;
     private String ccnSuite;
-    Prediction prediction;
     SQLiteDatabase myDB= null;
     DatabaseTable dbTable;
     int ppp;
-    static ImageView selectedImage;
     String predictionData = "";
 
     @Override
@@ -113,10 +109,6 @@ public class CcnLiteAndroid extends AppCompatActivity
         });
 
         initializeData();
-//        refreshSds();
-//        if (useAutoRefresh) {
-//            startAutoRefresh();
-//        }
     }
 
     @Override
@@ -132,7 +124,6 @@ public class CcnLiteAndroid extends AppCompatActivity
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        SharedPreferences.Editor prefEditor = sharedPref.edit();
         if (item.isChecked()) item.setChecked(false);
         else item.setChecked(true);
 
@@ -146,7 +137,6 @@ public class CcnLiteAndroid extends AppCompatActivity
                 bundle.putString(getString(R.string.bundle_name_externalIp), externalIp);
                 bundle.putString(getString(R.string.bundle_name_ccnSuite), ccnSuite);
                 bundle.putBoolean(getString(R.string.bundle_name_useServiceRelay), useServiceRelay);
-//                bundle.putBoolean(getString(R.string.bundle_name_useAutoRefresh), useAutoRefresh);
                 dialog.setArguments(bundle);
                 dialog.show(getSupportFragmentManager(), "dialog_network_settings");
                 break;
@@ -168,8 +158,6 @@ public class CcnLiteAndroid extends AppCompatActivity
                 res.getString(R.string.default_external_ip));
         useServiceRelay = sharedPref.getBoolean(res.getString(R.string.pref_key_use_service_relay),
                 res.getBoolean(R.bool.default_use_service_relay));
-//        useAutoRefresh = sharedPref.getBoolean(res.getString(R.string.pref_key_use_auto_refresh),
-//                res.getBoolean(R.bool.default_use_auto_refresh));
     }
 
     /**
@@ -197,10 +185,6 @@ public class CcnLiteAndroid extends AppCompatActivity
         swipe.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-//                if (useAutoRefresh) {
-//                    stopAutoRefresh();
-//                    startAutoRefresh();
-//                }
                 refresh();
             }
         });
@@ -210,75 +194,23 @@ public class CcnLiteAndroid extends AppCompatActivity
                 android.R.color.holo_red_light);
     }
 
-//    /**
-//     * Cleans and returns the passed string by stripping it of all '\n' at its end
-//     * @param str the string to clean
-//     * @return the cleaned string
-//     */
-//    public String cleanResultString(String str) {
-//        if (str != null) {
-//            while (str.length() > 0 && str.charAt(str.length()-1)=='\n') {
-//                str = str.substring(0, str.length()-1);
-//            }
-//        }
-//        return str;
-//    }
-
     /**
      * Callback for the positive button click on the RelayOptions dialog
      * @param dialog the dialog whence the positive button was clicked
      */
     @Override
     public void onNetworkSettingsDialogPositiveClick(NetworkSettingsFragment dialog) {
-//        Boolean newUseAutoRefresh = dialog.getUseAutoRefresh();
-//        if (newUseAutoRefresh != useAutoRefresh) {
-//            if (newUseAutoRefresh) {
-//                startAutoRefresh();
-//            } else {
-//                stopAutoRefresh();
-//            }
-//        }
-//        useAutoRefresh = newUseAutoRefresh;
         useServiceRelay = dialog.getUseServiceRelay();
         externalIp = dialog.getExternalIp();
         ccnSuite = dialog.getCcnSuite();
         SharedPreferences.Editor prefEditor = sharedPref.edit();
         prefEditor.putBoolean(getString(R.string.pref_key_use_service_relay), useServiceRelay);
-//        prefEditor.putBoolean(getString(R.string.pref_key_use_auto_refresh), useAutoRefresh);
         prefEditor.putString(getString(R.string.pref_key_external_ip), externalIp);
         prefEditor.putString(getString(R.string.pref_key_ccn_suite), ccnSuite);
         prefEditor.apply();
     }
 
-//    /**
-//     * Starts the automatic refreshing at a fixed rate
-//     */
-//    private void startAutoRefresh() {
-//        ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
-//        int delay = getResources().getInteger(R.integer.auto_refresh_delay_seconds);
-//        scheduledFuture = scheduler.scheduleAtFixedRate(new Runnable() {
-//            public void run() {
-//                refresh();
-//            }
-//        }, delay, delay, SECONDS);
-//    }
-//
-//    /**
-//     * Stops the automatic refreshing
-//     */
-//    private void stopAutoRefresh() {
-//        if (scheduledFuture != null) {
-//            scheduledFuture.cancel(true);
-//        }
-//    }
-
     private void startSwipeAnimation() {
-//        if(!swipeContainer.isRefreshing()) {
-//            TypedValue typed_value = new TypedValue();
-//            this.getTheme().resolveAttribute(android.support.v7.appcompat.R.attr.actionBarSize, typed_value, true);
-//            swipeContainer.setProgressViewOffset(false, 0, getResources().getDimensionPixelSize(typed_value.resourceId));
-//            swipeContainer.setRefreshing(true);
-//        }
         swipeContainer.setRefreshing(true);
     }
 
@@ -286,7 +218,6 @@ public class CcnLiteAndroid extends AppCompatActivity
      * Retreives SDS data, creates a peekTask with a specific uri aiming at the SDS
      */
     private void refreshSds() {
-//        stopAutoRefresh();
         String port = getString(R.string.sds_port);
         String targetIp = useServiceRelay ? getString(R.string.localIp) : externalIp;
         String uri = getString(R.string.sds_uri);
@@ -307,8 +238,6 @@ public class CcnLiteAndroid extends AppCompatActivity
     public void refreshPrediction(Area area) {
         String port = getString(R.string.port);
         String targetIp = useServiceRelay ? getString(R.string.localIp) : externalIp;
-//        String targetIp = getString(R.string.databasse_ip);
-//        String uri = getString(R.string.named_function_base) + area.getNamedFunctions().get("prediction") + "/" + area.getName();
         String uri = getString(R.string.prediction_base) + "/" + area.getName();
 
         Log.d(TAG, "refresh predictions called");
@@ -327,8 +256,6 @@ public class CcnLiteAndroid extends AppCompatActivity
     public void refreshHistory(Area area) {
         String port = getString(R.string.port);
         String targetIp = useServiceRelay ? getString(R.string.localIp) : externalIp;
-//        String targetIp = getString(R.string.databasse_ip);
-//        String uri = getString(R.string.named_function_base) + area.getNamedFunctions().get("historical") + "/" + area.getName();
         String uri = getString(R.string.history_base) + "/" + area.getName();
 
         Log.d(TAG, "refresh history called");
@@ -351,11 +278,7 @@ public class CcnLiteAndroid extends AppCompatActivity
         int totalUris = areaManager.getTotalUris();
         int areaCount = areaManager.getAreas().size();
 
-//        if (peekTaskCounter != null && peekTaskCounter.getRunningTasks() > 0) {
-//            peekTaskCounter.setRunningTasks(totalUris + peekTaskCounter.getRunningTasks());
-//        } else {
-            peekTaskCounter = new AndroidPeekTaskCounter(totalUris);
-//        }
+        peekTaskCounter = new AndroidPeekTaskCounter(totalUris);
         Log.d(TAG, "refresh called with "+totalUris+" URIs");
         startSwipeAnimation();
 
@@ -427,8 +350,6 @@ public class CcnLiteAndroid extends AppCompatActivity
                 case PREDICTION_TASK:
                     Log.i(TAG, "onPostExecute prediction result = " + result);
                     predictionData = parsePredictionData(result);
-                    //predictionData = "Date\n2016-12-14 12:04:44     8.83\n2016-12-14 12:04:57     12.03\ndtype";
-//                    swipeContainer.setRefreshing(false);
                     break;
                 case HISTORY_TASK:
                     Log.i(TAG, "onPostExecute history result = " + result);
@@ -479,13 +400,10 @@ public class CcnLiteAndroid extends AppCompatActivity
 
     String parsePredictionData(String result) {
         String[] eachLineArray = result.split("\n");
-       // ArrayList<String> predictionData = new ArrayList<String>();
         for(int i=1; i < eachLineArray.length-1; i++){
             String[] columns = eachLineArray[i].split("\\s+");
             String time = columns[1];
             String[] HHMMArray = time.split(":");
-          //  predictionData.add(HHMMArray[0]+HHMMArray[1]);
-            //values.add(columns[2]);
         }
         predictionData = result;
         return predictionData;
@@ -510,19 +428,9 @@ public class CcnLiteAndroid extends AppCompatActivity
             Log.v(TAG, "Refresh finished");
             if (--runningTasks == 0) {
                 areaManager.updateSmileyValues();
-//                areaManager.sortAreas();
-//                adapter.resetExpandedPosition();
                 adapter.notifyDataSetChanged();
                 swipeContainer.setRefreshing(false);
             }
-        }
-
-        int getRunningTasks() {
-            return runningTasks;
-        }
-
-        void setRunningTasks(int runningTasks) {
-            this.runningTasks = runningTasks;
         }
     }
 
@@ -654,10 +562,10 @@ public class CcnLiteAndroid extends AppCompatActivity
 
     }
 
-    public void launchHistoryActivity(View v) {
-        Intent intent = new Intent(this, ChartTabsActivity_main.class);
-        startActivity(intent);
-    }
+//    public void launchHistoryActivity(View v) {
+//        Intent intent = new Intent(this, ChartTabsActivity_main.class);
+//        startActivity(intent);
+//    }
 }
 
 

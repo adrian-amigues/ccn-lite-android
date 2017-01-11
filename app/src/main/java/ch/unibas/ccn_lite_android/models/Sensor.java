@@ -14,9 +14,7 @@ import ch.unibas.ccn_lite_android.helpers.Helper;
 
 @SuppressWarnings("serial")
 public class Sensor implements Serializable{
-//    private String id;
     private String uri;
-//    private Calendar initialTime;
     private long initialTime;
     private int initialSeqno;
     private int looptime;
@@ -28,10 +26,7 @@ public class Sensor implements Serializable{
     private final String humidityUnit = " %";
     private boolean available;
 
-//    public Sensor(String id, String uri, Calendar initialTime, int seqno, int looptime) {
-//    public Sensor(String uri, Calendar initialTime, int seqno, int looptime) {
     public Sensor(String uri, long initialTime, int seqno, int looptime) {
-//        this.id = id;
         this.uri = uri;
         this.initialTime = initialTime;
         this.initialSeqno = seqno;
@@ -42,14 +37,6 @@ public class Sensor implements Serializable{
         this.available = true;
     }
 
-//    public String getId() {
-//        return id;
-//    }
-//
-//    public void setId(String id) {
-//        this.id = id;
-//    }
-
     public String getBaseUri() {
         return uri;
     }
@@ -59,7 +46,6 @@ public class Sensor implements Serializable{
     }
 
     public String getUriWithSeqno() {
-//        return uri + "/" + getCurrentSeqno();
         long nowTime = Calendar.getInstance().getTimeInMillis() / 1000;
         return uri + "/" + Helper.getSeqno(initialTime, nowTime, looptime, initialSeqno);
     }
@@ -129,13 +115,4 @@ public class Sensor implements Serializable{
         this.temperature = sr.getTemperature();
         this.humidity = sr.getHumidity();
     }
-
-//    public int getCurrentSeqno() {
-//        Calendar dateNow = Calendar.getInstance();
-//        long nowTime = dateNow.getTimeInMillis() / 1000;
-//        long initialTime = this.initialTime;
-//        long diffTime = nowTime - initialTime;
-//        Double diffSeqno = Math.floor(diffTime / looptime);
-//        return initialSeqno + diffSeqno.intValue() - 1;
-//    }
 }
