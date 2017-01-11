@@ -229,7 +229,7 @@ public class Prediction {
         lineDataSetFuture.setDrawFilled(true);
 
         dataSets = new ArrayList<>();
-        //adds both old and predicted data to the dataset
+        //adds both old and predicted data to the datasett
         dataSets.add(lineDataSetPast);
         dataSets.add(lineDataSetFuture);
         //dataSets.add(barDataSet2);
