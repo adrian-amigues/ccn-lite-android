@@ -135,7 +135,11 @@ public class AreasAdapter extends RecyclerView.Adapter<AreasAdapter.AreaViewHold
         final Area area = areaManager.getAreas().get(position);
         holder.areaName.setText(area.getName());
         holder.areaPhoto.setImageResource(area.getPhotoId());
-        holder.areaPhoto.setImageBitmap(area.getBitmap());
+        if (area.getPhotoId() != -1) {
+            holder.areaPhoto.setImageResource(area.getPhotoId());
+        } else {
+            holder.areaPhoto.setImageBitmap(area.getBitmap());
+        }
         holder.areaSmiley.setImageResource(getSmiley(area.getSmileyValue()));
 
         final boolean isExpanded = position == mExpandedPosition;
@@ -152,7 +156,7 @@ public class AreasAdapter extends RecyclerView.Adapter<AreasAdapter.AreaViewHold
                     expandedChart = holder.predictionChart;
                     ((CcnLiteAndroid) context).refreshPrediction(area);
                     ((CcnLiteAndroid) context).refreshHistory(area);
-//                    prediction.makepredictionGraph(predictionChart);
+//                    prediction.makepredictionGraph(holder.predictionChart);
 
                 }
 //                mExpandedPosition = isExpanded ? -1 : holder.getAdapterPosition();

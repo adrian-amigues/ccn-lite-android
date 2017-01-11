@@ -80,10 +80,15 @@ public class HistorySearch extends AppCompatActivity {
 
             }
         });*/
-//        displayFakeData();
+        displayFakeData();
     }
 
     private void displayFakeData() {
+        LinearLayout reading_list_layout = (LinearLayout) findViewById(R.id.reading_list);
+        TextView v = new TextView(context);
+        v.setText("Result for Tue Jan 10 10:40:58 CET 2017:");
+        v.setTextColor(Color.BLACK);
+        reading_list_layout.addView(v);
         Sensor s = new Sensor("fakeHistory", 11111111, 24, 10);
         try {
             SensorReading sr = new SensorReading("32-10-240.3-23.2-22", s);

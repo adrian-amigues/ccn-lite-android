@@ -176,17 +176,28 @@ public class CcnLiteAndroid extends AppCompatActivity
      * Initializes the areas array with data
      */
     private void initializeData() {
-//        Area a = new Area("FooBar Origins");
-//        Sensor s = new Sensor("/p/4b4b6683/foobar/opt", Calendar.getInstance().getTimeInMillis() / 1000, 1, 5);
-//        s.setLight("260");
-//        s.setTemperature("19.6");
-//        s.setHumidity("20");
-//        a.addSensor(s);
-//        a.setPhotoId(R.drawable.foobar);
-//        areaManager.addArea(a);
-//
-//        areaManager.setAreaImages(dbTable);
-//        adapter.notifyDataSetChanged();
+        Area a = new Area("FooBar");
+        Sensor s = new Sensor("/p/foobar/4ba86083/348", Calendar.getInstance().getTimeInMillis() / 1000, 1, 5);
+        s.setLight("50");
+        s.setTemperature("19.6");
+        s.setHumidity("22");
+        a.addSensor(s);
+        a.setPhotoId(R.drawable.foobar);
+        a.setSmileyValue("0");
+        areaManager.addArea(a);
+
+        a = new Area("Uthgård");
+        a.setPhotoId(R.drawable.uthgard);
+        a.setSmileyValue("15");
+        areaManager.addArea(a);
+
+        a = new Area("Rullan");
+        a.setPhotoId(R.drawable.rullan);
+        a.setSmileyValue("45");
+        areaManager.addArea(a);
+
+        areaManager.setAreaImages(dbTable);
+        adapter.notifyDataSetChanged();
     }
 
     /**
@@ -194,20 +205,20 @@ public class CcnLiteAndroid extends AppCompatActivity
      * @param swipe the swipe layout
      */
     private void initializeSwipeRefresh(SwipeRefreshLayout swipe) {
-        swipe.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-//                if (useAutoRefresh) {
-//                    stopAutoRefresh();
-//                    startAutoRefresh();
-//                }
-                refresh();
-            }
-        });
-        swipe.setColorSchemeResources(android.R.color.holo_blue_bright,
-                android.R.color.holo_green_light,
-                android.R.color.holo_orange_light,
-                android.R.color.holo_red_light);
+//        swipe.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+//            @Override
+//            public void onRefresh() {
+////                if (useAutoRefresh) {
+////                    stopAutoRefresh();
+////                    startAutoRefresh();
+////                }
+//                refresh();
+//            }
+//        });
+//        swipe.setColorSchemeResources(android.R.color.holo_blue_bright,
+//                android.R.color.holo_green_light,
+//                android.R.color.holo_orange_light,
+//                android.R.color.holo_red_light);
     }
 
 //    /**
@@ -287,38 +298,39 @@ public class CcnLiteAndroid extends AppCompatActivity
      */
     private void refreshSds() {
 //        stopAutoRefresh();
-        String port = getString(R.string.sds_port);
-        String targetIp = useServiceRelay ? getString(R.string.localIp) : externalIp;
-        String uri = getString(R.string.sds_uri);
-
-        Log.d(TAG, "refreshSds called");
-        startSwipeAnimation();
-        if (useParallelTaskExecution && Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-            new AndroidPeekTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR
-                    , AndroidPeekTask.SDS_TASK, targetIp, port, uri);
-        } else {
-            new AndroidPeekTask().execute(AndroidPeekTask.SDS_TASK, targetIp, port, uri);
-        }
+//        String port = getString(R.string.sds_port);
+//        String targetIp = useServiceRelay ? getString(R.string.localIp) : externalIp;
+//        String uri = getString(R.string.sds_uri);
+//
+//        Log.d(TAG, "refreshSds called");
+//        startSwipeAnimation();
+//        if (useParallelTaskExecution && Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+//            new AndroidPeekTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR
+//                    , AndroidPeekTask.SDS_TASK, targetIp, port, uri);
+//        } else {
+//            new AndroidPeekTask().execute(AndroidPeekTask.SDS_TASK, targetIp, port, uri);
+//        }
+        swipeContainer.setRefreshing(false);
     }
 
     /**
      * Retreives the prediction data
      */
     public void refreshPrediction(Area area) {
-        String port = getString(R.string.port);
-        String targetIp = useServiceRelay ? getString(R.string.localIp) : externalIp;
-//        String targetIp = getString(R.string.databasse_ip);
-//        String uri = getString(R.string.named_function_base) + area.getNamedFunctions().get("prediction") + "/" + area.getName();
-        String uri = getString(R.string.prediction_base) + "/" + area.getName();
-
-        Log.d(TAG, "refresh predictions called");
-        startSwipeAnimation();
-        if (useParallelTaskExecution && Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-            new AndroidPeekTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR
-                    , AndroidPeekTask.PREDICTION_TASK, targetIp, port, uri);
-        } else {
-            new AndroidPeekTask().execute(AndroidPeekTask.PREDICTION_TASK, targetIp, port, uri);
-        }
+//        String port = getString(R.string.port);
+//        String targetIp = useServiceRelay ? getString(R.string.localIp) : externalIp;
+////        String targetIp = getString(R.string.databasse_ip);
+////        String uri = getString(R.string.named_function_base) + area.getNamedFunctions().get("prediction") + "/" + area.getName();
+//        String uri = getString(R.string.prediction_base) + "/" + area.getName();
+//
+//        Log.d(TAG, "refresh predictions called");
+//        startSwipeAnimation();
+//        if (useParallelTaskExecution && Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+//            new AndroidPeekTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR
+//                    , AndroidPeekTask.PREDICTION_TASK, targetIp, port, uri);
+//        } else {
+//            new AndroidPeekTask().execute(AndroidPeekTask.PREDICTION_TASK, targetIp, port, uri);
+//        }
     }
 
     /**
@@ -329,7 +341,8 @@ public class CcnLiteAndroid extends AppCompatActivity
         String targetIp = useServiceRelay ? getString(R.string.localIp) : externalIp;
 //        String targetIp = getString(R.string.databasse_ip);
 //        String uri = getString(R.string.named_function_base) + area.getNamedFunctions().get("historical") + "/" + area.getName();
-        String uri = getString(R.string.history_base) + "/" + area.getName();
+//        String uri = getString(R.string.history_base) + "/" + area.getName();
+        String uri = getString(R.string.history_base) + "/";
 
         Log.d(TAG, "refresh history called");
         startSwipeAnimation();
@@ -399,12 +412,13 @@ public class CcnLiteAndroid extends AppCompatActivity
             String ipString = params[1];
             int portInt = Integer.parseInt(params[2]);
             String contentString = params[3];
-            if (params.length == 6 && params[4] != null && params[5] != null) {
-                areaPos = Integer.parseInt(params[4]);
-                sensorPos = Integer.parseInt(params[5]);
-            }
-            Log.i(TAG, contentString+" ("+ccnSuite+") sent to "+ipString+" on port "+portInt);
-            return androidPeek(ccnSuite, ipString, portInt, contentString);
+//            if (params.length == 6 && params[4] != null && params[5] != null) {
+//                areaPos = Integer.parseInt(params[4]);
+//                sensorPos = Integer.parseInt(params[5]);
+//            }
+//            Log.i(TAG, contentString+" ("+ccnSuite+") sent to "+ipString+" on port "+portInt);
+            return "";
+//            return androidPeek(ccnSuite, ipString, portInt, contentString);
         }
 
         /**
@@ -431,12 +445,12 @@ public class CcnLiteAndroid extends AppCompatActivity
 //                    swipeContainer.setRefreshing(false);
                     break;
                 case HISTORY_TASK:
-                    Log.i(TAG, "onPostExecute history result = " + result);
-                    String historicalData = parseHistoricalData(result);
-                    if (!predictionData.equals("")) {
-                        Prediction p = new Prediction(predictionData, historicalData);
+//                    Log.i(TAG, "onPostExecute history result = " + result);
+//                    String historicalData = parseHistoricalData(result);
+//                    if (!predictionData.equals("")) {
+                        Prediction p = new Prediction(predictionData, "");
                         adapter.updatePredictionGraph(p);
-                    }
+//                    }
                     swipeContainer.setRefreshing(false);
                     break;
                 case REFRESH_TASK:

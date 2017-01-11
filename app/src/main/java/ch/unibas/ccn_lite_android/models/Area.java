@@ -28,6 +28,7 @@ public class Area {
         this.sensors = new ArrayList<>();
         this.smileyValue = "";
         this.namedFunctions = new HashMap<>();
+        this.photoId = -1;
     }
 
     public String getName() {
