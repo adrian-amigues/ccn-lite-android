@@ -49,8 +49,6 @@ public class HistorySearch extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 new SingleDateAndTimePickerDialogCustom.Builder(context)
-                        //.bottomSheet()
-                        //.curved()
                         .title("Pick a Date")
                         .listener(new SingleDateAndTimePickerDialogCustom.Listener() {
                             @Override
@@ -70,32 +68,20 @@ public class HistorySearch extends AppCompatActivity {
                         }).display();
             }
         });
-
-
-
-       /* Button dateButton = (Button) findViewById(R.id.select_date_button);
-        dateButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-            }
-        });*/
-//        displayFakeData();
     }
 
-    private void displayFakeData() {
-        Sensor s = new Sensor("fakeHistory", 11111111, 24, 10);
-        try {
-            SensorReading sr = new SensorReading("32-10-240.3-23.2-22", s);
-            updateShownReading(sr);
-        } catch(Exception e) {}
-    }
+//    private void displayFakeData() {
+//        Sensor s = new Sensor("fakeHistory", 11111111, 24, 10);
+//        try {
+//            SensorReading sr = new SensorReading("32-10-240.3-23.2-22", s);
+//            updateShownReading(sr);
+//        } catch(Exception e) {}
+//    }
 
     private void requestHistoricalData(Calendar cal) {
         long time = cal.getTimeInMillis() / 1000;
         String uri = sensor.getUri() + "/" + Helper.getSeqno(sensor.getInitialTime(), time,
                 sensor.getLooptime(), sensor.getInitialSeqno());
-//        String uri = sensor.getUri() + "/" + 1;
         new PeekHistoryTask().execute(uri);
     }
 
@@ -114,7 +100,6 @@ public class HistorySearch extends AppCompatActivity {
             TextView temperature = (TextView)readingsList.findViewById(R.id.card_item_sensor_temperature);
             TextView humidity = (TextView)readingsList.findViewById(R.id.card_item_sensor_humidity);
 
-            //LinearLayout ly = (LinearLayout) inflater.inflate(R.layout.card_item, null);
             TextView historyLink = (TextView)readingsList.findViewById(R.id.history_link);
             sensorName.setText(sensor.getUriWithSeqno());
             light.setText(sensor.printLight());

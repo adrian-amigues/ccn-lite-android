@@ -23,9 +23,6 @@ public class SensorReading {
         try {
             String[] parts = content.split("-");
             this.seqNo = parts[0];
-           /* int s = Integer.getInteger(seqNo);
-            s--;
-            this.seqNo= String.valueOf(s);*/
             this.interval = parts[1];
             this.light = parts[2];
             this.temperature = parts[3];
@@ -39,18 +36,6 @@ public class SensorReading {
     public static boolean isSensorReading(String content) {
         return (content.split("-").length == 5);
     }
-
-//    @Override
-//    public boolean equals(Object object)
-//    {
-//        boolean same = false;
-//        if (object != null && object instanceof SensorReading)
-//        {
-//            same = this.id.equals(((SensorReading) object).getId());
-//        }
-//        return same;
-//        return false;
-//    }
 
     public void updateSensorValues() {
         sensor.updateValues(this);

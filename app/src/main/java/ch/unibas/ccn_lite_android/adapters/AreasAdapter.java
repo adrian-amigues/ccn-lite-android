@@ -74,11 +74,9 @@ public class AreasAdapter extends RecyclerView.Adapter<AreasAdapter.AreaViewHold
         TextView areaName;
         ImageView areaPhoto;
         ImageView areaSmiley;
-        ImageView predictionGraph;
         Boolean isExpanded;
         LinearLayout expandedPart;
         LinearLayout sensorList;
-        TextView pastChart;
         LineChart predictionChart;
 
 
@@ -88,13 +86,10 @@ public class AreasAdapter extends RecyclerView.Adapter<AreasAdapter.AreaViewHold
             areaName = (TextView)itemView.findViewById(R.id.area_name);
             areaPhoto = (ImageView)itemView.findViewById(R.id.area_photo);
             areaSmiley = (ImageView)itemView.findViewById(R.id.area_smiley);
-//            predictionGraph = (ImageView)itemView.findViewById(R.id.prediction_graph);
             expandedPart = (LinearLayout)itemView.findViewById(R.id.expanded_part);
             sensorList = (LinearLayout)itemView.findViewById(R.id.sensor_list);
-//            pastChart = (TextView)itemView.findViewById(R.id.past_chart_link);
             isExpanded = false;
             predictionChart = (LineChart) itemView.findViewById(R.id.predictionChart);
-//            pastChart.setOnClickListener(this);
             areaPhoto.setOnClickListener(new View.OnClickListener(){
                 public void onClick(View v) {
                     int position = getAdapterPosition();
@@ -108,14 +103,6 @@ public class AreasAdapter extends RecyclerView.Adapter<AreasAdapter.AreaViewHold
                 }
             });
         }
-
-//        @Override
-//        public void onClick(View v) {
-////            ((CcnLiteAndroid) context).launchHistoryActivity(v);
-////            Intent intent = new Intent(context, ChartTabsActivity_main.class);
-//            Intent intent = new Intent(context, HistorySearch.class);
-//            context.startActivity(intent);
-//        }
     }
 
     @Override
@@ -152,10 +139,7 @@ public class AreasAdapter extends RecyclerView.Adapter<AreasAdapter.AreaViewHold
                     expandedChart = holder.predictionChart;
                     ((CcnLiteAndroid) context).refreshPrediction(area);
                     ((CcnLiteAndroid) context).refreshHistory(area);
-//                    prediction.makepredictionGraph(predictionChart);
-
                 }
-//                mExpandedPosition = isExpanded ? -1 : holder.getAdapterPosition();
                 TransitionManager.beginDelayedTransition(rv);
                 notifyDataSetChanged();
             }
@@ -206,20 +190,9 @@ public class AreasAdapter extends RecyclerView.Adapter<AreasAdapter.AreaViewHold
         return areaManager.getAreas().size();
     }
 
-//    public String getURI(int i) {
-//        Area area = areaManager.getAreas().get(i);
-//        if (area.isDeprecatedArea()) {
-//            return area.getUriWithSeqno();
-//        } else {
-//            return area.getSensor(0).getUriWithSeqno(); //TODO: update to not only get the first URI
-//        }
-//    }
-
     public void updateValue(int areaPos, int sensorPos, String newValue) {
         Area area= areaManager.getAreas().get(areaPos);
         Sensor sensor = area.getSensor(sensorPos);
-//        area.setDescription(newValue);
-//        area.setSmileyValue(newValue);
         sensor.setAvailable(false);
     }
 
@@ -231,8 +204,6 @@ public class AreasAdapter extends RecyclerView.Adapter<AreasAdapter.AreaViewHold
         sensor.updateValues(sr);
         float smileyValue = Float.parseFloat(sr.getLight()) / 4;
         area.setSmileyValue(Float.toString(smileyValue));
-//        area.setDescription(Float.toString(smileyValue)); //TODO: Deprecated
-//        area.setSmileyValue(Float.toString(smileyValue));
         sr.updateSensorValues();
     }
 
@@ -261,10 +232,10 @@ public class AreasAdapter extends RecyclerView.Adapter<AreasAdapter.AreaViewHold
         }
     }
 
-    public void resetExpandedPosition() {
-        mExpandedPosition = -1;
-        expandedChart = null;
-    }
+//    public void resetExpandedPosition() {
+//        mExpandedPosition = -1;
+//        expandedChart = null;
+//    }
 
     //Opens an alertDialog that enable users to choose any image or delete an available image in a specific area specified with "position"
     private void selectImage(final int position) {
@@ -303,7 +274,6 @@ public class AreasAdapter extends RecyclerView.Adapter<AreasAdapter.AreaViewHold
     public void galleryIntent(){
         Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         intent.setType("image/*");
-        //intent.setAction(Intent.ACTION_GET_CONTENT);//
         ((Activity) context).startActivityForResult(Intent.createChooser(intent, "Select File"),2);
     }
 

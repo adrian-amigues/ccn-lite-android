@@ -20,14 +20,11 @@ public class Area {
 
     private int photoId;
     private Bitmap bitmap;
-    private boolean selectedPhoto;
-    private Map<String, String> namedFunctions;
 
     public Area(String name) {
         this.name = name;
         this.sensors = new ArrayList<>();
         this.smileyValue = "";
-        this.namedFunctions = new HashMap<>();
     }
 
     public String getName() {
@@ -40,10 +37,6 @@ public class Area {
 
     public int getPhotoId() {
         return photoId;
-    }
-
-    public void setPhotoId(int photoId) {
-        this.photoId = photoId;
     }
 
     public String getSmileyValue() {
@@ -62,24 +55,12 @@ public class Area {
         this.bitmap = bitmap;
     }
 
-    public Map<String, String> getNamedFunctions() {
-        return namedFunctions;
-    }
-
     public List<Sensor> getSensors() {
         return sensors;
     }
 
-    public void setSensors(List<Sensor> sensors) {
-        this.sensors = sensors;
-    }
-
     public Sensor getSensor(int i) {
         return sensors.get(i);
-    }
-
-    public void emptySensors() {
-        sensors = new ArrayList<>();
     }
 
     public void addSensor(Sensor s) {

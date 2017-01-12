@@ -52,11 +52,6 @@ public class AreaManager {
                     areas.add(area);
                 }
 
-                //JSONArray jsonNamedFunctions = areaObject.getJSONArray("nfn");
-                //area.getNamedFunctions().put("prediction", jsonNamedFunctions.getString(0));
-                //area.getNamedFunctions().put("historical", jsonNamedFunctions.getString(1));
-//                area.getNamedFunctions().put("historical", "/historical");
-
                 String uri = areaObject.getString("pf");
                 Double timeDouble = Double.parseDouble(areaObject.getString("bt"));
                 long sensorInitialDate = timeDouble.intValue();
@@ -81,38 +76,18 @@ public class AreaManager {
         return areas;
     }
 
-    public void setAreas(List<Area> areas) {
-        this.areas = areas;
-    }
-
-    public void addArea(Area area) {
-        areas.add(area);
-    }
-
-    public void emptyAreas() {
-        areas = new ArrayList<>();
-    }
-
-    public int getNumberAreas() {
-        return areas.size();
-    }
-
-    public void sortAreas() {
-        Collections.sort(areas, new AreaComparator());
-    }
-
-    private class AreaComparator implements Comparator<Area> {
-        @Override
-        public int compare(Area a1, Area a2) {
-            try {
-                int value1 = Integer.parseInt(a1.getSmileyValue());
-                int value2 = Integer.parseInt(a2.getSmileyValue());
-                return value1 - value2;
-            } catch (Exception e) {
-                return a1.getSmileyValue().compareTo(a2.getSmileyValue());
-            }
-        }
-    }
+//    private class AreaComparator implements Comparator<Area> {
+//        @Override
+//        public int compare(Area a1, Area a2) {
+//            try {
+//                int value1 = Integer.parseInt(a1.getSmileyValue());
+//                int value2 = Integer.parseInt(a2.getSmileyValue());
+//                return value1 - value2;
+//            } catch (Exception e) {
+//                return a1.getSmileyValue().compareTo(a2.getSmileyValue());
+//            }
+//        }
+//    }
 
     public int getTotalUris() {
         int count = 0;
@@ -128,16 +103,6 @@ public class AreaManager {
             Area a = areas.get(i);
             a.updateSmileyValue();
         }
-    }
-
-    public boolean areaIsPresent(String areaName) {
-        for (int i = 0; i < areas.size(); i++) {
-            Area a = areas.get(i);
-            if (a.getName().equals(areaName)) {
-                return true;
-            }
-        }
-        return false;
     }
 
     public Area getAreaByName(String areaName) {
@@ -164,8 +129,6 @@ public class AreaManager {
             String s = a.getName();
             a.setBitmap(icon);
 
-//            areas.add(new Area(s, "Mote 1", R.drawable.foobar, "/demo/mote1/", icon));
-
             String Name = "";
             if (c != null) {
                 c.moveToFirst();
@@ -183,7 +146,6 @@ public class AreaManager {
                         }
                         if (bitmap != null) {
                             a.setBitmap(bitmap);
-//                            areas.set(areas.size()-1, new Area(s, "Mote 1", R.drawable.foobar, "/demo/mote1/", bitmap));
                         }
                         break;
                     }
