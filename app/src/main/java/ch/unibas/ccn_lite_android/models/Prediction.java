@@ -186,9 +186,15 @@ public class Prediction {
 
         //an arrayList of predicted data
         ArrayList<Entry> valueSetFuture = new ArrayList<>();
+        Entry v;
+        if(historicalYValue.length > 0){
+            v = new Entry(counter, historicalYValue[historicalYValue.length-1]);
+            counter++;
+            valueSetFuture.add(v);
+        }
         if(predictionYValue != null) {
-            for (int i = 0; i < predictionYValue.length; i++) {
-                Entry v = new Entry(counter, predictionYValue[i]);
+            for (int i = 1; i < predictionYValue.length; i++) {
+                v = new Entry(counter, predictionYValue[i]);
                 counter++;
                 valueSetFuture.add(v);
             }
@@ -209,8 +215,8 @@ public class Prediction {
         Entry v1e16 = new Entry(16.00f, 3);
         valueSetFuture.add(v1e16);*/
 
-        LineDataSet lineDataSetPast = new LineDataSet(valueSetPast, "Brand 1");
-        LineDataSet lineDataSetFuture = new LineDataSet(valueSetFuture, "Brand 2");
+        LineDataSet lineDataSetPast = new LineDataSet(valueSetPast, "Historical Data");
+        LineDataSet lineDataSetFuture = new LineDataSet(valueSetFuture, "Prediction Data");
 
         //Configures the line drawn for the old data
         lineDataSetPast.setColor(Color.BLUE);
@@ -223,7 +229,7 @@ public class Prediction {
         lineDataSetFuture.setDrawFilled(true);
 
         dataSets = new ArrayList<>();
-        //adds both old and predicted data to the dataset
+        //adds both old and predicted data to the datasett
         dataSets.add(lineDataSetPast);
         dataSets.add(lineDataSetFuture);
         //dataSets.add(barDataSet2);
@@ -240,9 +246,9 @@ public class Prediction {
         chartTest.setData(data);
 
         //Configures the description of the chart
-       /* String description = "Prediction Chart";
+        String description = "";
         chartTest.setDescription(description);
-        chartTest.setDescriptionPosition(handler.contentLeft() + 2*handler.offsetLeft() + 2*description.length(), handler.contentTop());
+       /* chartTest.setDescriptionPosition(handler.contentLeft() + 2*handler.offsetLeft() + 2*description.length(), handler.contentTop());
         chartTest.setDescriptionTextSize(14f);*/
 
         //chartTest.setFitBars(true);
@@ -266,10 +272,11 @@ public class Prediction {
         xAxis.setGranularity(1f);// minimum axis-step (interval) is 1
         xAxis.setAxisMinValue(0);
         // the labels that should be drawn on the XAxis
-        final String[] quarters = new String[historicalTimeValue.size()+predictionTimeValue.size()+1];
+        final String[] quarters = new String[historicalTimeValue.size()+predictionTimeValue.size()+1+1];
         quarters[0] = "";
         for(int a=1;a<=historicalTimeValue.size();a++)
             quarters[a]=historicalTimeValue.get(a-1);
+
         for(int a = 0;a<predictionTimeValue.size();a++)
             quarters[a+historicalTimeValue.size()+1] = predictionTimeValue.get(a);
        // { "9.00", "10.00", "11.00", "12.00", "13.00", "14.00", "15.00", "16.00", "17.00", "18.00", "19.00", "20.00", "21.00", "22.00", "23.00", "00.00", "00.01" };
