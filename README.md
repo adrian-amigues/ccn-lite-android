@@ -2,7 +2,10 @@
 
 ccn-lite-android is a student project application that uses ccn-lite as a primary networking protocol.
 The application is not made to work with anything else than the rest of the project that are in separated repositories.
-TODO: list repos
+
+Images of the application:
+
+<img src="https://github.com/Aranor28/ccn-lite-android/blob/master/img/ccn-app1.png" height="550px" /> <img src="https://github.com/Aranor28/ccn-lite-android/blob/master/img/ccn-app2.png" height="550px" />
 
 ## Installation
 
